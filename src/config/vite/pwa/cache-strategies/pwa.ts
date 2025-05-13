@@ -12,7 +12,7 @@ export const getPWACacheStrategies = () => {
         cacheName: CACHE_NAMES.pwa,
         expiration: {
           maxEntries: 1,
-          maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
+          maxAgeSeconds: 60 * 60 * 24, // 1 day (reduced from 7 days)
         },
         cacheableResponse: {
           statuses: [0, 200],
@@ -27,7 +27,7 @@ export const getPWACacheStrategies = () => {
         cacheName: CACHE_NAMES.pwa,
         expiration: {
           maxEntries: 1,
-          maxAgeSeconds: 60 * 60 * 24, // 1 day
+          maxAgeSeconds: 60 * 60, // 1 hour (reduced from 1 day)
         },
         cacheableResponse: {
           statuses: [0, 200],
