@@ -10,5 +10,6 @@ export const CACHE_NAMES = {
   api: 'api-cache-v1',
   pwa: 'pwa-assets-v1',
   workbox: 'workbox-runtime-v1',
-  fallback: 'fallback-cache-v1'
+  fallback: 'fallback-cache-v1',
+  supabase: 'supabase-api-v1' // Add specific cache for Supabase API responses
 };
