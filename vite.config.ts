@@ -9,7 +9,8 @@ import { configureServer } from "./src/config/vite/server";
 import { configureDevelopment } from "./src/config/vite/development";
 // Import PostCSS plugins statically
 import autoprefixer from 'autoprefixer';
-import purgecss from '@fullhuman/postcss-purgecss';
+// Fix the purgecss import to use the default export
+import purgecssPlugin from '@fullhuman/postcss-purgecss';
 import cssnano from 'cssnano';
 
 // https://vitejs.dev/config/
@@ -23,9 +24,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   if (isProd) {
     postcssPlugins.push(
       autoprefixer,
-      purgecss({
+      purgecssPlugin({
         content: ['./src/**/*.{ts,tsx}', './index.html'],
-        defaultExtractor: (content: string) => content.match(/[\w-/:]+(?<!:)/g) || [],
+        defaultExtractor: (content) => content.match(/[\w-/:]+(?<!:)/g) || [],
         safelist: {
           standard: [/^animate-/, /^bg-/, /^text-/, /^shadow-/, /^hover:/, /will-change-/],
           deep: [/blue-glow/, /yellow/, /royal-blue/, /teal/]
