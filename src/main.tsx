@@ -1,12 +1,12 @@
 
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
+// Don't import CSS here, it's now loaded in the HTML
 import { registerSW } from 'virtual:pwa-register'
-import { getAllCacheNames } from './config/vite/pwa/cache-names.ts' 
 
 // Use VitePWA's registration function with more robust options
 if ('serviceWorker' in navigator) {
-  const updateSW = registerSW({
+  registerSW({
     immediate: true, // Register immediately to ensure assets are cached faster
     onNeedRefresh() {
       console.log('New content available, refresh needed')
@@ -22,73 +22,26 @@ if ('serviceWorker' in navigator) {
       
       const refreshButton = refreshUI.querySelector('button');
       refreshButton?.addEventListener('click', () => {
-        // Update service worker and reload page
-        updateSW().then(() => {
-          window.location.reload();
-        });
+        window.location.reload();
       });
     },
     onOfflineReady() {
       console.log('App ready to work offline')
-      // Show offline ready notification
-      const offlineToast = document.createElement('div');
-      offlineToast.className = 'fixed bottom-4 left-4 bg-green-600 text-white px-4 py-2 rounded-md shadow-lg flex items-center space-x-2 z-50';
-      offlineToast.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wifi"><path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 20 0"/><line x1="12" x2="12.01" y1="20" y2="20"/></svg>
-        <span>App ready for offline use</span>
-      `;
-      document.body.appendChild(offlineToast);
-      
-      // Remove notification after 3 seconds
-      setTimeout(() => {
-        offlineToast.remove();
-      }, 3000);
     },
     onRegistered(r) {
       console.log('Service worker has been registered successfully')
       
-      // Periodically check for updates (every 30 minutes instead of hourly)
+      // Periodically check for updates (every hour)
       if (r) {
         setInterval(() => {
-          console.log('Checking for service worker updates...');
           r.update().catch(console.error)
-        }, 30 * 60 * 1000) // 30 minutes
+        }, 60 * 60 * 1000)
       }
-
-      // Clean up old caches if we have a new version
-      if (r && 'navigationPreload' in r) {
-        r.navigationPreload.enable();
-      }
-
-      // Add a cache clearing mechanism
-      window.clearCaches = async () => {
-        try {
-          const cacheNames = getAllCacheNames();
-          for (const cacheName of cacheNames) {
-            await caches.delete(cacheName);
-          }
-          console.log('All caches cleared successfully');
-          return true;
-        } catch (error) {
-          console.error('Failed to clear caches:', error);
-          return false;
-        }
-      };
     },
     onRegisterError(error) {
       console.error('Service worker registration failed:', error)
     }
-  });
-
-  // Also handle updates when app visibility changes
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      // Wait until the app is fully visible and stable
-      setTimeout(() => {
-        updateSW().catch(console.error);
-      }, 1000);
-    }
-  });
+  })
 }
 
 // Use requestIdleCallback for non-critical initialization

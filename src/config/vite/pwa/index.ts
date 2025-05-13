@@ -15,57 +15,14 @@ export const configurePWA = () => {
       ...getCacheStrategy(),
       // Fix the glob pattern issue by modifying the globDirectory
       globDirectory: 'dist',
-      globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,gif,wasm}'],
-      // Enable navigation preload for faster navigations
-      navigationPreload: true,
-      // Only precache essential assets
-      maximumFileSizeToCacheInBytes: 2 * 1024 * 1024, // 2MB max file size
-      // Cleanup old caches
-      cleanupOutdatedCaches: true,
-      // Custom cache keys
-      cacheId: 'team-qab-v2',
-      // Increase clientsClaim speed
-      clientsClaim: true,
-      // Use ImmortalCache for permanent assets
-      runtimeCaching: [
-        {
-          urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'google-fonts-cache-v2',
-            expiration: {
-              maxEntries: 30,
-              maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
-            },
-            cacheableResponse: {
-              statuses: [0, 200],
-            },
-          },
-        },
-      ],
+      globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,gif,wasm}']
     },
     manifest: getPWAManifest(timestamp),
     // Explicitly include workbox-window to resolve dependency
     injectRegister: 'auto',
     devOptions: {
       enabled: true,
-      type: 'module',
-      navigateFallback: 'index.html',
-    },
-    // Add cache headers for better control
-    headers: {
-      // Cache immutable assets for a year
-      '/*.(js|css|woff2|jpg|png|svg|gif|ico)': {
-        'Cache-Control': 'public, max-age=31536000, immutable'
-      },
-      // Cache HTML and JSON for a short time
-      '/*.(html|json)': {
-        'Cache-Control': 'public, max-age=600, stale-while-revalidate=1200'
-      }
-    },
-    // Service worker strategy options
-    strategies: 'injectManifest',
-    // Let the service worker handle page refreshes 
-    selfDestroying: false,
+      type: 'module'
+    }
   });
 };

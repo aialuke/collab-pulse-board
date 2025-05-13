@@ -7,10 +7,7 @@ export const getPWAManifest = (timestamp: number) => {
     description: 'Share and track feedback in your organization',
     theme_color: '#ffffff',
     background_color: '#ffffff',
-    display: 'standalone' as const, 
-    start_url: '/?source=pwa',
-    categories: ['productivity', 'business'],
-    orientation: 'portrait-primary',
+    display: 'standalone' as const, // Ensure this is typed correctly for the PWA plugin
     icons: [
       {
         src: `/pwa-192x192.png?v=${timestamp}`,
@@ -29,27 +26,5 @@ export const getPWAManifest = (timestamp: number) => {
         purpose: 'maskable',
       },
     ],
-    // Capture installation metrics
-    related_applications: [],
-    prefer_related_applications: false,
-    shortcuts: [
-      {
-        name: "Create Feedback",
-        short_name: "Create",
-        description: "Create new feedback",
-        url: "/create?source=pwa",
-        icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
-      }
-    ],
-    // Share target for web share target API
-    share_target: {
-      action: "/create",
-      method: "GET",
-      params: {
-        title: "title",
-        text: "content",
-        url: "link_url"
-      }
-    }
   };
 };

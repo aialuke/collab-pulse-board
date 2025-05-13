@@ -22,7 +22,6 @@ export async function fetchProfiles(userIds: string[]): Promise<Record<string, P
     // If no user IDs, return empty result
     if (!userIds.length) return {};
 
-    // Cache profiles for longer since they change less frequently
     const { data: profilesData, error: profilesError } = await supabase
       .from('profiles')
       .select('id, name, avatar_url, role')
@@ -55,7 +54,6 @@ export async function fetchUserUpvotes(userId: string | undefined): Promise<Reco
   try {
     if (!userId) return {};
     
-    // Cache upvotes for a short time as they change frequently
     const { data: upvotes } = await supabase
       .from('upvotes')
       .select('feedback_id')

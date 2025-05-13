@@ -10,11 +10,6 @@ import { FeedbackResponse } from '@/types/supabase';
  */
 export async function fetchFeedback(filterStatus?: string): Promise<FeedbackType[]> {
   try {
-    // Add cache headers to requests when possible
-    const headers = {
-      'Cache-Control': 'max-age=300, stale-while-revalidate=600', // 5min fresh, 10min stale
-    };
-
     // 1. Build and execute query
     let query = createBaseFeedbackQuery();
 
@@ -86,15 +81,10 @@ export async function fetchFeedback(filterStatus?: string): Promise<FeedbackType
  */
 export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
   try {
-    // Use a different cache policy for individual items
-    const cacheControl = {
-      'Cache-Control': 'max-age=60, stale-while-revalidate=300', // 1min fresh, 5min stale
-    };
-    
     // 1. Fetch the specific feedback item
     const { data: feedbackData, error: feedbackError } = await createBaseFeedbackQuery()
       .eq('id', id)
-      .maybeSingle(); // Use maybeSingle instead of single for safer error handling
+      .single();
 
     if (feedbackError) {
       console.error('Error fetching feedback by id:', feedbackError);

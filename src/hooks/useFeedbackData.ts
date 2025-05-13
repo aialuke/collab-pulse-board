@@ -12,12 +12,10 @@ export function useFeedbackData() {
   const [retryCount, setRetryCount] = useState(0);
   const { toast } = useToast();
 
-  // Enhanced React Query configuration with optimal cache settings
   const { 
     data, 
     isLoading, 
-    refetch,
-    isFetching
+    refetch 
   } = useQuery({
     queryKey: ['feedback', retryCount],
     queryFn: async () => {
@@ -34,12 +32,6 @@ export function useFeedbackData() {
         throw error;
       }
     },
-    staleTime: 3 * 60 * 1000, // 3 minutes - data is considered fresh for 3 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes - keep unused data in cache for 10 minutes
-    refetchOnWindowFocus: true, // Refresh data when window gains focus
-    refetchOnMount: true, // Refresh data when component mounts
-    refetchOnReconnect: true, // Refresh when network reconnects
-    retry: 2, // Retry failed requests twice
   });
 
   useEffect(() => {
@@ -69,11 +61,8 @@ export function useFeedbackData() {
     filteredFeedback,
     setFilteredFeedback,
     isLoading,
-    isFetching, // Expose fetching state for UI refresh indicators
     loadError,
     handleRetry,
-    loadFeedback,
-    refetch, // Expose refetch function directly
-    isStale: false, // Additional helper for UI cues
+    loadFeedback
   };
 }

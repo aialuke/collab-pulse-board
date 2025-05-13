@@ -11,15 +11,11 @@ export const getFallbackCacheStrategy = () => {
       options: {
         cacheName: CACHE_NAMES.fallback,
         expiration: {
-          maxEntries: 250, // Increased from 200
-          maxAgeSeconds: 60 * 60 * 12, // 12 hours (reduced from 24 hours)
+          maxEntries: 200,
+          maxAgeSeconds: 60 * 60 * 24, // 1 day
         },
-        networkTimeoutSeconds: 5, // Timeout to fallback to cache after 5 seconds
         cacheableResponse: {
           statuses: [0, 200],
-        },
-        matchOptions: {
-          ignoreSearch: true, // Ignore query parameters for fallback
         },
       },
     },
