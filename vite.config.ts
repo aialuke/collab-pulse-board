@@ -16,6 +16,30 @@ import cssnano from 'cssnano';
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const isProd = mode === 'production';
   
+  // Create an array of PostCSS plugins based on the environment
+  const postcssPlugins = [];
+  
+  // Only add these plugins in production
+  if (isProd) {
+    postcssPlugins.push(
+      autoprefixer,
+      purgecss({
+        content: ['./src/**/*.{ts,tsx}', './index.html'],
+        defaultExtractor: (content: string) => content.match(/[\w-/:]+(?<!:)/g) || [],
+        safelist: {
+          standard: [/^animate-/, /^bg-/, /^text-/, /^shadow-/, /^hover:/, /will-change-/],
+          deep: [/blue-glow/, /yellow/, /royal-blue/, /teal/]
+        }
+      }),
+      cssnano({
+        preset: ['default', {
+          discardComments: { removeAll: true },
+          normalizeWhitespace: false,
+        }],
+      })
+    );
+  }
+  
   return {
     server: {
       ...configureServer(),
@@ -52,24 +76,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       },
       // Add PurgeCSS for production builds through postcss
       postcss: {
-        plugins: [
-          // Use imported plugins instead of dynamic requires
-          isProd && autoprefixer,
-          isProd && purgecss({
-            content: ['./src/**/*.{ts,tsx}', './index.html'],
-            defaultExtractor: (content: string) => content.match(/[\w-/:]+(?<!:)/g) || [],
-            safelist: {
-              standard: [/^animate-/, /^bg-/, /^text-/, /^shadow-/, /^hover:/, /will-change-/],
-              deep: [/blue-glow/, /yellow/, /royal-blue/, /teal/]
-            }
-          }),
-          isProd && cssnano({
-            preset: ['default', {
-              discardComments: { removeAll: true },
-              normalizeWhitespace: false,
-            }],
-          })
-        ].filter(Boolean)
+        plugins: postcssPlugins
       }
     },
     build: {
