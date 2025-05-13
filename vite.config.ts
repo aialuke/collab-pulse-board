@@ -49,21 +49,31 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       // Add PurgeCSS for production builds through postcss
       postcss: {
         plugins: [
-          require('autoprefixer'),
-          isProd && require('@fullhuman/postcss-purgecss')({
-            content: ['./src/**/*.{ts,tsx}', './index.html'],
-            defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || [],
-            safelist: {
-              standard: [/^animate-/, /^bg-/, /^text-/, /^shadow-/, /^hover:/, /will-change-/],
-              deep: [/blue-glow/, /yellow/, /royal-blue/, /teal/]
-            }
-          }),
-          isProd && require('cssnano')({
-            preset: ['default', {
-              discardComments: { removeAll: true },
-              normalizeWhitespace: false,
-            }],
-          })
+          // Using import statement instead of require
+          isProd && (() => {
+            const autoprefixer = require('autoprefixer');
+            return autoprefixer;
+          })(),
+          isProd && (() => {
+            const purgecss = require('@fullhuman/postcss-purgecss');
+            return purgecss({
+              content: ['./src/**/*.{ts,tsx}', './index.html'],
+              defaultExtractor: (content: string) => content.match(/[\w-/:]+(?<!:)/g) || [],
+              safelist: {
+                standard: [/^animate-/, /^bg-/, /^text-/, /^shadow-/, /^hover:/, /will-change-/],
+                deep: [/blue-glow/, /yellow/, /royal-blue/, /teal/]
+              }
+            });
+          })(),
+          isProd && (() => {
+            const cssnano = require('cssnano');
+            return cssnano({
+              preset: ['default', {
+                discardComments: { removeAll: true },
+                normalizeWhitespace: false,
+              }],
+            });
+          })()
         ].filter(Boolean)
       }
     },
