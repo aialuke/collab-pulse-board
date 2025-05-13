@@ -52,17 +52,7 @@ export const configurePWA = () => {
       type: 'module',
       navigateFallback: 'index.html',
     },
-    // Add cache headers for better control
-    headers: {
-      // Cache immutable assets for a year
-      '/*.(js|css|woff2|jpg|png|svg|gif|ico)': {
-        'Cache-Control': 'public, max-age=31536000, immutable'
-      },
-      // Cache HTML and JSON for a short time
-      '/*.(html|json)': {
-        'Cache-Control': 'public, max-age=600, stale-while-revalidate=1200'
-      }
-    },
+    // Remove the unsupported 'headers' property
     // Change to generateSW to fix the missing sw.js file
     strategies: 'generateSW',
     // Let the service worker handle page refreshes 
