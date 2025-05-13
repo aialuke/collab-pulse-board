@@ -23,7 +23,7 @@ if ('serviceWorker' in navigator) {
       const refreshButton = refreshUI.querySelector('button');
       refreshButton?.addEventListener('click', () => {
         // Update service worker and reload page
-        updateSW().then(() => {
+        updateSW(true).then(() => {
           window.location.reload();
         });
       });
@@ -61,7 +61,7 @@ if ('serviceWorker' in navigator) {
       }
 
       // Add a cache clearing mechanism
-      window.clearCaches = async () => {
+      window.clearCaches = async function() {
         try {
           const cacheNames = getAllCacheNames();
           for (const cacheName of cacheNames) {
@@ -85,7 +85,7 @@ if ('serviceWorker' in navigator) {
     if (document.visibilityState === 'visible') {
       // Wait until the app is fully visible and stable
       setTimeout(() => {
-        updateSW().catch(console.error);
+        updateSW(true).catch(console.error);
       }, 1000);
     }
   });

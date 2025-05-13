@@ -10,7 +10,7 @@ export const getPWAManifest = (timestamp: number) => {
     display: 'standalone' as const, 
     start_url: '/?source=pwa',
     categories: ['productivity', 'business'],
-    orientation: 'portrait-primary',
+    orientation: 'portrait-primary' as const, // Fix: Using proper type
     icons: [
       {
         src: `/pwa-192x192.png?v=${timestamp}`,

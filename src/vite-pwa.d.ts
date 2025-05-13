@@ -11,6 +11,6 @@ declare module 'virtual:pwa-register' {
   }
 
   export function registerSW(options?: RegisterSWOptions): {
-    update: () => Promise<void>;
+    update: (reloadPage?: boolean) => Promise<void>;
   };
 }
