@@ -2,6 +2,4 @@
 import { componentTagger } from "lovable-tagger";
 
 // Development-specific configuration with optimized component tagging
-export const configureDevelopment = () => componentTagger({ 
-  include: ["src/components/**/*.tsx"] // Limit tagging to component files only to reduce build time
-});
+export const configureDevelopment = () => componentTagger(); // Remove the argument as it's not supported

@@ -18,14 +18,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       react({
         // Enhanced React-SWC configuration for production optimization
         devTarget: isProd ? 'es2022' : 'es2020',
-        swcOptions: {
-          jsc: {
-            minify: isProd ? { 
-              compress: true, 
-              mangle: true 
-            } : false,
-          },
-        },
+        // Removing the swcOptions property as it doesn't exist in the Options type
       }),
       mode === 'development' && configureDevelopment(),
       configurePWA(),
