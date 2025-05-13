@@ -45,26 +45,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       // Modules configuration for CSS
       modules: {
         localsConvention: 'camelCaseOnly'
-      },
-      // Add PurgeCSS for production builds through postcss
-      postcss: {
-        plugins: [
-          require('autoprefixer'),
-          isProd && require('@fullhuman/postcss-purgecss')({
-            content: ['./src/**/*.{ts,tsx}', './index.html'],
-            defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || [],
-            safelist: {
-              standard: [/^animate-/, /^bg-/, /^text-/, /^shadow-/, /^hover:/, /will-change-/],
-              deep: [/blue-glow/, /yellow/, /royal-blue/, /teal/]
-            }
-          }),
-          isProd && require('cssnano')({
-            preset: ['default', {
-              discardComments: { removeAll: true },
-              normalizeWhitespace: false,
-            }],
-          })
-        ].filter(Boolean)
       }
     },
     build: {
