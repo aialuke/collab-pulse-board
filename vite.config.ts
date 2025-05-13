@@ -7,6 +7,10 @@ import { configureCompression } from "./src/config/vite/compression";
 import { configureBuild } from "./src/config/vite/build";
 import { configureServer } from "./src/config/vite/server";
 import { configureDevelopment } from "./src/config/vite/development";
+// Import PostCSS plugins statically
+import autoprefixer from 'autoprefixer';
+import purgecss from '@fullhuman/postcss-purgecss';
+import cssnano from 'cssnano';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
@@ -49,31 +53,22 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       // Add PurgeCSS for production builds through postcss
       postcss: {
         plugins: [
-          // Using import statement instead of require
-          isProd && (() => {
-            const autoprefixer = require('autoprefixer');
-            return autoprefixer;
-          })(),
-          isProd && (() => {
-            const purgecss = require('@fullhuman/postcss-purgecss');
-            return purgecss({
-              content: ['./src/**/*.{ts,tsx}', './index.html'],
-              defaultExtractor: (content: string) => content.match(/[\w-/:]+(?<!:)/g) || [],
-              safelist: {
-                standard: [/^animate-/, /^bg-/, /^text-/, /^shadow-/, /^hover:/, /will-change-/],
-                deep: [/blue-glow/, /yellow/, /royal-blue/, /teal/]
-              }
-            });
-          })(),
-          isProd && (() => {
-            const cssnano = require('cssnano');
-            return cssnano({
-              preset: ['default', {
-                discardComments: { removeAll: true },
-                normalizeWhitespace: false,
-              }],
-            });
-          })()
+          // Use imported plugins instead of dynamic requires
+          isProd && autoprefixer,
+          isProd && purgecss({
+            content: ['./src/**/*.{ts,tsx}', './index.html'],
+            defaultExtractor: (content: string) => content.match(/[\w-/:]+(?<!:)/g) || [],
+            safelist: {
+              standard: [/^animate-/, /^bg-/, /^text-/, /^shadow-/, /^hover:/, /will-change-/],
+              deep: [/blue-glow/, /yellow/, /royal-blue/, /teal/]
+            }
+          }),
+          isProd && cssnano({
+            preset: ['default', {
+              discardComments: { removeAll: true },
+              normalizeWhitespace: false,
+            }],
+          })
         ].filter(Boolean)
       }
     },
