@@ -5,9 +5,10 @@ export const getCacheSettings = () => {
     skipWaiting: true,
     clientsClaim: true,
     cleanupOutdatedCaches: true,
-    // Fix the glob patterns to ensure they match files correctly
+    // Fix the glob patterns with absolute paths
     globDirectory: 'dist',
     globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,gif}'],
+    // Remove duplicate entries in globIgnores
     globIgnores: ['**/node_modules/**/*', 'sw.js', 'workbox-*.js'],
   };
 };
