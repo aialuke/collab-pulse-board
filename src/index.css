@@ -1,15 +1,15 @@
 
-/* Import all CSS files first */
+/* Tailwind directives first */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import all CSS files after */
 @import "./styles/base.css";
 @import "./styles/components.css";
 @import "./styles/layout.css";
 @import "./styles/utilities.css";
 @import "./styles/compatibility.css";
-
-/* Tailwind directives after imports */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* No need for explicit mobile media queries as we're using mobile-first approach */
 /* Root element styles with max-width for desktop */
