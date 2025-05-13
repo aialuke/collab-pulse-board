@@ -7,40 +7,10 @@ import { configureCompression } from "./src/config/vite/compression";
 import { configureBuild } from "./src/config/vite/build";
 import { configureServer } from "./src/config/vite/server";
 import { configureDevelopment } from "./src/config/vite/development";
-// Import PostCSS plugins statically
-import autoprefixer from 'autoprefixer';
-// Import the purgecss module and handle both ESM and CJS import patterns
-import * as purgecssModule from '@fullhuman/postcss-purgecss';
-const purgecssPlugin = purgecssModule.default || purgecssModule;
-import cssnano from 'cssnano';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const isProd = mode === 'production';
-  
-  // Create an array of PostCSS plugins based on the environment
-  const postcssPlugins = [];
-  
-  // Only add these plugins in production
-  if (isProd) {
-    postcssPlugins.push(
-      autoprefixer,
-      purgecssPlugin({
-        content: ['./src/**/*.{ts,tsx}', './index.html'],
-        defaultExtractor: (content) => content.match(/[\w-/:]+(?<!:)/g) || [],
-        safelist: {
-          standard: [/^animate-/, /^bg-/, /^text-/, /^shadow-/, /^hover:/, /will-change-/],
-          deep: [/blue-glow/, /yellow/, /royal-blue/, /teal/]
-        }
-      }),
-      cssnano({
-        preset: ['default', {
-          discardComments: { removeAll: true },
-          normalizeWhitespace: false,
-        }],
-      })
-    );
-  }
   
   return {
     server: {
@@ -75,10 +45,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       // Modules configuration for CSS
       modules: {
         localsConvention: 'camelCaseOnly'
-      },
-      // Add PurgeCSS for production builds through postcss
-      postcss: {
-        plugins: postcssPlugins
       }
     },
     build: {
