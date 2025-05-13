@@ -6,7 +6,7 @@ import { getAllCacheNames } from './config/vite/pwa/cache-names.ts'
 
 // Use VitePWA's registration function with more robust options
 if ('serviceWorker' in navigator) {
-  const updateSWRegistration = registerSW({
+  const updateSW = registerSW({
     immediate: true, // Register immediately to ensure assets are cached faster
     onNeedRefresh() {
       console.log('New content available, refresh needed')
@@ -22,8 +22,8 @@ if ('serviceWorker' in navigator) {
       
       const refreshButton = refreshUI.querySelector('button');
       refreshButton?.addEventListener('click', () => {
-        // Update service worker and reload page - fixed by using the update method
-        updateSWRegistration.update(true).then(() => {
+        // Update service worker and reload page
+        updateSW(true).then(() => {
           window.location.reload();
         });
       });
@@ -85,8 +85,7 @@ if ('serviceWorker' in navigator) {
     if (document.visibilityState === 'visible') {
       // Wait until the app is fully visible and stable
       setTimeout(() => {
-        // Fix by using the update method of the registration object
-        updateSWRegistration.update(true).catch(console.error);
+        updateSW(true).catch(console.error);
       }, 1000);
     }
   });

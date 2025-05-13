@@ -10,7 +10,7 @@ export const getPWAManifest = (timestamp: number) => {
     display: 'standalone' as const, 
     start_url: '/?source=pwa',
     categories: ['productivity', 'business'],
-    orientation: 'portrait-primary' as const, // Proper type
+    orientation: 'portrait-primary' as const, // Fix: Using proper type
     icons: [
       {
         src: `/pwa-192x192.png?v=${timestamp}`,
@@ -41,10 +41,10 @@ export const getPWAManifest = (timestamp: number) => {
         icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
       }
     ],
-    // Share target for web share target API - fix by using explicit "GET" type 
+    // Share target for web share target API
     share_target: {
       action: "/create",
-      method: "GET" as const, // Fix: Explicitly use "GET" as a literal type
+      method: "GET",
       params: {
         title: "title",
         text: "content",
