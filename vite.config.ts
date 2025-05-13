@@ -21,7 +21,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       react({
         // Enhanced React-SWC configuration for production optimization
         devTarget: isProd ? 'es2022' : 'es2020',
-        // Removing the swcOptions property as it doesn't exist in the Options type
       }),
       mode === 'development' && configureDevelopment(),
       configurePWA(),
@@ -33,6 +32,20 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         "@components": path.resolve(__dirname, "./src/components"),
         "@utils": path.resolve(__dirname, "./src/utils"),
       },
+    },
+    css: {
+      // Enhanced CSS processing options
+      devSourcemap: true,
+      // Optimize CSS processing
+      preprocessorOptions: {
+        scss: {
+          charset: false
+        }
+      },
+      // Modules configuration for CSS
+      modules: {
+        localsConvention: 'camelCaseOnly'
+      }
     },
     build: {
       ...configureBuild(),
@@ -66,7 +79,8 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
               'src/components/ui/button.tsx',
               'src/components/ui/input.tsx'
             ],
-            'feedback': ['src/components/feedback/home/FeedbackContainer.tsx']
+            'feedback': ['src/components/feedback/home/FeedbackContainer.tsx'],
+            'styles': ['src/styles/base.css', 'src/styles/components.css', 'src/styles/layout.css', 'src/styles/utilities.css']
           }
         },
         // Add external packages that should not be bundled
