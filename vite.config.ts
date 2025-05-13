@@ -59,6 +59,8 @@ export default defineConfig(({ mode }: ConfigEnv) => ({
           'features': ['src/components/feedback/home/FeedbackContainer.tsx']
         }
       },
+      // Add external packages that should not be bundled
+      external: []
     },
   },
 }));

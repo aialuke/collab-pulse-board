@@ -11,7 +11,18 @@ export const configurePWA = () => {
   return VitePWA({
     registerType: 'autoUpdate',
     includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
-    workbox: getCacheStrategy(),
+    workbox: {
+      ...getCacheStrategy(),
+      // Fix the glob pattern issue by modifying the globDirectory
+      globDirectory: 'dist',
+      globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,gif,wasm}']
+    },
     manifest: getPWAManifest(timestamp),
+    // Explicitly include workbox-window to resolve dependency
+    injectRegister: 'auto',
+    devOptions: {
+      enabled: true,
+      type: 'module'
+    }
   });
 };
