@@ -15,14 +15,15 @@ export function FloatingFeedbackButton() {
       onClick={() => navigate('/create')}
       size="icon"
       className={cn(
-        "fixed bottom-4 right-4 z-50 h-14 w-14 rounded-full shadow-lg",
+        "fixed bottom-4 right-4 z-50 h-[3.85rem] w-[3.85rem] sm:h-[4.24rem] sm:w-[4.24rem] rounded-full shadow-lg",
         "bg-gradient-yellow hover:shadow-glow text-neutral-900",
         "flex items-center justify-center transition-all duration-300",
-        "animate-fade-in"
+        "animate-fade-in",
+        "safe-area-inset"
       )}
       aria-label="Create new feedback"
     >
-      <Lightbulb className="h-6 w-6" />
+      <Lightbulb className="h-[1.65rem] w-[1.65rem] sm:h-[1.8rem] sm:w-[1.8rem]" />
     </Button>
   );
 }
