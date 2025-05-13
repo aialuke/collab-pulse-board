@@ -1,14 +1,16 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle, ChevronLeft } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function ProfilePage() {
   const { user, acceptTerms } = useAuth();
+  const navigate = useNavigate();
   
   if (!user) {
     return <div>Loading profile...</div>;
@@ -23,6 +25,19 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-8">
+      <div className="flex items-start mb-2">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate('/')} 
+          className="hover:bg-yellow-500/10 -ml-3 mt-2"
+          aria-label="Go back to home page"
+        >
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Back
+        </Button>
+      </div>
+
       <Card className="bg-white border-neutral-200">
         <CardHeader>
           <CardTitle>Profile Information</CardTitle>
