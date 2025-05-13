@@ -1,119 +1,114 @@
 
-/* Base styles that will be included within Tailwind's base layer through index.css */
-:root {
-  /* Explicitly define background with correct HSL value for #E8F0FE */
-  --background: 214 80% 95%; /* #E8F0FE */
-  --foreground: 220 14% 35%; /* Slate Gray */
+@layer base {
+  :root {
+    /* Explicitly define background with correct HSL value for #E8F0FE */
+    --background: 214 80% 95%; /* #E8F0FE */
+    --foreground: 220 14% 35%; /* Slate Gray */
 
-  --card: 0 0% 100%; /* White */
-  --card-foreground: 220 14% 35%; /* Slate Gray */
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 220 14% 35%; /* Slate Gray */
 
-  --popover: 0 0% 100%;
-  --popover-foreground: 220 14% 35%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 14% 35%;
 
-  --primary: 53 95% 65%; /* Warm Yellow (#FCF050) */
-  --primary-foreground: 220 14% 35%;
+    --primary: 53 95% 65%; /* Warm Yellow (#FCF050) */
+    --primary-foreground: 220 14% 35%;
 
-  --secondary: 222 68% 33%; /* Deep Blue (#1E3A8A) */
-  --secondary-foreground: 0 0% 100%;
+    --secondary: 222 68% 33%; /* Deep Blue (#1E3A8A) */
+    --secondary-foreground: 0 0% 100%;
 
-  --muted: 220 10% 96%;
-  --muted-foreground: 220 14% 46%;
+    --muted: 220 10% 96%;
+    --muted-foreground: 220 14% 46%;
 
-  --accent: 222 68% 33%; /* Deep Blue (#1E3A8A) */
-  --accent-foreground: 0 0% 100%;
+    --accent: 222 68% 33%; /* Deep Blue (#1E3A8A) */
+    --accent-foreground: 0 0% 100%;
 
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-  --border: 220 13% 91%;
-  --input: 220 13% 91%;
-  --ring: 53 95% 65%; /* Warm Yellow */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 53 95% 65%; /* Warm Yellow */
 
-  --radius: 0.75rem;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Updated dark mode version that aligns with our new color scheme */
+    --background: 222 68% 15%;
+    --foreground: 210 40% 96%;
+
+    --card: 222 68% 18%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 222 68% 18%;
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 53 95% 65%;
+    --primary-foreground: 222 68% 15%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 68% 15%;
+
+    --muted: 222 68% 22%;
+    --muted-foreground: 217 10% 65%;
+
+    --accent: 222 68% 33%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 222 68% 22%;
+    --input: 222 68% 22%;
+    --ring: 53 95% 65%;
+  }
 }
 
-.dark {
-  /* Updated dark mode version that aligns with our new color scheme */
-  --background: 222 68% 15%;
-  --foreground: 210 40% 96%;
+@layer base {
+  * {
+    @apply border-border;
+  }
 
-  --card: 222 68% 18%;
-  --card-foreground: 210 40% 96%;
-
-  --popover: 222 68% 18%;
-  --popover-foreground: 210 40% 96%;
-
-  --primary: 53 95% 65%;
-  --primary-foreground: 222 68% 15%;
-
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 68% 15%;
-
-  --muted: 222 68% 22%;
-  --muted-foreground: 217 10% 65%;
-
-  --accent: 222 68% 33%;
-  --accent-foreground: 210 40% 98%;
-
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
-
-  --border: 222 68% 22%;
-  --input: 222 68% 22%;
-  --ring: 53 95% 65%;
-}
-
-/* Base styles */
-* {
-  border-color: hsl(var(--border));
-}
-
-html {
-  overflow-x: hidden;
-  scroll-smooth;
-  font-size: 100%; /* Ensures 1rem = 16px for accessibility */
-}
+  html {
+    @apply overflow-x-hidden scroll-smooth;
+    font-size: 100%; /* Ensures 1rem = 16px for accessibility */
+  }
   
-body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-feature-settings: "rlig" 1, "calt" 1;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-/* Optimized placeholder styles */
-input::placeholder,
-textarea::placeholder {
-  color: hsl(var(--muted-foreground));
-  opacity: 0.7;
-  transition: opacity 0.2s;
-  /* Prevent placeholder from adding render delay */
-  will-change: opacity;
-  visibility: visible;
-}
+  /* Optimized placeholder styles */
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-muted-foreground opacity-70 transition-opacity;
+    /* Prevent placeholder from adding render delay */
+    will-change: opacity;
+    visibility: visible;
+  }
 
-/* Improved touch targets for form elements */
-button, 
-input[type="submit"],
-input[type="reset"],
-input[type="button"] {
-  min-height: 48px; 
-  min-width: 48px; /* Ensure minimum 48px touch targets */
-  touch-action: manipulation;
-}
+  /* Improved touch targets for form elements */
+  button, 
+  input[type="submit"],
+  input[type="reset"],
+  input[type="button"] {
+    @apply min-h-12 min-w-12; /* Ensure minimum 48px touch targets */
+    touch-action: manipulation;
+  }
 
-/* Improve placeholder appearance when input is focused */
-input:focus::placeholder,
-textarea:focus::placeholder {
-  opacity: 0.4;
-}
+  /* Improve placeholder appearance when input is focused */
+  input:focus::placeholder,
+  textarea:focus::placeholder {
+    @apply opacity-40;
+  }
 
-/* Enhanced focus states for accessibility */
-a:focus, button:focus, input:focus, select:focus, textarea:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px hsl(var(--primary)), 0 0 0 4px hsla(var(--primary), 0.2);
+  /* Enhanced focus states for accessibility */
+  a:focus, button:focus, input:focus, select:focus, textarea:focus {
+    @apply outline-none ring-2 ring-primary ring-offset-2;
+  }
 }
