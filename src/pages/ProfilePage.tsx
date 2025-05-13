@@ -3,7 +3,6 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, AlertCircle, ChevronLeft } from 'lucide-react';
 import { format } from 'date-fns';
@@ -44,15 +43,6 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="relative">
-              <Avatar className={`h-24 w-24 ${isManager ? 'ring-2 ring-royal-blue-500/30' : 'ring-2 ring-yellow-500/30'}`}>
-                <AvatarImage src={user.avatarUrl} alt={user.name} />
-                <AvatarFallback className={`text-lg ${isManager ? 'bg-royal-blue-100 text-royal-blue-600' : 'bg-yellow-100 text-yellow-600'}`}>
-                  {user.name.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-            
             <div className="space-y-1 flex-1">
               <h3 className="text-xl font-medium">{user.name}</h3>
               <p className="text-sm text-muted-foreground">{user.email}</p>
