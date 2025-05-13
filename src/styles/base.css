@@ -1,8 +1,4 @@
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @layer base {
   :root {
     /* Explicitly define background with correct HSL value for #E8F0FE */
