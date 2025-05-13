@@ -15,7 +15,7 @@ export function FloatingFeedbackButton() {
       onClick={() => navigate('/create')}
       size="icon"
       className={cn(
-        "fixed bottom-4 right-4 z-50 h-[3.85rem] w-[3.85rem] sm:h-[4.24rem] sm:w-[4.24rem] rounded-full shadow-lg",
+        "fixed bottom-6 right-6 z-50 h-[3.85rem] w-[3.85rem] sm:bottom-8 sm:right-8 sm:h-[4.24rem] sm:w-[4.24rem] rounded-full shadow-lg",
         "bg-gradient-yellow hover:shadow-glow text-neutral-900",
         "flex items-center justify-center transition-all duration-300",
         "animate-fade-in",
