@@ -1,16 +1,15 @@
 
 import viteCompression from 'vite-plugin-compression';
 
-// Configuration for compression plugins with optimized settings
+// Configuration for compression plugins
 export const configureCompression = () => {
   return [
-    // Brotli compression with optimized settings
+    // Brotli compression
     viteCompression({
       algorithm: 'brotliCompress',
       ext: '.br',
       filter: /\.(js|css|html|svg|json)$/i,
-      compressionOptions: { level: 11 }, // Maximum compression level
-      threshold: 1024, // Only compress files larger than 1KB
+      compressionOptions: { level: 11 },
       deleteOriginFile: false,
     }),
     // Gzip compression for browsers without Brotli support
@@ -18,8 +17,7 @@ export const configureCompression = () => {
       algorithm: 'gzip',
       ext: '.gz',
       filter: /\.(js|css|html|svg|json)$/i,
-      compressionOptions: { level: 9 }, // Maximum compression level
-      threshold: 1024, // Only compress files larger than 1KB
+      compressionOptions: { level: 9 },
       deleteOriginFile: false,
     }),
   ];

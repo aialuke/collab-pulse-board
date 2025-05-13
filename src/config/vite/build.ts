@@ -1,13 +1,11 @@
 
 // Build configuration options
 export const configureBuild = () => {
-  const isProd = process.env.NODE_ENV === 'production';
-  
   return {
     // Add build options to assist with caching
     assetsInlineLimit: 4096, // Only inline files less than 4kb
-    // Disable source maps in production for smaller bundles
-    sourcemap: !isProd,
+    // Enable source maps for better debugging (but disable in production later)
+    sourcemap: process.env.NODE_ENV !== 'production',
     // Set target to modern browsers
     target: 'esnext',
     modulePreload: {
@@ -19,9 +17,5 @@ export const configureBuild = () => {
     emptyOutDir: true,
     // Generate chunks for better caching
     chunkSizeWarningLimit: 600,
-    // Use esbuild for CSS minification in production
-    cssMinify: isProd ? 'esbuild' : false,
-    // Enable CSS code splitting
-    cssCodeSplit: true,
   };
 };

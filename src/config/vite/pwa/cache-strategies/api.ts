@@ -20,20 +20,5 @@ export const getAPICacheStrategy = () => {
         },
       },
     },
-    // Cache Supabase API responses
-    {
-      urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
-      handler: 'StaleWhileRevalidate' as const,
-      options: {
-        cacheName: CACHE_NAMES.supabase,
-        expiration: {
-          maxEntries: 50,
-          maxAgeSeconds: 60 * 60 * 24, // 24 hours
-        },
-        cacheableResponse: {
-          statuses: [0, 200],
-        },
-      },
-    },
   ];
 };
