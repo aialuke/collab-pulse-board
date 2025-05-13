@@ -16,27 +16,26 @@
     @apply flex items-center justify-center px-4 py-2 min-h-12 min-w-12 font-medium text-white bg-red hover:bg-red-600 rounded-full transition-colors duration-200 ease-in-out;
   }
 
-  /* Improved link with touch target size */
   .link {
-    @apply text-blue-700 hover:text-blue-800 transition-colors duration-200 ease-in-out underline-offset-4 hover:underline inline-flex min-h-10 min-w-10 items-center px-1;
+    @apply text-blue-700 hover:text-blue-800 transition-colors duration-200 ease-in-out underline-offset-4 hover:underline inline-flex min-h-10 items-center;
   }
 
   .card {
     @apply bg-white rounded-lg border border-neutral-200 overflow-hidden transition-all duration-200 ease-in-out hover:shadow-sm backdrop-blur-sm w-full;
   }
 
-  /* Touch-optimized input group */
+  /* Improved input group with better touch accessibility */
   .input-group {
-    @apply relative flex items-center w-full min-h-12;
+    @apply relative flex items-center w-full;
   }
 
   .input-icon-container {
     @apply absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-teal-500 w-6 h-6 pointer-events-none;
   }
 
-  /* Input with better touch accessibility */
+  /* Keep old classes for backward compatibility but improve for touch */
   .input-wrapper {
-    @apply relative min-h-12;
+    @apply relative;
   }
 
   .input-icon {
@@ -48,7 +47,7 @@
   }
 
   .input-with-icon {
-    @apply pl-12 pr-3 min-h-12;
+    @apply pl-12 pr-3;
   }
 
   .input {
@@ -87,30 +86,8 @@
     @apply text-royal-blue-600;
   }
   
-  /* Optimized repost styling */
+  /* New reply text class for repost comments */
   .reply-text {
     @apply font-bold italic text-royal-blue-600;
-  }
-  
-  /* New repost style with enhanced accessibility */
-  .repost {
-    @apply pl-8 border-l-2 border-l-blue-700 italic text-royal-blue-600 line-clamp-2;
-  }
-  
-  /* Task header styling */
-  .task-header {
-    @apply flex items-center gap-2 p-4;
-  }
-  
-  .task-card {
-    @apply mb-3;
-  }
-  
-  /* Floating button with safe area awareness */
-  .floating-button {
-    @apply fixed z-20 flex items-center justify-center rounded-full shadow-lg;
-    bottom: calc(16px + var(--safe-area-inset-bottom));
-    right: calc(16px + var(--safe-area-inset-right));
-    padding: 12px;
   }
 }

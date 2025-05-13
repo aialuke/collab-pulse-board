@@ -21,9 +21,7 @@ export const configureBuild = () => {
     chunkSizeWarningLimit: 600,
     // Use esbuild for CSS minification in production
     cssMinify: isProd ? 'esbuild' : false,
-    // Enable CSS code splitting with improved settings
+    // Enable CSS code splitting
     cssCodeSplit: true,
-    // CSS transformation options
-    cssTarget: 'esnext',
   };
 };
