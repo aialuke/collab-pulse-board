@@ -63,8 +63,8 @@ export const configurePWA = () => {
         'Cache-Control': 'public, max-age=600, stale-while-revalidate=1200'
       }
     },
-    // Change to generateSW to fix the missing sw.js file
-    strategies: 'generateSW',
+    // Service worker strategy options
+    strategies: 'injectManifest',
     // Let the service worker handle page refreshes 
     selfDestroying: false,
   });
