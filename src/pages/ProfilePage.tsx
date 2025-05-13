@@ -39,11 +39,11 @@ export default function ProfilePage() {
 
       <Card className="bg-white border-neutral-200">
         <CardHeader>
-          <CardTitle>Profile Information</CardTitle>
+          <CardTitle className="text-center">Profile Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="space-y-1 flex-1">
+          <div className="flex flex-col items-center text-center gap-4">
+            <div className="space-y-1">
               <h3 className="text-xl font-medium">{user.name}</h3>
               <p className="text-sm text-muted-foreground">{user.email}</p>
               <p className={`text-xs inline-block px-2 py-0.5 rounded-full mt-1 ${
