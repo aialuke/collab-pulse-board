@@ -13,10 +13,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const isProd = mode === 'production';
   
   return {
-    server: {
-      ...configureServer(),
-      port: 8080
-    },
+    server: configureServer(),
     plugins: [
       react({
         // Enhanced React-SWC configuration for production optimization
