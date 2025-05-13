@@ -68,7 +68,7 @@ body {
   line-clamp: 3;
 }
 
-/* Touch-friendly interactive elements */
+/* Touch-friendly interactive elements with mininum 44px size */
 button,
 [role="button"],
 a.btn,

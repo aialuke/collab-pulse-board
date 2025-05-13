@@ -30,17 +30,20 @@
               linear-gradient(to right, rgba(30, 58, 138, 0.6), rgba(30, 58, 138, 0.4)) border-box;
 }
 
-/* Special Effects */
+/* Special Effects with will-change for better performance */
 .glow-on-hover:hover {
   box-shadow: 0 0 0.9375rem rgba(252, 240, 80, 0.5);
+  will-change: box-shadow;
 }
 
 .blue-glow-on-hover:hover {
   box-shadow: 0 0 0.9375rem rgba(30, 58, 138, 0.5);
+  will-change: box-shadow;
 }
 
 .royal-blue-glow-on-hover:hover {
   box-shadow: 0 0 0.9375rem rgba(36, 60, 136, 0.5);
+  will-change: box-shadow;
 }
 
 .glass-effect {
@@ -64,9 +67,13 @@
   @apply py-2 sm:py-3 md:py-4;
 }
 
-/* Touch-friendly interactive areas */
+/* Improved touch-friendly interactive areas (44px minimum) */
 .touch-target {
-  @apply min-h-10 sm:min-h-12 min-w-10 sm:min-w-12 flex items-center justify-center;
+  @apply min-h-[44px] min-w-[44px] flex items-center justify-center p-2;
+}
+
+.min-touch {
+  @apply min-h-[44px] min-w-[44px] p-2;
 }
 
 /* Safe area spacing (avoiding notches, etc) */
