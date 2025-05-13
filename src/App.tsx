@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -102,25 +103,25 @@ function App() {
 
   return (
     <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <FeatureFlagProvider>
-            <NotificationsProvider>
-              <RefreshProvider>
-                <TooltipProvider>
-                  <Toaster />
-                  <Sonner />
-                  <BrowserRouter>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <FeatureFlagProvider>
+              <NotificationsProvider>
+                <RefreshProvider>
+                  <TooltipProvider>
+                    <Toaster />
+                    <Sonner />
                     <AppRoutes />
-                  </BrowserRouter>
-                  <PWAInstallPrompt />
-                  <OfflineIndicator />
-                </TooltipProvider>
-              </RefreshProvider>
-            </NotificationsProvider>
-          </FeatureFlagProvider>
-        </AuthProvider>
-      </QueryClientProvider>
+                    <PWAInstallPrompt />
+                    <OfflineIndicator />
+                  </TooltipProvider>
+                </RefreshProvider>
+              </NotificationsProvider>
+            </FeatureFlagProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
     </React.StrictMode>
   );
 }
