@@ -1,19 +1,19 @@
 
-import { getApiCacheStrategy } from './api';
-import { getAssetsCacheStrategy } from './assets';
+import { getAPICacheStrategy } from './api';
+import { getAssetCacheStrategies } from './assets';
 import { getFallbackCacheStrategy } from './fallback';
 import { getFontsCacheStrategy } from './fonts';
-import { getPWACacheStrategy } from './pwa';
+import { getPWACacheStrategies } from './pwa';
 import { getSupabaseCacheStrategy } from './supabase';
 
 // Combine all cache strategies
 export const getAllCacheStrategies = () => {
   return [
-    ...getApiCacheStrategy(),
-    ...getAssetsCacheStrategy(),
+    ...getAPICacheStrategy(),
+    ...getAssetCacheStrategies(),
     ...getFallbackCacheStrategy(),
     ...getFontsCacheStrategy(),
-    ...getPWACacheStrategy(),
+    ...getPWACacheStrategies(),
     ...getSupabaseCacheStrategy(),
   ];
 };
