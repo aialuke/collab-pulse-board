@@ -58,12 +58,12 @@ export default function ProfilePage() {
 
       <Card className="bg-white border-neutral-200">
         <CardHeader>
-          <CardTitle>Terms of Use</CardTitle>
+          <CardTitle className="text-center">Terms of Use</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-3">
-            {user.hasAcceptedTerms ? (
-              <>
+        <CardContent className="space-y-4 flex flex-col items-center">
+          {user.hasAcceptedTerms ? (
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-center gap-3 mb-2">
                 <CheckCircle className="text-green-500 h-5 w-5" />
                 <div>
                   <p className="font-medium">You have accepted our Terms of Use</p>
@@ -73,24 +73,22 @@ export default function ProfilePage() {
                     </p>
                   )}
                 </div>
-              </>
-            ) : (
-              <>
-                <AlertCircle className="text-red-500 h-5 w-5" />
-                <p className="font-medium">You need to accept our Terms of Use</p>
-              </>
-            )}
-          </div>
-          
-          {user.hasAcceptedTerms && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleReacceptTerms}
-              className="mt-2"
-            >
-              Review Terms Again
-            </Button>
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleReacceptTerms}
+                className="mt-2"
+              >
+                Review Terms Again
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <AlertCircle className="text-red-500 h-5 w-5" />
+              <p className="font-medium">You need to accept our Terms of Use</p>
+            </div>
           )}
         </CardContent>
       </Card>
