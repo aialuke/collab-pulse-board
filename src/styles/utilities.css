@@ -30,7 +30,7 @@
               linear-gradient(to right, rgba(30, 58, 138, 0.6), rgba(30, 58, 138, 0.4)) border-box;
 }
 
-/* Special Effects with will-change only for animated elements */
+/* Special Effects with will-change for better performance */
 .glow-on-hover:hover {
   box-shadow: 0 0 0.9375rem rgba(252, 240, 80, 0.5);
   will-change: box-shadow;
@@ -67,7 +67,7 @@
   @apply py-2 sm:py-3 md:py-4;
 }
 
-/* Touch-friendly interactive areas (44px minimum) */
+/* Improved touch-friendly interactive areas (44px minimum) */
 .touch-target {
   @apply min-h-[44px] min-w-[44px] flex items-center justify-center p-2;
 }

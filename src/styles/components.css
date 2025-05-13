@@ -1,11 +1,11 @@
 
 @layer components {
   .btn-primary {
-    @apply flex items-center justify-center px-4 py-2 min-h-[44px] min-w-[44px] font-medium text-neutral-900 bg-gradient-yellow hover:shadow-glow rounded-full transition-all duration-200 ease-in-out;
+    @apply flex items-center justify-center px-4 py-2 min-h-[44px] min-w-[44px] font-medium text-neutral-900 bg-gradient-yellow hover:shadow-glow will-change-auto rounded-full transition-all duration-200 ease-in-out;
   }
   
   .btn-secondary {
-    @apply flex items-center justify-center px-4 py-2 min-h-[44px] min-w-[44px] font-medium text-white bg-gradient-blue hover:shadow-blue-glow rounded-full transition-all duration-200 ease-in-out;
+    @apply flex items-center justify-center px-4 py-2 min-h-[44px] min-w-[44px] font-medium text-white bg-gradient-blue hover:shadow-blue-glow will-change-auto rounded-full transition-all duration-200 ease-in-out;
   }
 
   .btn-outline {
@@ -97,11 +97,21 @@
     @apply pl-8 border-l-2 border-l-blue-700 italic text-royal-blue-600 line-clamp-2;
   }
   
+  /* Task header styling */
+  .task-header {
+    @apply flex items-center gap-2 p-4;
+  }
+  
+  .task-card {
+    @apply mb-3;
+  }
+  
   /* Floating button with safe area awareness */
   .floating-button {
     @apply fixed z-20 flex items-center justify-center rounded-full shadow-lg min-h-[44px] min-w-[44px];
     bottom: calc(16px + var(--safe-area-inset-bottom));
     right: calc(16px + var(--safe-area-inset-right));
     padding: 12px;
+    will-change: transform, box-shadow;
   }
 }

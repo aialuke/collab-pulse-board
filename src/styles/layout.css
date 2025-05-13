@@ -99,4 +99,15 @@
   @apply grid gap-4 sm:gap-6;
 }
 
-/* Note: Removed duplicate touch-target class as it's defined in utilities.css */
+/* Touch-optimized interactive areas */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+@media (pointer: fine) {
+  .touch-target {
+    min-height: unset;
+    min-width: unset;
+  }
+}
