@@ -1,9 +1,5 @@
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Now import other styles after the Tailwind directives */
+/* Mobile-first styles as the default */
 @import "./styles/base.css";
 @import "./styles/components.css";
 @import "./styles/layout.css";
