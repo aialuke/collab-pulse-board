@@ -9,8 +9,9 @@ import { configureServer } from "./src/config/vite/server";
 import { configureDevelopment } from "./src/config/vite/development";
 // Import PostCSS plugins statically
 import autoprefixer from 'autoprefixer';
-// Fix the purgecss import to use the default export
-import purgecssPlugin from '@fullhuman/postcss-purgecss';
+// Import the purgecss module and handle both ESM and CJS import patterns
+import * as purgecssModule from '@fullhuman/postcss-purgecss';
+const purgecssPlugin = purgecssModule.default || purgecssModule;
 import cssnano from 'cssnano';
 
 // https://vitejs.dev/config/
