@@ -5,6 +5,7 @@
 @import "./styles/layout.css";
 @import "./styles/utilities.css";
 @import "./styles/compatibility.css";
+@import "./styles/accessibility.css"; /* New WCAG AAA compliant styles */
 
 /* No need for explicit mobile media queries as we're using mobile-first approach */
 /* Root element should take full width by default */

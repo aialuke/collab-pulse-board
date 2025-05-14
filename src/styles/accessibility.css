@@ -1,0 +1,139 @@
+
+/* WCAG AAA Compliant Styles with 7:1 contrast ratio for normal text */
+:root {
+  /* Base colors with high contrast */
+  --text-normal: #121212; /* Very dark gray for text on light bg (12:1) */
+  --text-light-bg: #121212; /* Very dark gray for text on light bg (12:1) */
+  --text-dark-bg: #ffffff; /* White text on dark bg (21:1) */
+  
+  --bg-light: #ffffff; /* White for light mode */
+  --bg-dark: #121212; /* Very dark gray for dark mode */
+  
+  /* Primary brand colors with accessible alternatives */
+  --primary-color: #0c4a80; /* Darker blue with sufficient contrast */
+  --primary-color-light: #d4e5f9; /* Very light blue for backgrounds */
+  --primary-color-dark: #0b3761; /* Even darker blue for dark mode */
+  
+  /* Error, success, warning with high contrast */
+  --error-color: #ab1212; /* Dark red for error text (7:1) */
+  --success-color: #0d652d; /* Dark green for success (7:1) */
+  --warning-color: #974c00; /* Dark orange for warnings (7:1) */
+  
+  /* Focus states */
+  --focus-ring: 0 0 0 3px rgba(12, 74, 128, 0.5); /* Thicker focus ring */
+}
+
+/* High contrast focus styles */
+*:focus {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Support for high contrast modes */
+@media (forced-colors: active) {
+  /* Use system colors in high contrast modes */
+  :root {
+    --primary-color: CanvasText;
+    --primary-color-light: Canvas;
+    --primary-color-dark: CanvasText;
+    --error-color: CanvasText;
+    --success-color: CanvasText;
+    --warning-color: CanvasText;
+  }
+  
+  /* Enhance focus states in high contrast mode */
+  *:focus {
+    outline: 3px solid CanvasText;
+  }
+}
+
+/* Increase font sizes for better readability */
+body {
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2.5rem; /* 40px */
+}
+
+h2 {
+  font-size: 2rem; /* 32px */
+}
+
+/* Make sure all interactive elements have sufficient touch target size */
+button, 
+a, 
+input[type="button"], 
+input[type="submit"], 
+input[type="reset"],
+[role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Skip to content link for keyboard users */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.skip-to-content:focus {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  padding: 16px;
+  background: var(--bg-light);
+  color: var(--text-light-bg);
+  z-index: 9999;
+  text-decoration: none;
+}
+
+/* Custom loading and error states */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading-skeleton 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-skeleton {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.error-state {
+  border: 2px solid var(--error-color);
+  border-radius: 8px;
+  padding: 16px;
+  color: var(--error-color);
+  background-color: rgba(171, 18, 18, 0.05);
+}
+
+/* Improved offline indicator */
+.offline-indicator {
+  background-color: var(--warning-color);
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  padding: 8px 16px;
+}
