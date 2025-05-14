@@ -29,7 +29,6 @@ export async function fetchProfiles(userIds: string[]): Promise<Record<string, P
       .select('id, name, avatar_url, role')
       .in('id', userIds)
       .order('name')
-      // Remove the options property as it's not supported
       .limit(userIds.length);  // Use limit directly instead of options
 
     if (profilesError) {

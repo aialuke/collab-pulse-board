@@ -18,7 +18,12 @@ export async function fetchFeedback(
     const columns = 'id, title, content, user_id, category_id, created_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
     
     // 1. Build query with pagination and filtering
-    let query = createBaseFeedbackQuery(columns);
+    let query = supabase
+      .from('feedback')
+      .select(`
+        ${columns},
+        categories(name, id)
+      `);
 
     // Apply status filter if provided
     if (filterStatus && filterStatus !== 'all') {
@@ -60,19 +65,19 @@ export async function fetchFeedback(
     const profilesMap = await fetchProfiles(userIds);
 
     // 4. Attach profiles to feedback items
-    const feedbackWithProfiles: FeedbackResponse[] = feedbackData.map(item => {
-      // Ensure we're working with a proper object
-      if (!item || typeof item !== 'object') {
-        console.error('Invalid feedback item:', item);
-        return null;
-      }
-      
-      // Add profile data to each feedback item
-      return {
-        ...item,
-        profiles: profilesMap[item.user_id]
-      };
-    }).filter(Boolean) as FeedbackResponse[]; // Filter out any null values
+    const feedbackWithProfiles: FeedbackResponse[] = feedbackData
+      .filter(item => item !== null && typeof item === 'object')
+      .map(item => {
+        return {
+          ...item,
+          profiles: profilesMap[item.user_id],
+          updated_at: item.updated_at || item.created_at,
+          comments_count: item.comments_count || 0,
+          is_repost: item.is_repost || false,
+          original_post_id: item.original_post_id || null,
+          repost_comment: item.repost_comment || null
+        };
+      });
 
     // 5. Get current user's upvotes - using optimized query
     const userId = (await supabase.auth.getUser()).data.user?.id;
@@ -120,11 +125,16 @@ export async function fetchFeedback(
 export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
   try {
     // 1. Fetch the specific feedback item with only necessary columns
-    const columns = 'id, title, content, user_id, category_id, created_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
+    const columns = 'id, title, content, user_id, category_id, created_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment, updated_at';
     
-    const { data: feedbackData, error: feedbackError } = await createBaseFeedbackQuery(columns)
+    const { data: feedbackData, error: feedbackError } = await supabase
+      .from('feedback')
+      .select(`
+        ${columns},
+        categories(name, id)
+      `)
       .eq('id', id)
-      .maybeSingle(); // Use maybeSingle instead of single for better error handling
+      .maybeSingle();
 
     if (feedbackError) {
       console.error('Error fetching feedback by id:', feedbackError);
@@ -141,7 +151,12 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
     // 3. Add profile to feedback
     const feedbackWithProfile: FeedbackResponse = {
       ...feedbackData,
-      profiles: profilesMap[feedbackData.user_id]
+      profiles: profilesMap[feedbackData.user_id],
+      updated_at: feedbackData.updated_at || feedbackData.created_at,
+      comments_count: feedbackData.comments_count || 0,
+      is_repost: feedbackData.is_repost || false,
+      original_post_id: feedbackData.original_post_id || null,
+      repost_comment: feedbackData.repost_comment || null
     };
 
     // 4. Get current user's upvotes
