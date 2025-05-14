@@ -20,7 +20,7 @@ export function ImagePreview({ image, compressionStats }: ImagePreviewProps) {
             className="object-contain w-full h-full"
             width={1200}
             height={900}
-            loading="lazy"
+            loading="lazy" // This is for preview during upload, so lazy is appropriate
           />
         </AspectRatio>
       </div>

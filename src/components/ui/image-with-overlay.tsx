@@ -10,6 +10,7 @@ interface ImageWithOverlayProps extends React.ImgHTMLAttributes<HTMLImageElement
   overlayClassName?: string;
   width?: number;
   height?: number;
+  loading?: 'lazy' | 'eager';
 }
 
 /**
@@ -27,6 +28,7 @@ const ImageWithOverlay = React.forwardRef<HTMLDivElement, ImageWithOverlayProps>
     overlayClassName, 
     width = 1200,
     height = 800,
+    loading = 'eager', // Default to eager loading for LCP optimization
     ...props 
   }, ref) => {
     return (
@@ -38,7 +40,7 @@ const ImageWithOverlay = React.forwardRef<HTMLDivElement, ImageWithOverlayProps>
             className="object-cover w-full h-full"
             width={width}
             height={height}
-            loading="lazy"
+            loading={loading}
             {...props}
           />
         </AspectRatio>

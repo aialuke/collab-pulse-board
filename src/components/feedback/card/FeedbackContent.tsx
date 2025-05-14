@@ -31,6 +31,7 @@ export function FeedbackContent({
               width={1200}
               height={900}
               className="w-full hover:opacity-90 transition-opacity"
+              loading="lazy" // Explicitly set to lazy as this is likely below the fold
             />
           </div>
           
