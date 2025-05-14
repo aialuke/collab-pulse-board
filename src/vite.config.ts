@@ -1,5 +1,5 @@
 
-import { defineConfig, ConfigEnv, Plugin } from "vite";
+import { defineConfig, ConfigEnv, PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { configurePWA } from "./config/vite/pwa";
@@ -10,7 +10,10 @@ import { configureServer } from "./config/vite/server";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => ({
-  server: configureServer(),
+  server: {
+    port: 8080,
+    ...configureServer()
+  },
   plugins: [
     react({
       devTarget: mode === 'production' ? 'es2022' : 'es2020',
@@ -18,7 +21,7 @@ export default defineConfig(({ mode }: ConfigEnv) => ({
     mode === 'development' && componentTagger(),
     configurePWA(),
     ...(mode === 'production' ? configureCompression() : []),
-  ].filter(Boolean) as Plugin[],
+  ].filter(Boolean) as PluginOption[],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

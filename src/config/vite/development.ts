@@ -1,9 +1,9 @@
 
 import { componentTagger } from "lovable-tagger";
+import { PluginOption } from "vite";
 
 // Development-specific configuration
-export const configureDevelopment = () => {
-  // Return the componentTagger plugin without arguments
-  // since it doesn't accept any arguments according to the error
+export const configureDevelopment = (): PluginOption => {
+  // Return the componentTagger plugin
   return componentTagger();
 };
