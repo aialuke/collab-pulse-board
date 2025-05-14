@@ -2,11 +2,11 @@
 import { defineConfig, ConfigEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { configurePWA } from "./src/config/vite/pwa";
-import { configureCompression } from "./src/config/vite/compression";
-import { configureBuild } from "./src/config/vite/build";
+import { configurePWA } from "./config/vite/pwa";
+import { configureCompression } from "./config/vite/compression";
+import { configureBuild } from "./config/vite/build";
 import { componentTagger } from "lovable-tagger";
-import { configureServer } from "./src/config/vite/server";
+import { configureServer } from "./config/vite/server";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => ({
