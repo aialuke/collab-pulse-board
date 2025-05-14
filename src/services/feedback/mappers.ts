@@ -2,6 +2,9 @@
 import { FeedbackResponse } from '@/types/supabase';
 import { FeedbackType, FeedbackStatus } from '@/types/feedback';
 
+// Define the category ID for shout outs
+const SHOUT_OUT_CATEGORY_ID = 5;
+
 // Extract first name from full name
 export function getFirstName(name: string): string {
   return name.split(' ')[0] || 'User';
@@ -36,8 +39,8 @@ export function mapFeedbackItem(
   const authorId = item.user_id;
   const authorInfo = item.profiles || { name: 'Unknown User' };
   
-  // Check if this is a shout out post based on status
-  const isShoutOut = item.status === 'shout-out';
+  // Check if this is a shout out post based on category ID
+  const isShoutOut = item.category_id === SHOUT_OUT_CATEGORY_ID;
   
   // Map to frontend model
   const feedbackItem: FeedbackType = {
@@ -63,8 +66,8 @@ export function mapFeedbackItem(
     isRepost: item.is_repost || false,
     originalPostId: item.original_post_id || undefined,
     repostComment: item.repost_comment || undefined,
-    isShoutOut, // Add isShoutOut property based on status
-    targetUserId: item.target_user_id, // Add target user ID if present
+    isShoutOut, // Set based on category ID
+    targetUserId: item.target_user_id, // Include target user ID if present
   };
   
   // Add original post if this is a repost and we have the original post data

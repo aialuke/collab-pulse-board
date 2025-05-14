@@ -2,21 +2,21 @@
 import { supabase } from '@/integrations/supabase/client';
 import { FeedbackType, FeedbackStatus } from '@/types/feedback';
 import { mapFeedbackItem } from './mappers';
-import { FeedbackResponse } from '@/types/supabase';
+
+// Define the category ID for shout outs
+const SHOUT_OUT_CATEGORY_ID = 5;
 
 /**
  * Create a new shout out post
  * @param userId The ID of the user creating the post
- * @param targetUserId The ID of the user being shouted out
+ * @param targetUserId The ID of the user being shouted out (optional)
  * @param content The content of the shout out
- * @param categoryId The category ID for the post
  * @returns The created shout out post
  */
 export const createShoutOut = async (
   userId: string,
-  targetUserId: string,
   content: string,
-  categoryId: number
+  targetUserId?: string
 ): Promise<FeedbackType | null> => {
   try {
     const { data, error } = await supabase
@@ -24,12 +24,11 @@ export const createShoutOut = async (
       .insert({
         user_id: userId,
         content,
-        category_id: categoryId,
+        category_id: SHOUT_OUT_CATEGORY_ID, // Use the shout out category ID
         target_user_id: targetUserId,
-        // Add custom metadata instead of column
-        status: 'shout-out'
+        status: 'completed' // Use a standard status
       })
-      .select('*, author:profiles(*), category:categories(*)')
+      .select('*, categories(*), profiles(*)')
       .single();
 
     if (error) {
@@ -45,44 +44,50 @@ export const createShoutOut = async (
 };
 
 /**
- * Mark a feedback post as a shout out
- * @param feedbackId The ID of the feedback to mark as a shout out
- * @returns Success status
+ * Get all shout outs
+ * @returns A list of shout out posts
  */
-export const markAsShoutOut = async (feedbackId: string): Promise<boolean> => {
+export const getAllShoutOuts = async (): Promise<FeedbackType[]> => {
   try {
-    const { error } = await supabase
+    // Fetch all feedback with the shout out category
+    const { data, error } = await supabase
       .from('feedback')
-      .update({ 
-        status: 'shout-out' // Use status field instead of custom column
-      })
-      .eq('id', feedbackId);
+      .select('*, categories(*), profiles(*)')
+      .eq('category_id', SHOUT_OUT_CATEGORY_ID)
+      .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error marking as shout out:', error);
-      return false;
+    if (error || !data) {
+      console.error('Error getting shout outs:', error);
+      return [];
     }
 
-    return true;
+    // Use the standard mapping function
+    const userIds = [...new Set(data.map(item => item.user_id))];
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    
+    // Default all to not upvoted for now - we could fetch upvotes if needed
+    const userUpvotes = Object.fromEntries(data.map(item => [item.id, false]));
+
+    return data.map(item => mapFeedbackItem(item, userUpvotes[item.id]));
   } catch (error) {
-    console.error('Error marking as shout out:', error);
-    return false;
+    console.error('Error getting shout outs:', error);
+    return [];
   }
 };
 
 /**
- * Get all shout outs for a specific user
- * @param targetUserId The ID of the user to get shout outs for
+ * Get shout outs for a specific user (either as creator or target)
+ * @param userId The ID of the user to get shout outs for
  * @returns A list of shout out posts
  */
-export const getShoutOutsForUser = async (targetUserId: string): Promise<FeedbackType[]> => {
+export const getShoutOutsForUser = async (userId: string): Promise<FeedbackType[]> => {
   try {
-    // Fetch all feedback marked as shout-out for the target user
+    // Fetch shout outs where user is either the creator or target
     const { data, error } = await supabase
       .from('feedback')
-      .select('*, author:profiles(*), category:categories(*)')
-      .eq('status', 'shout-out')
-      .eq('target_user_id', targetUserId)
+      .select('*, categories(*), profiles(*)')
+      .eq('category_id', SHOUT_OUT_CATEGORY_ID)
+      .or(`user_id.eq.${userId},target_user_id.eq.${userId}`)
       .order('created_at', { ascending: false });
 
     if (error || !data) {
@@ -90,37 +95,13 @@ export const getShoutOutsForUser = async (targetUserId: string): Promise<Feedbac
       return [];
     }
 
-    // Avoid using complex mapping to prevent deep instantiation issues
-    return data.map(item => {
-      // Type guards to safely handle potentially undefined or null objects
-      const authorData = item.author && typeof item.author === 'object' ? item.author : null;
-      const categoryData = item.category && typeof item.category === 'object' ? item.category : null;
-      
-      // Create a feedback item with explicit typings
-      const feedbackItem: FeedbackType = {
-        id: item.id,
-        content: item.content,
-        author: {
-          id: item.user_id,
-          name: authorData?.name || 'Unknown User',
-          avatarUrl: authorData?.avatar_url,
-          role: authorData?.role
-        },
-        createdAt: new Date(item.created_at),
-        category: categoryData?.name || 'Uncategorized',
-        categoryId: item.category_id,
-        upvotes: item.upvotes_count || 0,
-        comments: item.comments_count || 0,
-        status: item.status as FeedbackStatus,
-        imageUrl: item.image_url || undefined,
-        linkUrl: item.link_url || undefined,
-        isUpvoted: false,
-        isShoutOut: true,
-        targetUserId: item.target_user_id
-      };
+    // Map to frontend models with standard mapping function
+    const currentUserId = (await supabase.auth.getUser()).data.user?.id;
+    
+    // Default all to not upvoted for now
+    const userUpvotes = Object.fromEntries(data.map(item => [item.id, false]));
 
-      return feedbackItem;
-    });
+    return data.map(item => mapFeedbackItem(item, userUpvotes[item.id]));
   } catch (error) {
     console.error('Error getting shout outs for user:', error);
     return [];

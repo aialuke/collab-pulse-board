@@ -10,6 +10,9 @@ import { FeedbackComments } from '../comments/FeedbackComments';
 import { TrophyIcon } from '@/components/icons/TrophyIcon';
 import { useAnimationOnScroll } from '@/hooks/useAnimationOnScroll';
 
+// Define the category ID for shout outs
+const SHOUT_OUT_CATEGORY_ID = 5;
+
 interface FeedbackCardProps {
   feedback: FeedbackType;
   isManager: boolean;
@@ -54,7 +57,9 @@ export function FeedbackCard({
   const dropdownTriggerRef = useRef<HTMLButtonElement>(null);
   const isManagerPost = feedback.author.role === 'manager' || feedback.author.role === 'admin';
   const isOwnFeedback = isAuthor;
-  const isShoutOut = feedback.isShoutOut;
+  
+  // Check if this is a shout out based on category ID or explicit flag
+  const isShoutOut = feedback.isShoutOut || feedback.categoryId === SHOUT_OUT_CATEGORY_ID;
   
   // Use the animation on scroll hook for shout out cards
   const { ref: animationRef, isVisible } = useAnimationOnScroll({
