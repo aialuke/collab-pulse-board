@@ -1,11 +1,12 @@
+
 import * as React from "react"
 import {
-  Root as ContextMenuRoot,
-  Trigger as ContextMenuTrigger,
-  Group as ContextMenuGroup,
-  Portal as ContextMenuPortal,
-  Sub as ContextMenuSub,
-  RadioGroup as ContextMenuRadioGroup,
+  Root,
+  Trigger,
+  Group,
+  Portal,
+  Sub,
+  RadioGroup,
   SubTrigger as ContextMenuPrimitiveSubTrigger,
   SubContent as ContextMenuPrimitiveSubContent,
   Content as ContextMenuPrimitiveContent,
@@ -20,17 +21,17 @@ import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-const ContextMenu = ContextMenuRoot
+const ContextMenu = Root
 
-const ContextMenuTrigger = ContextMenuTrigger
+const ContextMenuTrigger = Trigger
 
-const ContextMenuGroup = ContextMenuGroup
+const ContextMenuGroup = Group
 
-const ContextMenuPortal = ContextMenuPortal
+const ContextMenuPortal = Portal
 
-const ContextMenuSub = ContextMenuSub
+const ContextMenuSub = Sub
 
-const ContextMenuRadioGroup = ContextMenuRadioGroup
+const ContextMenuRadioGroup = RadioGroup
 
 const ContextMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitiveSubTrigger>,
@@ -72,7 +73,7 @@ const ContextMenuContent = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitiveContent>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitiveContent>
 >(({ className, ...props }, ref) => (
-  <ContextMenuPrimitive.Portal>
+  <Portal>
     <ContextMenuPrimitiveContent
       ref={ref}
       className={cn(
@@ -81,7 +82,7 @@ const ContextMenuContent = React.forwardRef<
       )}
       {...props}
     />
-  </ContextMenuPrimitive.Portal>
+  </Portal>
 ))
 ContextMenuContent.displayName = ContextMenuPrimitiveContent.displayName
 
@@ -140,9 +141,9 @@ const ContextMenuRadioItem = React.forwardRef<
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <ContextMenuPrimitive.ItemIndicator>
+      <ContextMenuPrimitiveItemIndicator>
         <Circle className="h-2 w-2 fill-current" />
-      </ContextMenuPrimitive.ItemIndicator>
+      </ContextMenuPrimitiveItemIndicator>
     </span>
     {children}
   </ContextMenuPrimitiveRadioItem>
