@@ -151,15 +151,20 @@
     animation: soft-glow-fade 2.5s ease-in-out infinite;
     /* Add will-change to optimize GPU rendering */
     will-change: box-shadow;
+    /* Use filter for more uniform glow that follows the shape of the card */
+    filter: drop-shadow(0 0 8px var(--glow-color-light));
   }
 
   /* Soft Glow Fade animation keyframes - ENHANCED */
   @keyframes soft-glow-fade {
     0%, 100% { 
-      box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.2); /* Bright gold with low opacity */
+      box-shadow: 0 0 0 0 var(--glow-color-light), 0 0 0 0 var(--glow-color-light), 0 0 0 0 var(--glow-color-light), 0 0 0 0 var(--glow-color-light);
+      filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.2));
     }
     50% { 
-      box-shadow: 0 0 16px 4px rgba(255, 215, 0, 0.5); /* Bright gold with higher opacity and larger spread */
+      /* Use multiple box-shadows to create a more uniform glow */
+      box-shadow: 0 0 16px 4px var(--glow-color-light), 0 0 16px 4px var(--glow-color-light), 0 0 16px 4px var(--glow-color-light), 0 0 16px 4px var(--glow-color-light);
+      filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
     }
   }
 
@@ -168,28 +173,33 @@
     .shout-out-card.animate {
       animation: none !important;
       box-shadow: 0 0 4px 1px rgba(255, 215, 0, 0.3); /* Static subtle glow for reduced motion */
+      filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.3));
     }
   }
 
-  /* Dark mode support for animations with cyan glow */
+  /* Dark mode support for animations with golden glow */
   @media (prefers-color-scheme: dark) {
     .shout-out-card.animate {
       animation: soft-glow-fade-dark 2.5s ease-in-out infinite;
+      filter: drop-shadow(0 0 8px var(--glow-color-dark));
     }
     
     @keyframes soft-glow-fade-dark {
       0%, 100% { 
-        box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.2); /* Cyan glow with low opacity */
+        box-shadow: 0 0 0 0 var(--glow-color-dark), 0 0 0 0 var(--glow-color-dark), 0 0 0 0 var(--glow-color-dark), 0 0 0 0 var(--glow-color-dark);
+        filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.3));
       }
       50% { 
-        box-shadow: 0 0 16px 4px rgba(0, 255, 255, 0.5); /* Cyan glow with higher opacity and larger spread */
+        box-shadow: 0 0 16px 4px var(--glow-color-dark), 0 0 16px 4px var(--glow-color-dark), 0 0 16px 4px var(--glow-color-dark), 0 0 16px 4px var(--glow-color-dark);
+        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
       }
     }
 
     /* Honor reduced motion in dark mode */
     @media (prefers-reduced-motion: reduce) {
       .shout-out-card.animate {
-        box-shadow: 0 0 4px 1px rgba(0, 255, 255, 0.3); /* Static subtle cyan glow for reduced motion */
+        box-shadow: 0 0 4px 1px rgba(255, 215, 0, 0.4); /* Static subtle golden glow for reduced motion */
+        filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.4));
       }
     }
   }
