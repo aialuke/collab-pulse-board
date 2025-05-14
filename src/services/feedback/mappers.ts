@@ -36,6 +36,9 @@ export function mapFeedbackItem(
   const authorId = item.user_id;
   const authorInfo = item.profiles || { name: 'Unknown User' };
   
+  // Check if this is a shout out post based on status
+  const isShoutOut = item.status === 'shout-out';
+  
   // Map to frontend model
   const feedbackItem: FeedbackType = {
     id: item.id,
@@ -60,6 +63,8 @@ export function mapFeedbackItem(
     isRepost: item.is_repost || false,
     originalPostId: item.original_post_id || undefined,
     repostComment: item.repost_comment || undefined,
+    isShoutOut, // Add isShoutOut property based on status
+    targetUserId: item.target_user_id, // Add target user ID if present
   };
   
   // Add original post if this is a repost and we have the original post data
@@ -68,7 +73,7 @@ export function mapFeedbackItem(
       originalPostsMap && 
       originalPostsMap[item.original_post_id]) {
     const originalPost = originalPostsMap[item.original_post_id];
-    feedbackItem.originalPost = mapFeedbackItem(originalPost, !!originalPost.id);
+    feedbackItem.originalPost = mapFeedbackItem(originalPost, false);
   }
   
   return feedbackItem;

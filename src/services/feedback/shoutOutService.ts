@@ -21,11 +21,12 @@ export const createShoutOut = async (
     const { data, error } = await supabase
       .from('feedback')
       .insert({
-        author_id: userId,
+        user_id: userId,
         content,
         category_id: categoryId,
-        is_shout_out: true,
-        target_user_id: targetUserId
+        target_user_id: targetUserId,
+        // Add custom metadata instead of column
+        status: 'shout-out'
       })
       .select('*, author:profiles(*), category:categories(*)')
       .single();
@@ -51,7 +52,9 @@ export const markAsShoutOut = async (feedbackId: string): Promise<boolean> => {
   try {
     const { error } = await supabase
       .from('feedback')
-      .update({ is_shout_out: true })
+      .update({ 
+        status: 'shout-out' // Use status field instead of custom column
+      })
       .eq('id', feedbackId);
 
     if (error) {
@@ -76,7 +79,7 @@ export const getShoutOutsForUser = async (targetUserId: string): Promise<Feedbac
     const { data, error } = await supabase
       .from('feedback')
       .select('*, author:profiles(*), category:categories(*)')
-      .eq('is_shout_out', true)
+      .eq('status', 'shout-out')
       .eq('target_user_id', targetUserId)
       .order('created_at', { ascending: false });
 
@@ -85,7 +88,11 @@ export const getShoutOutsForUser = async (targetUserId: string): Promise<Feedbac
       return [];
     }
 
-    return data.map(mapFeedbackItem);
+    // Create a map of user upvotes for consistency with the mapFeedbackItems function
+    const userUpvotes: Record<string, boolean> = {};
+    
+    // Map each item individually to ensure types match correctly
+    return data.map(item => mapFeedbackItem(item, false));
   } catch (error) {
     console.error('Error getting shout outs for user:', error);
     return [];
