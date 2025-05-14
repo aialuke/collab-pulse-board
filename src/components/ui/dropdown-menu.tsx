@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import {
   Root,
@@ -125,7 +126,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
       </DropdownMenuPrimitiveItemIndicator>
     </span>
     {children}
-  </DropdownMenuCheckboxItem>
+  </DropdownMenuPrimitiveCheckboxItem>
 ))
 DropdownMenuCheckboxItem.displayName =
   DropdownMenuPrimitiveCheckboxItem.displayName
@@ -148,7 +149,7 @@ const DropdownMenuRadioItem = React.forwardRef<
       </DropdownMenuPrimitiveItemIndicator>
     </span>
     {children}
-  </DropdownMenuRadioItem>
+  </DropdownMenuPrimitiveRadioItem>
 ))
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitiveRadioItem.displayName
 
