@@ -36,8 +36,9 @@ export function useFeedbackData() {
 
   useEffect(() => {
     if (data) {
-      setFeedback(data);
-      setFilteredFeedback(data);
+      // Fix type mismatch - extract the items array from the response
+      setFeedback(data.items);
+      setFilteredFeedback(data.items);
       setLoadError(null);
     }
   }, [data]);

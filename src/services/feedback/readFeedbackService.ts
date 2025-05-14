@@ -26,11 +26,11 @@ export async function fetchFeedback(
     }
 
     // Count total before applying pagination (for hasMore calculation)
-    const { count } = await supabase
-      .from('feedback')
-      .select('*', { count: 'exact', head: true })
-      .eq(filterStatus && filterStatus !== 'all' ? 'status' : 'id', 
-           filterStatus && filterStatus !== 'all' ? filterStatus : supabase.not('id', 'is', null));
+    const countQuery = filterStatus && filterStatus !== 'all' 
+      ? supabase.from('feedback').select('*', { count: 'exact', head: true }).eq('status', filterStatus)
+      : supabase.from('feedback').select('*', { count: 'exact', head: true });
+    
+    const { count } = await countQuery;
     
     // Apply pagination
     const from = (page - 1) * limit;
@@ -60,10 +60,19 @@ export async function fetchFeedback(
     const profilesMap = await fetchProfiles(userIds);
 
     // 4. Attach profiles to feedback items
-    const feedbackWithProfiles: FeedbackResponse[] = feedbackData.map(item => ({
-      ...item,
-      profiles: profilesMap[item.user_id]
-    }));
+    const feedbackWithProfiles: FeedbackResponse[] = feedbackData.map(item => {
+      // Ensure we're working with a proper object
+      if (!item || typeof item !== 'object') {
+        console.error('Invalid feedback item:', item);
+        return null;
+      }
+      
+      // Add profile data to each feedback item
+      return {
+        ...item,
+        profiles: profilesMap[item.user_id]
+      };
+    }).filter(Boolean) as FeedbackResponse[]; // Filter out any null values
 
     // 5. Get current user's upvotes - using optimized query
     const userId = (await supabase.auth.getUser()).data.user?.id;

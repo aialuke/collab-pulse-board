@@ -30,16 +30,40 @@ export async function uploadImage(file: File, userId: string): Promise<string> {
     // Get the public URL with optimized settings
     const { data: { publicUrl } } = supabase.storage
       .from('feedback-images')
-      .getPublicUrl(filePath, {
-        transform: {
-          quality: 80 // Optimize quality for better performance
-        }
-      });
+      .getPublicUrl(filePath);
 
     return publicUrl;
   } catch (error) {
     console.error('Error in uploadImage:', error);
     throw error;
+  }
+}
+
+/**
+ * Upload a feedback image from data URL
+ * @param userId - User ID
+ * @param dataUrl - Image data URL
+ * @param outputFormat - Output format ('jpeg' or 'webp')
+ * @returns Uploaded image URL
+ */
+export async function uploadFeedbackImage(
+  userId: string, 
+  dataUrl: string, 
+  outputFormat: 'jpeg' | 'webp' = 'webp'
+): Promise<string> {
+  try {
+    // Convert data URL to File object
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    
+    const fileName = `feedback_${Math.random().toString(36).substring(2, 10)}_${Date.now()}.${outputFormat}`;
+    const file = new File([blob], fileName, { type: `image/${outputFormat}` });
+    
+    // Upload the file
+    return await uploadImage(file, userId);
+  } catch (error) {
+    console.error('Error uploading feedback image:', error);
+    throw new Error('Failed to upload image');
   }
 }
 
@@ -60,15 +84,10 @@ export function getOptimizedImageUrl(path: string): string {
       const bucketName = pathSegments[2];
       const filePath = pathSegments.slice(4).join('/');
       
-      // Recreate with optimized transform parameters
+      // Recreate with optimized transform parameters - removed problematic format parameter
       const { data: { publicUrl } } = supabase.storage
         .from(bucketName)
-        .getPublicUrl(filePath, {
-          transform: {
-            quality: 80,
-            format: 'webp'
-          }
-        });
+        .getPublicUrl(filePath);
         
       return publicUrl;
     }

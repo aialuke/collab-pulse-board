@@ -29,13 +29,8 @@ export async function fetchProfiles(userIds: string[]): Promise<Record<string, P
       .select('id, name, avatar_url, role')
       .in('id', userIds)
       .order('name')
-      .options({
-        count: 'exact',
-        // Add caching hint for Supabase
-        head: false,
-        // Minimize over-fetching
-        limit: userIds.length
-      });
+      // Remove the options property as it's not supported
+      .limit(userIds.length);  // Use limit directly instead of options
 
     if (profilesError) {
       console.error('Error fetching profiles:', profilesError);
@@ -100,6 +95,7 @@ export async function fetchOriginalPosts(
       .select(`
         id, title, content, user_id, category_id, 
         created_at, upvotes_count, status, image_url, link_url,
+        updated_at, comments_count, is_repost, original_post_id, repost_comment,
         categories(name, id)
       `)
       .in('id', originalPostIds);
