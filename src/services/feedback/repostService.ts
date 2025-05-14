@@ -49,7 +49,7 @@ export async function repostFeedback(originalPostId: string, comment: string): P
     // Now fetch the category information
     const { data: categoryData, error: categoryError } = await supabase
       .from('categories')
-      .select('name')
+      .select('name, id')  // Make sure we select the id field
       .eq('id', repostData.category_id)
       .single();
 
@@ -71,10 +71,11 @@ export async function repostFeedback(originalPostId: string, comment: string): P
     }
 
     // Add profile and category data to feedback item
+    // Make sure categories includes the id field
     const feedbackWithData = {
       ...repostData,
-      categories: categoryData || { name: 'Uncategorized' },
-      profiles: profileData || { name: 'Unknown User' }
+      categories: categoryData || { name: 'Uncategorized', id: repostData.category_id },
+      profiles: profileData || { name: 'Unknown User', id: user.id }
     };
 
     return mapFeedbackItem(feedbackWithData);
