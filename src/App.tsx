@@ -56,7 +56,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const AppRoutes = () => {
+// This component needs to be inside the AuthProvider
+const AppRoutesWithAuth = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -112,7 +113,7 @@ function App() {
                   <TooltipProvider>
                     <Toaster />
                     <Sonner />
-                    <AppRoutes />
+                    <AppRoutesWithAuth />
                     <PWAInstallPrompt />
                     <OfflineIndicator />
                   </TooltipProvider>

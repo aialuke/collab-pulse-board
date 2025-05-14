@@ -6,7 +6,9 @@ import { RepostProvider } from '@/contexts/RepostContext';
 export default function HomePage() {
   return (
     <div className="w-full flex-1 flex flex-col">
-      <FeedbackContainer />
+      <RepostProvider onRepostSuccess={(feedback) => {}}>
+        <FeedbackContainer />
+      </RepostProvider>
     </div>
   );
 }

@@ -4,13 +4,13 @@ import { FeedbackType } from '@/types/feedback';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useFeedbackActions } from '@/hooks/useFeedbackActions';
 import { useFeedbackFilters } from '@/hooks/useFeedbackFilters';
-import { RepostProvider, useRepost } from '@/contexts/RepostContext';
+import { useRepost } from '@/contexts/RepostContext';
 import { useFeedbackData } from '@/hooks/useFeedbackData';
 import { useFilteredFeedback } from '@/hooks/useFilteredFeedback';
 import { MobileFeedbackView } from './MobileFeedbackView';
 import { DesktopFeedbackView } from './DesktopFeedbackView';
 
-function FeedbackContainerContent() {
+export function FeedbackContainer() {
   const isMobile = useIsMobile();
   const { filters } = useFeedbackFilters();
   const {
@@ -83,13 +83,5 @@ function FeedbackContainerContent() {
       handleRepost={handleRepost}
       handleRetry={handleRetry}
     />
-  );
-}
-
-export function FeedbackContainer() {
-  return (
-    <RepostProvider onRepostSuccess={(feedback) => {}}>
-      <FeedbackContainerContent />
-    </RepostProvider>
   );
 }
