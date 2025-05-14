@@ -5,57 +5,57 @@
 
 @layer base {
   :root {
-    /* Explicitly define background with correct HSL value for #E8F0FE */
+    /* Updated background with correct HSL value for #E8F0FE */
     --background: 214 80% 95%; /* #E8F0FE */
-    --foreground: 220 14% 35%; /* Slate Gray */
+    --foreground: 220 40% 20%; /* Darkened from 35% to 20% for 7:1 contrast ratio */
 
     --card: 0 0% 100%; /* White */
-    --card-foreground: 220 14% 35%; /* Slate Gray */
+    --card-foreground: 220 40% 20%; /* Matched with main foreground */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 14% 35%;
+    --popover-foreground: 220 40% 20%;
 
-    --primary: 53 95% 65%; /* Warm Yellow (#FCF050) */
-    --primary-foreground: 220 14% 35%;
+    --primary: 53 95% 55%; /* Darkened yellow (#E6D938) for better contrast */
+    --primary-foreground: 220 40% 20%;
 
     --secondary: 222 68% 33%; /* Deep Blue (#1E3A8A) */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 10% 96%;
-    --muted-foreground: 220 14% 46%;
+    --muted: 220 10% 92%; /* Slightly adjusted for better visibility */
+    --muted-foreground: 220 40% 35%; /* Darkened for 4.5:1 contrast ratio */
 
     --accent: 222 68% 33%; /* Deep Blue (#1E3A8A) */
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 50%; /* Darkened red for better contrast */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 53 95% 65%; /* Warm Yellow */
+    --border: 220 13% 75%; /* Darkened for better visibility */
+    --input: 220 13% 75%; /* Matched with border */
+    --ring: 53 95% 50%; /* Darkened ring */
 
     --radius: 0.75rem;
   }
 
   .dark {
-    /* Updated dark mode version that aligns with our new color scheme */
-    --background: 222 68% 15%;
-    --foreground: 210 40% 96%;
+    /* Updated dark mode colors for improved contrast */
+    --background: 222 68% 10%;
+    --foreground: 210 40% 98%;
 
-    --card: 222 68% 18%;
-    --card-foreground: 210 40% 96%;
+    --card: 222 68% 13%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 222 68% 18%;
-    --popover-foreground: 210 40% 96%;
+    --popover: 222 68% 13%;
+    --popover-foreground: 210 40% 98%;
 
     --primary: 53 95% 65%;
-    --primary-foreground: 222 68% 15%;
+    --primary-foreground: 222 68% 10%;
 
     --secondary: 210 40% 96%;
-    --secondary-foreground: 222 68% 15%;
+    --secondary-foreground: 222 68% 10%;
 
-    --muted: 222 68% 22%;
-    --muted-foreground: 217 10% 65%;
+    --muted: 222 68% 18%;
+    --muted-foreground: 217 10% 80%; /* Increased from 65% for better contrast */
 
     --accent: 222 68% 33%;
     --accent-foreground: 210 40% 98%;
@@ -63,8 +63,8 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 222 68% 22%;
-    --input: 222 68% 22%;
+    --border: 222 68% 25%; /* Increased for better visibility */
+    --input: 222 68% 25%;
     --ring: 53 95% 65%;
   }
 }
@@ -87,7 +87,7 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Typography base styles */
+  /* Typography base styles with improved contrast */
   h1 {
     @apply text-heading-1 font-semibold md:text-[2.5rem] md:leading-[2.75rem];
   }
@@ -104,10 +104,10 @@
     @apply text-body md:text-[1rem] md:leading-[1.5rem];
   }
 
-  /* Optimized placeholder styles */
+  /* Optimized placeholder styles with enhanced contrast */
   input::placeholder,
   textarea::placeholder {
-    @apply text-muted-foreground opacity-70 transition-opacity;
+    @apply text-muted-foreground opacity-60 transition-opacity;
     /* Prevent placeholder from adding render delay */
     will-change: opacity;
     visibility: visible;
@@ -125,10 +125,10 @@
   /* Improve placeholder appearance when input is focused */
   input:focus::placeholder,
   textarea:focus::placeholder {
-    @apply opacity-40;
+    @apply opacity-30;
   }
 
-  /* Enhanced focus states for accessibility */
+  /* Enhanced focus states for accessibility with higher contrast */
   a:focus, button:focus, input:focus, select:focus, textarea:focus {
     @apply outline-none ring-2 ring-primary ring-offset-2;
   }

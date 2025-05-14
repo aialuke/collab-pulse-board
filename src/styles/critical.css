@@ -2,7 +2,7 @@
 /* Critical CSS for above-the-fold content - Mobile First */
 :root {
   --background: 214 80% 95%; /* #E8F0FE */
-  --foreground: 220 14% 35%; /* Slate Gray */
+  --foreground: 220 40% 20%; /* Darkened for 7:1 contrast ratio */
 }
 
 body {
@@ -28,7 +28,7 @@ body {
 /* Mobile-first header layout */
 header {
   background: white;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0,0,0,0.2); /* Enhanced contrast border */
   height: 64px;
   display: flex;
   align-items: center;
@@ -54,12 +54,13 @@ main {
   overflow-x: hidden;
 }
 
-/* Typography base sizes - mobile first */
+/* Typography base sizes - mobile first with enhanced contrast */
 h1 {
   font-size: 2rem;
   line-height: 2.25rem;
   letter-spacing: -0.02em;
   font-weight: 600;
+  color: hsl(220, 40%, 15%); /* Darker for better contrast */
 }
 
 h2 {
@@ -67,11 +68,13 @@ h2 {
   line-height: 2rem;
   letter-spacing: -0.02em;
   font-weight: 600;
+  color: hsl(220, 40%, 15%); /* Darker for better contrast */
 }
 
 p {
   font-size: 0.875rem;
   line-height: 1.25rem;
+  color: hsl(220, 40%, 20%); /* Consistent with foreground */
 }
 
 /* Safe area insets for modern mobile devices */

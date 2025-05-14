@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { OTPInput, OTPInputContext } from "input-otp"
 import { Dot } from "lucide-react"
@@ -11,7 +12,7 @@ const InputOTP = React.forwardRef<
   <OTPInput
     ref={ref}
     containerClassName={cn(
-      "flex items-center gap-2 has-[:disabled]:opacity-50",
+      "flex items-center gap-2 has-[:disabled]:opacity-60",
       containerClassName
     )}
     className={cn("disabled:cursor-not-allowed", className)}
@@ -39,8 +40,8 @@ const InputOTPSlot = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        "relative flex h-10 w-10 items-center justify-center border-y border-r border-input text-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md",
-        isActive && "z-10 ring-2 ring-ring ring-offset-background",
+        "relative flex h-10 w-10 items-center justify-center border-y-2 border-r-2 border-input text-sm transition-all first:rounded-l-md first:border-l-2 last:rounded-r-md",
+        isActive && "z-10 ring-2 ring-ring ring-offset-2",
         className
       )}
       {...props}
@@ -61,7 +62,7 @@ const InputOTPSeparator = React.forwardRef<
   React.ComponentPropsWithoutRef<"div">
 >(({ ...props }, ref) => (
   <div ref={ref} role="separator" {...props}>
-    <Dot />
+    <Dot className="text-foreground" />
   </div>
 ))
 InputOTPSeparator.displayName = "InputOTPSeparator"
