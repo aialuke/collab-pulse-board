@@ -25,8 +25,6 @@ export function useFilteredFeedback(
           return a.createdAt.getTime() - b.createdAt.getTime();
         case 'upvotes':
           return b.upvotes - a.upvotes;
-        case 'comments':
-          return b.comments - a.comments;
         default:
           return 0;
       }

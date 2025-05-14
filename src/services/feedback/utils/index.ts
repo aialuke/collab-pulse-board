@@ -63,7 +63,6 @@ export function mapFeedbackItem(item: any, isUpvoted: boolean = false): Feedback
     category: categoryName,
     categoryId: item.category_id,
     upvotes: item.upvotes_count || 0,
-    comments: item.comments_count || 0,
     status: item.status as FeedbackStatus,
     imageUrl: item.image_url || undefined,
     linkUrl: item.link_url || undefined,

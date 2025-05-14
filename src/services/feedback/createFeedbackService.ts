@@ -68,7 +68,6 @@ export async function createFeedback(input: CreateFeedbackInput): Promise<Feedba
     categoryId: data.category_id,
     createdAt: new Date(data.created_at),
     upvotes: data.upvotes_count,
-    comments: data.comments_count,
     status: data.status as FeedbackStatus,
     imageUrl: data.image_url || undefined,
     linkUrl: data.link_url || undefined,
