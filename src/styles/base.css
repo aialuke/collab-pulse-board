@@ -5,41 +5,15 @@
 
 @layer base {
   :root {
-    /* Light mode - Background with HSL value for #F8F9FA */
+    /* Essential color variables */
     --background: 210 17% 98%; /* #F8F9FA */
-    --foreground: 210 10% 11%; /* #171E28 - 7:1 contrast with background */
-
-    --card: 0 0% 100%; /* White */
-    --card-foreground: 210 10% 11%; /* #171E28 - Matched with foreground */
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 10% 11%;
-
-    /* Vibrant yellow - #FFD700 Gold */
+    --foreground: 210 10% 11%; /* #171E28 */
     --primary: 50 100% 50%; /* #FFD700 - vibrant gold */
-    --primary-foreground: 210 10% 11%; /* Darker text for contrast with gold */
-
-    /* Deep Blue - Meets 3:1 contrast with white text */
+    --primary-foreground: 210 10% 11%;
     --secondary: 222 68% 30%; /* #1A326E */
     --secondary-foreground: 0 0% 100%;
-
-    --muted: 220 10% 94%; /* Light muted background */
-    --muted-foreground: 210 10% 30%; /* Darker for 4.5:1 contrast ratio */
-
-    --accent: 222 68% 30%; /* Deep Blue (#1A326E) */
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84% 40%; /* Darkened red for better contrast */
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 220 13% 80%; /* Darkened for better visibility - 3:1 contrast with background */
-    --input: 220 13% 80%; /* Matched with border */
-    --ring: 50 100% 50%; /* Ring matches primary gold */
-
     --radius: 0.75rem;
-    
-    /* Glow color - unified value */
-    --glow-color: rgba(255, 215, 0, 0.5); /* Bright gold */
+    --glow-color: rgba(255, 215, 0, 0.5);
   }
 }
 
@@ -62,7 +36,7 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Typography base styles with improved contrast and Manrope specifications */
+  /* Core typography styles */
   h1 {
     @apply text-heading-1 font-semibold md:text-[2.5rem] md:leading-[2.75rem] tracking-[-0.02em];
   }
@@ -79,15 +53,7 @@
     @apply text-body md:text-[1rem] md:leading-[1.5rem];
   }
 
-  /* Optimized placeholder styles with enhanced contrast */
-  input::placeholder,
-  textarea::placeholder {
-    @apply text-muted-foreground opacity-60 transition-opacity;
-    will-change: opacity;
-    visibility: visible;
-  }
-
-  /* Consolidated focus states for accessibility with higher contrast */
+  /* Focus states for accessibility */
   a:focus-visible, 
   button:focus-visible, 
   input:focus-visible, 

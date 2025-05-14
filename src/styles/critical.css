@@ -1,12 +1,12 @@
 
 /* Critical CSS for above-the-fold content - Mobile First with WCAG AAA compliance */
 :root {
-  /* Critical variables only - others are loaded from base.css */
+  /* Critical variables only */
   --background: 210 17% 98%;
   --foreground: 210 10% 11%;
 }
 
-/* Base critical styles for mobile-first rendering */
+/* Essential base styles */
 body {
   margin: 0;
   padding: 0;
@@ -27,7 +27,7 @@ body {
   width: 100%;
 }
 
-/* Mobile-first header layout with enhanced contrast */
+/* Essential header styling */
 header {
   background: white;
   border-bottom: 1px solid rgba(0,0,0,0.3);
@@ -37,26 +37,20 @@ header {
   position: sticky;
   top: 0;
   z-index: 10;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   padding: 0 1rem;
 }
 
-/* Mobile-optimized content area */
+/* Essential main content area */
 main {
   flex: 1;
   width: 100%;
   overflow-x: hidden;
 }
 
-/* Safe area insets for modern mobile devices */
+/* Safe area insets for modern devices */
 @supports (padding: env(safe-area-inset-bottom)) {
   header {
     padding-left: max(1rem, env(safe-area-inset-left));
     padding-right: max(1rem, env(safe-area-inset-right));
-  }
-  
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
   }
 }

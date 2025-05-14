@@ -1,23 +1,5 @@
 
-/* WCAG AAA Compliant Styles with 7:1 contrast ratio for normal text */
-:root {
-  /* Base colors with high contrast */
-  --text-normal: #121212; /* Very dark gray for text on light bg (12:1) */
-  --text-light-bg: #121212; /* Very dark gray for text on light bg (12:1) */
-  --text-on-accent: #ffffff; /* White text on accent colors */
-  
-  --bg-light: #ffffff; /* White for light mode */
-  
-  /* Primary brand colors with accessible alternatives */
-  --primary-color: #0c4a80; /* Darker blue with sufficient contrast */
-  --primary-color-light: #d4e5f9; /* Very light blue for backgrounds */
-  --primary-color-accent: #0b3761; /* Even darker blue for accents */
-  
-  /* Error, success, warning with high contrast */
-  --error-color: #ab1212; /* Dark red for error text (7:1) */
-  --success-color: #0d652d; /* Dark green for success (7:1) */
-  --warning-color: #974c00; /* Dark orange for warnings (7:1) */
-}
+/* WCAG AAA Compliant Accessibility Styles */
 
 /* High contrast focus styles */
 *:focus {
@@ -28,22 +10,12 @@
 /* Support for high contrast modes */
 @media (forced-colors: active) {
   /* Use system colors in high contrast modes */
-  :root {
-    --primary-color: CanvasText;
-    --primary-color-light: Canvas;
-    --primary-color-accent: CanvasText;
-    --error-color: CanvasText;
-    --success-color: CanvasText;
-    --warning-color: CanvasText;
-  }
-  
-  /* Enhance focus states in high contrast mode */
   *:focus {
     outline: 3px solid CanvasText;
   }
 }
 
-/* Make sure all interactive elements have sufficient touch target size */
+/* Ensure sufficient touch target sizes */
 button, 
 a, 
 input[type="button"], 
@@ -71,51 +43,17 @@ input[type="reset"],
   width: auto;
   height: auto;
   padding: 16px;
-  background: var(--bg-light);
-  color: var(--text-light-bg);
+  background: white;
+  color: black;
   z-index: 9999;
   text-decoration: none;
 }
 
-/* Consolidated accessibility utilities */
+/* Screen reader only utilities */
 .sr-only {
   @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
 }
 
 .sr-only-focusable:focus {
   @apply not-sr-only static h-auto w-auto overflow-visible whitespace-normal;
-}
-
-/* Image accessibility utilities */
-.img-alt-text {
-  @apply sr-only;
-}
-
-/* Text overlay for images with proper contrast */
-.text-overlay {
-  @apply absolute bottom-0 left-0 right-0 p-4 bg-text-overlay-dark;
-}
-
-/* Custom loading and error states */
-.loading-skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading-skeleton 1.5s ease-in-out infinite;
-}
-
-@keyframes loading-skeleton {
-  from {
-    background-position: 200% 0;
-  }
-  to {
-    background-position: -200% 0;
-  }
-}
-
-.error-state {
-  border: 2px solid var(--error-color);
-  border-radius: 8px;
-  padding: 16px;
-  color: var(--error-color);
-  background-color: rgba(171, 18, 18, 0.05);
 }
