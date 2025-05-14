@@ -1,6 +1,4 @@
 
-import { OutgoingHttpHeaders } from 'http';
-
 // Server configuration that returns static headers rather than functions
 export const configureServer = () => {
   return {
@@ -9,7 +7,7 @@ export const configureServer = () => {
       overlay: false, // Disable HMR overlay for better performance
     },
     cors: true,
-    // Use Vite's custom headers format for pattern matching instead of functions
+    // Use Vite's custom headers format for pattern matching
     headers: {
       // Set appropriate cache control headers
       '*.js': {
@@ -46,6 +44,6 @@ export const configureServer = () => {
       '**': {
         'Cache-Control': 'public, max-age=3600' // 1 hour default
       }
-    } as OutgoingHttpHeaders
+    }
   };
 };
