@@ -140,31 +140,28 @@
     @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
   }
 
-  /* Shout Out animation classes - ENHANCED WITH BRIGHTER COLORS */
+  /* Shout Out animation classes - ENHANCED WITH UNIFORM GOLDEN GLOW */
   .shout-out-card {
-    @apply relative overflow-hidden;
+    @apply relative overflow-hidden rounded-lg;
   }
 
-  /* Soft Glow Fade animation for Shout Out cards - ENHANCED */
+  /* Soft Glow Fade animation for Shout Out cards - ENHANCED FOR ROUNDED CORNERS */
   .shout-out-card.animate {
-    /* Enhanced animation with brighter gold color, increased opacity and spread */
-    animation: soft-glow-fade 2.5s ease-in-out infinite;
-    /* Add will-change to optimize GPU rendering */
-    will-change: box-shadow;
-    /* Use filter for more uniform glow that follows the shape of the card */
+    /* Use filter for cleaner glow that properly follows the rounded corners */
     filter: drop-shadow(0 0 8px var(--glow-color-light));
+    /* Add will-change to optimize GPU rendering */
+    will-change: filter;
+    /* Add border-radius to match card rounding */
+    border-radius: 0.5rem;
   }
 
-  /* Soft Glow Fade animation keyframes - ENHANCED */
+  /* Soft Glow Fade animation keyframes - IMPROVED FOR UNIFORM DISTRIBUTION */
   @keyframes soft-glow-fade {
     0%, 100% { 
-      box-shadow: 0 0 0 0 var(--glow-color-light), 0 0 0 0 var(--glow-color-light), 0 0 0 0 var(--glow-color-light), 0 0 0 0 var(--glow-color-light);
       filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.2));
     }
     50% { 
-      /* Use multiple box-shadows to create a more uniform glow */
-      box-shadow: 0 0 16px 4px var(--glow-color-light), 0 0 16px 4px var(--glow-color-light), 0 0 16px 4px var(--glow-color-light), 0 0 16px 4px var(--glow-color-light);
-      filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
     }
   }
 
@@ -172,8 +169,7 @@
   @media (prefers-reduced-motion: reduce) {
     .shout-out-card.animate {
       animation: none !important;
-      box-shadow: 0 0 4px 1px rgba(255, 215, 0, 0.3); /* Static subtle glow for reduced motion */
-      filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.3));
+      filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.3));
     }
   }
 
@@ -186,21 +182,20 @@
     
     @keyframes soft-glow-fade-dark {
       0%, 100% { 
-        box-shadow: 0 0 0 0 var(--glow-color-dark), 0 0 0 0 var(--glow-color-dark), 0 0 0 0 var(--glow-color-dark), 0 0 0 0 var(--glow-color-dark);
         filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.3));
       }
       50% { 
-        box-shadow: 0 0 16px 4px var(--glow-color-dark), 0 0 16px 4px var(--glow-color-dark), 0 0 16px 4px var(--glow-color-dark), 0 0 16px 4px var(--glow-color-dark);
-        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
       }
     }
 
     /* Honor reduced motion in dark mode */
     @media (prefers-reduced-motion: reduce) {
       .shout-out-card.animate {
-        box-shadow: 0 0 4px 1px rgba(255, 215, 0, 0.4); /* Static subtle golden glow for reduced motion */
-        filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.4));
+        animation: none !important;
+        filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.4));
       }
     }
   }
 }
+
