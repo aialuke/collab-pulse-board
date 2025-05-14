@@ -12,7 +12,6 @@ export function useFeedbackData() {
   const [retryCount, setRetryCount] = useState(0);
   const { toast } = useToast();
 
-  // Properly typed React Query with a queryFn that matches expected signature
   const { 
     data, 
     isLoading, 
@@ -21,14 +20,16 @@ export function useFeedbackData() {
   } = useQuery({
     queryKey: ['feedback', retryCount],
     queryFn: async () => {
-      console.log("Fetching feedback data");
-      const result = await fetchFeedback();
-      console.log("Fetch result:", result);
-      return result;
+      try {
+        return await fetchFeedback();
+      } catch (error) {
+        console.error('Error loading feedback:', error);
+        throw error; // Let React Query handle the error
+      }
     },
     meta: {
       onError: (error: Error) => {
-        console.error("Query error:", error);
+        // This will run when the query encounters an error
         setLoadError('Failed to load feedback. Please try again.');
         toast({
           title: 'Error',
@@ -41,27 +42,23 @@ export function useFeedbackData() {
 
   useEffect(() => {
     if (data) {
-      console.log("Setting data from query result:", data);
-      // Make sure we handle data properly
-      setFeedback(data.items || []);
-      setFilteredFeedback(data.items || []);
+      // Extract the items array from the response
+      setFeedback(data.items);
+      setFilteredFeedback(data.items);
       setLoadError(null);
     }
   }, [data]);
 
   const loadFeedback = useCallback(async () => {
     try {
-      console.log("Manually triggering refetch");
       await refetch();
       return Promise.resolve();
     } catch (error) {
-      console.error("Refetch error:", error);
       return Promise.reject(error);
     }
   }, [refetch]);
 
   const handleRetry = useCallback(() => {
-    console.log("Retry triggered, incrementing count");
     setRetryCount(prev => prev + 1);
   }, []);
 

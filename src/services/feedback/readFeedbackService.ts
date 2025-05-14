@@ -1,6 +1,4 @@
-
-import { supabaseDb } from '@/integrations/supabase/db-client';
-import { supabaseAuth } from '@/integrations/supabase/auth-client';
+import { supabase } from '@/integrations/supabase/client';
 import { FeedbackType } from '@/types/feedback';
 import { createBaseFeedbackQuery, fetchProfiles, fetchUserUpvotes, fetchOriginalPosts } from './feedbackApi';
 import { mapFeedbackItem, mapFeedbackItems } from './mappers';
@@ -14,23 +12,11 @@ export async function fetchFeedback(
   limit: number = 10
 ): Promise<{ items: FeedbackType[], hasMore: boolean, total: number }> {
   try {
-    console.log(`Fetching feedback page ${page} with limit ${limit}`);
-    console.log('Auth state before request:', await supabaseAuth.getSession());
-    
-    // Check auth state before proceeding
-    const sessionResponse = await supabaseAuth.getSession();
-    const isAuthenticated = !!sessionResponse.data.session;
-    
-    if (!isAuthenticated) {
-      console.warn('fetchFeedback called without authentication, returning empty result');
-      return { items: [], hasMore: false, total: 0 };
-    }
-    
     // Select only the columns we need to improve query performance
     const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
     
     // 1. Build query with pagination
-    let query = supabaseDb
+    let query = supabase
       .from('feedback')
       .select(`
         ${columns},
@@ -38,16 +24,7 @@ export async function fetchFeedback(
       `);
 
     // Count total before applying pagination (for hasMore calculation)
-    const { count, error: countError } = await supabaseDb
-      .from('feedback')
-      .select('*', { count: 'exact', head: true });
-      
-    if (countError) {
-      console.error('Error counting feedback items:', countError);
-      throw countError;
-    }
-    
-    console.log(`Total feedback count: ${count}`);
+    const { count } = await supabase.from('feedback').select('*', { count: 'exact', head: true });
     
     // Apply pagination
     const from = (page - 1) * limit;
@@ -67,18 +44,11 @@ export async function fetchFeedback(
     }
 
     if (!feedbackData || feedbackData.length === 0) {
-      console.log('No feedback data returned');
       return { items: [], hasMore: false, total: count || 0 };
     }
-    
-    console.log(`Successfully fetched ${feedbackData.length} feedback items:`, feedbackData);
 
-    // 2. Collect all unique user IDs with proper type safety
-    const userIds: string[] = feedbackData
-      .filter(item => item && typeof item === 'object' && 'user_id' in item && typeof item.user_id === 'string')
-      .map(item => item.user_id as string);
-
-    console.log(`Found ${userIds.length} unique user IDs`);
+    // 2. Collect all unique user IDs
+    const userIds = [...new Set(feedbackData.map(item => item.user_id))];
 
     // 3. Fetch profiles in a single query
     const profilesMap = await fetchProfiles(userIds);
@@ -87,31 +57,21 @@ export async function fetchFeedback(
     const feedbackWithProfiles: FeedbackResponse[] = feedbackData
       .filter(item => item !== null && typeof item === 'object')
       .map(item => {
-        const typedItem = item as any;
         // We need to ensure all required properties are present, adding defaults for optional ones
         return {
-          ...typedItem,
-          profiles: typedItem.user_id && profilesMap[typedItem.user_id] ? profilesMap[typedItem.user_id] : null,
+          ...item,
+          profiles: profilesMap[item.user_id],
           // Make sure all required properties are present, defaulting if necessary
-          updated_at: typedItem.updated_at || typedItem.created_at,
-          comments_count: typedItem.comments_count || 0,
-          is_repost: Boolean(typedItem.is_repost),
-          original_post_id: typedItem.original_post_id || null,
-          repost_comment: typedItem.repost_comment || null
-        } as FeedbackResponse;
+          updated_at: item.updated_at || item.created_at,
+          comments_count: item.comments_count || 0,
+          is_repost: Boolean(item.is_repost),
+          original_post_id: item.original_post_id || null,
+          repost_comment: item.repost_comment || null
+        };
       });
 
     // 5. Get current user's upvotes - using optimized query
-    let userId: string | undefined;
-    try {
-      const authResponse = await supabaseAuth.getUser();
-      userId = authResponse.data.user?.id;
-      console.log(userId ? `Current user ID: ${userId}` : 'No authenticated user');
-    } catch (authError) {
-      console.error('Error fetching current user:', authError);
-      // Continue without user ID, just won't show upvotes
-    }
-    
+    const userId = (await supabase.auth.getUser()).data.user?.id;
     const userUpvotes = await fetchUserUpvotes(userId);
 
     // 6. Handle reposts efficiently - fetch original posts if needed
@@ -119,14 +79,12 @@ export async function fetchFeedback(
       item.is_repost && item.original_post_id
     );
     
-    console.log(`Found ${repostItems.length} reposts`);
-    
     let originalPostsMap = {};
     
     if (repostItems.length > 0) {
       const originalPostIds = repostItems
         .map(item => item.original_post_id)
-        .filter((id): id is string => typeof id === 'string');
+        .filter(Boolean) as string[];
       
       originalPostsMap = await fetchOriginalPosts(
         originalPostIds,
@@ -137,8 +95,6 @@ export async function fetchFeedback(
 
     // 7. Map to frontend models
     const mappedItems = mapFeedbackItems(feedbackWithProfiles, userUpvotes, originalPostsMap);
-    
-    console.log(`Successfully mapped ${mappedItems.length} feedback items`);
     
     // 8. Determine if there are more items
     const hasMore = count ? from + feedbackData.length < count : false;
@@ -159,12 +115,10 @@ export async function fetchFeedback(
  */
 export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
   try {
-    console.log(`Fetching feedback by ID: ${id}`);
-    
     // 1. Fetch the specific feedback item with only necessary columns
     const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
     
-    const { data: feedbackData, error: feedbackError } = await supabaseDb
+    const { data: feedbackData, error: feedbackError } = await supabase
       .from('feedback')
       .select(`
         ${columns},
@@ -179,20 +133,16 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
     }
 
     if (!feedbackData) {
-      console.error(`Feedback with ID ${id} not found`);
       throw new Error('Feedback not found');
     }
-    
-    console.log('Successfully fetched feedback item');
 
-    // 2. Fetch profile for the feedback author - ensuring user_id is a string
-    const userIds: string[] = typeof feedbackData.user_id === 'string' ? [feedbackData.user_id] : [];
-    const profilesMap = await fetchProfiles(userIds);
+    // 2. Fetch profile for the feedback author
+    const profilesMap = await fetchProfiles([feedbackData.user_id]);
     
     // 3. Add profile to feedback
     const feedbackWithProfile: FeedbackResponse = {
-      ...feedbackData as any,
-      profiles: profilesMap[feedbackData.user_id as string] || null,
+      ...feedbackData,
+      profiles: profilesMap[feedbackData.user_id],
       // Ensure required properties have default values if missing
       updated_at: feedbackData.updated_at || feedbackData.created_at,
       comments_count: feedbackData.comments_count || 0,
@@ -202,15 +152,7 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
     };
 
     // 4. Get current user's upvotes
-    let userId: string | undefined;
-    try {
-      const authResponse = await supabaseAuth.getUser();
-      userId = authResponse.data.user?.id;
-    } catch (authError) {
-      console.error('Error fetching current user:', authError);
-      // Continue without user ID
-    }
-    
+    const userId = (await supabase.auth.getUser()).data.user?.id;
     const userUpvotes = await fetchUserUpvotes(userId);
     
     // 5. Map the feedback item
@@ -218,10 +160,8 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
 
     // 6. If it's a repost, fetch the original post
     if (feedbackItem.isRepost && feedbackItem.originalPostId) {
-      const originalPostIds: string[] = [feedbackItem.originalPostId];
-      
       const originalPostsMap = await fetchOriginalPosts(
-        originalPostIds,
+        [feedbackItem.originalPostId],
         profilesMap,
         userUpvotes
       );
@@ -233,8 +173,6 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
         );
       }
     }
-    
-    console.log('Finished processing feedback item');
 
     return feedbackItem;
   } catch (error) {

@@ -1,6 +1,7 @@
 
 import { supabaseDb } from '@/integrations/supabase/db-client';
-import { FeedbackResponse, ProfileResponse } from '@/types/supabase';
+import { supabaseAuth } from '@/integrations/supabase/auth-client';
+import { FeedbackResponse, ProfileResponse, UpvoteResponse } from '@/types/supabase';
 
 /**
  * Base query builder for feedback with column selection optimization
@@ -21,18 +22,15 @@ export function createBaseFeedbackQuery(columns = '*') {
 export async function fetchProfiles(userIds: string[]): Promise<Record<string, ProfileResponse>> {
   try {
     // If no user IDs, return empty result
-    if (!userIds.length) {
-      console.log('No user IDs provided to fetchProfiles');
-      return {};
-    }
+    if (!userIds.length) return {};
 
-    console.log(`Fetching profiles for ${userIds.length} users`);
-    
     // Use a single batch query instead of multiple queries
     const { data: profilesData, error: profilesError } = await supabaseDb
       .from('profiles')
       .select('id, name, avatar_url, role')
-      .in('id', userIds);
+      .in('id', userIds)
+      .order('name')
+      .limit(userIds.length);  // Use limit directly instead of options
 
     if (profilesError) {
       console.error('Error fetching profiles:', profilesError);
@@ -41,15 +39,10 @@ export async function fetchProfiles(userIds: string[]): Promise<Record<string, P
 
     // Create a map of user_id to profile data for quick lookups
     const profilesMap: Record<string, ProfileResponse> = {};
-    if (profilesData && profilesData.length > 0) {
-      console.log(`Successfully fetched ${profilesData.length} profiles`);
+    if (profilesData) {
       profilesData.forEach(profile => {
-        if (profile && typeof profile === 'object' && 'id' in profile) {
-          profilesMap[profile.id] = profile as ProfileResponse;
-        }
+        profilesMap[profile.id] = profile;
       });
-    } else {
-      console.log('No profile data returned from query');
     }
 
     return profilesMap;
@@ -64,39 +57,23 @@ export async function fetchProfiles(userIds: string[]): Promise<Record<string, P
  */
 export async function fetchUserUpvotes(userId: string | undefined): Promise<Record<string, boolean>> {
   try {
-    if (!userId) {
-      console.log('No user ID provided to fetchUserUpvotes, returning empty result');
-      return {};
-    }
+    if (!userId) return {};
     
-    console.log(`Fetching upvotes for user ${userId}`);
-    
-    const { data: upvotes, error } = await supabaseDb
+    const { data: upvotes } = await supabaseDb
       .from('upvotes')
       .select('feedback_id')
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
     
-    if (error) {
-      console.error('Error fetching user upvotes:', error);
-      return {};
-    }
-    
-    if (!upvotes || upvotes.length === 0) {
-      console.log('No upvotes found for user');
-      return {};
-    }
-    
-    console.log(`Found ${upvotes.length} upvotes for user`);
+    if (!upvotes) return {};
     
     // Use reduce for better performance than object assignment in a loop
-    return upvotes.reduce<Record<string, boolean>>((acc, upvote) => {
-      if (upvote && typeof upvote === 'object' && 'feedback_id' in upvote) {
-        acc[upvote.feedback_id] = true;
-      }
+    return upvotes.reduce((acc, upvote) => {
+      acc[upvote.feedback_id] = true;
       return acc;
-    }, {});
+    }, {} as Record<string, boolean>);
   } catch (error) {
-    console.error('Error in fetchUserUpvotes:', error);
+    console.error('Error fetching user upvotes:', error);
     return {};
   }
 }
@@ -110,12 +87,7 @@ export async function fetchOriginalPosts(
   userUpvotes: Record<string, boolean>
 ): Promise<Record<string, FeedbackResponse>> {
   try {
-    if (!originalPostIds.length) {
-      console.log('No original post IDs provided to fetchOriginalPosts');
-      return {};
-    }
-    
-    console.log(`Fetching ${originalPostIds.length} original posts`);
+    if (!originalPostIds.length) return {};
     
     // Optimize the columns we select to only what's needed
     const { data: originalPostsData, error: originalPostsError } = await supabaseDb
@@ -133,27 +105,21 @@ export async function fetchOriginalPosts(
       throw originalPostsError;
     }
     
-    if (!originalPostsData || originalPostsData.length === 0) {
-      console.log('No original posts found');
-      return {};
-    }
+    if (!originalPostsData) return {};
     
-    console.log(`Successfully fetched ${originalPostsData.length} original posts`);
-    
-    // Get the profiles for original post authors - Fix #1: Use type guards and filter
-    const originalPostUserIds: string[] = originalPostsData
-      .filter(item => item && typeof item === 'object' && 'user_id' in item && typeof item.user_id === 'string')
-      .map(item => item.user_id as string);
+    // Get the profiles for original post authors
+    const originalPostUserIds = originalPostsData
+      .map(item => item.user_id)
+      .filter((id): id is string => typeof id === 'string');
     
     // Create a Set from the array for uniqueness, then convert back to array
     const uniqueUserIds = [...new Set(originalPostUserIds)];
     
-    // Only fetch profiles we don't already have - Fix #2: Add type safety for profilesMap indexing
-    const missingUserIds = uniqueUserIds.filter(id => !Object.prototype.hasOwnProperty.call(profilesMap, id));
+    // Only fetch profiles we don't already have
+    const missingUserIds = uniqueUserIds.filter(id => !profilesMap[id as string]);
     
     if (missingUserIds.length > 0) {
-      console.log(`Fetching ${missingUserIds.length} missing profiles for original posts`);
-      const additionalProfilesMap = await fetchProfiles(missingUserIds);
+      const additionalProfilesMap = await fetchProfiles(missingUserIds as string[]);
       // Merge with existing profiles map
       Object.assign(profilesMap, additionalProfilesMap);
     }
@@ -162,17 +128,12 @@ export async function fetchOriginalPosts(
     const originalPostsMap: Record<string, FeedbackResponse> = {};
     
     originalPostsData.forEach(post => {
-      if (post && typeof post === 'object' && 'id' in post && 'user_id' in post) {
-        const userId = post.user_id as string;
-        // Add profile to the post - Fix #3: Add safer access to profilesMap
-        const postWithProfile = {
+      if (typeof post.user_id === 'string') {
+        // Add profile to the post
+        originalPostsMap[post.id] = {
           ...post,
-          profiles: Object.prototype.hasOwnProperty.call(profilesMap, userId) 
-            ? profilesMap[userId] 
-            : null
-        } as FeedbackResponse;
-        
-        originalPostsMap[post.id as string] = postWithProfile;
+          profiles: profilesMap[post.user_id]
+        };
       }
     });
     

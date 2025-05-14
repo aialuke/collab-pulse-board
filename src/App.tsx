@@ -7,7 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import { RefreshProvider } from "@/contexts/RefreshContext";
 import { TermsOfUseDialog } from "@/components/terms/TermsOfUseDialog";
-import { createBasicQueryClient } from "@/lib/react-query";
+import { createQueryClient } from "@/lib/react-query";
 
 // Layout
 import { AppLayout } from "./components/layout/AppLayout";
@@ -125,8 +125,8 @@ const AppRoutesWithAuth = () => {
   );
 };
 
-// Create QueryClient instance with basic configuration for better performance
-const queryClient = createBasicQueryClient();
+// Create QueryClient instance at app initialization time but outside of render cycles
+const queryClient = createQueryClient();
 
 function App() {
   return (

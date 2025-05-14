@@ -11,8 +11,6 @@ import { FeedbackSkeleton, FeedbackError } from './LoadingStates';
 export function FeedbackContainer() {
   const isMobile = useIsMobile();
   
-  console.log("Rendering FeedbackContainer");
-  
   // Use the paginated feedback hook for optimized data loading and infinite scroll
   const {
     feedback,
@@ -20,16 +18,9 @@ export function FeedbackContainer() {
     error: loadError,
     hasMore,
     sentinelRef,
-    refresh
+    refresh: handleRetry
   } = usePaginatedFeedback({
     pageSize: 10
-  });
-  
-  console.log("FeedbackContainer state:", { 
-    feedbackCount: feedback?.length, 
-    isLoading, 
-    loadError, 
-    hasMore 
   });
   
   // Use the existing feedback actions hook
@@ -38,8 +29,7 @@ export function FeedbackContainer() {
     handleReport, 
     handleDelete,
   } = useFeedbackActions(() => {
-    console.log('Feedback updated via actions, refreshing data');
-    refresh();
+    console.log('Feedback updated via actions');
   });
   
   // Use the repost context
@@ -51,26 +41,11 @@ export function FeedbackContainer() {
     closeRepostDialog
   } = useRepost();
   
-  // Log when the component mounts and unmounts to track lifecycle
-  useEffect(() => {
-    console.log("FeedbackContainer mounted");
-    return () => {
-      console.log("FeedbackContainer unmounted");
-    };
-  }, []);
-
-  // Log when feedback data changes
-  useEffect(() => {
-    if (feedback) {
-      console.log(`FeedbackContainer received ${feedback.length} feedback items`);
-    }
-  }, [feedback]);
-  
   // Common props for both mobile and desktop views
   const viewProps = {
     feedback,
     isLoading,
-    loadError: loadError || null,
+    loadError,
     feedbackToRepost,
     repostDialogOpen,
     handleUpvote,
@@ -79,7 +54,7 @@ export function FeedbackContainer() {
     openRepostDialog,
     closeRepostDialog,
     handleRepost,
-    handleRetry: refresh, // Use refresh as handleRetry
+    handleRetry,
     hasMore,
     sentinelRef
   };
