@@ -1,5 +1,5 @@
 
-// Import HeadersConfig type from Vite to properly type our headers
+// Import the correct type for Vite server options
 import type { ServerOptions } from 'vite';
 
 // Server configuration
@@ -10,42 +10,46 @@ export const configureServer = (): ServerOptions => {
       overlay: false, // Disable HMR overlay for better performance
     },
     cors: true,
-    // Use Vite's custom headers format for pattern matching
+    // Set appropriate cache control headers
+    // Format: pattern -> header -> value
     headers: {
-      // Set appropriate cache control headers
+      // Static assets with hash-based filenames (immutable)
       '*.js': {
-        'Cache-Control': 'public, max-age=31536000, immutable' // 1 year for hashed assets
+        'Cache-Control': 'public, max-age=31536000, immutable'
       },
       '*.css': {
-        'Cache-Control': 'public, max-age=31536000, immutable' // 1 year for hashed assets
+        'Cache-Control': 'public, max-age=31536000, immutable'
       },
+      // Image assets
       '*.png': {
-        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400' // 7 days with 1 day stale
+        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400'
       },
       '*.jpg': {
-        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400' // 7 days with 1 day stale
+        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400'
       },
       '*.jpeg': {
-        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400' // 7 days with 1 day stale
+        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400'
       },
       '*.gif': {
-        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400' // 7 days with 1 day stale
+        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400'
       },
       '*.webp': {
-        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400' // 7 days with 1 day stale
+        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400'
       },
       '*.svg': {
-        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400' // 7 days with 1 day stale
+        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400'
       },
+      // PWA manifest
       'manifest.webmanifest': {
-        'Cache-Control': 'public, max-age=86400' // 1 day for PWA manifest
+        'Cache-Control': 'public, max-age=86400'
       },
+      // Service worker - no caching
       'sw.js': {
-        'Cache-Control': 'public, max-age=0, must-revalidate' // No caching for service workers
+        'Cache-Control': 'public, max-age=0, must-revalidate'
       },
-      // Default header applied to all other files
+      // Default for all other files
       '**': {
-        'Cache-Control': 'public, max-age=3600' // 1 hour default
+        'Cache-Control': 'public, max-age=3600'
       }
     }
   };
