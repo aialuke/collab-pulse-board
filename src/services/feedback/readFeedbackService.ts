@@ -49,10 +49,12 @@ export async function fetchFeedback(
       return { items: [], hasMore: false, total: count || 0 };
     }
 
-    // 2. Collect all unique user IDs
-    const userIds = [...new Set(feedbackData.map(item => item.user_id))];
+    // 2. Collect all unique user IDs with proper type safety
+    const userIds: string[] = feedbackData
+      .map(item => item.user_id)
+      .filter((id): id is string => typeof id === 'string');
 
-    // 3. Fetch profiles in a single query
+    // 3. Fetch profiles in a single query - Now we're passing a properly typed string array
     const profilesMap = await fetchProfiles(userIds);
 
     // 4. Attach profiles to feedback items
@@ -86,7 +88,7 @@ export async function fetchFeedback(
     if (repostItems.length > 0) {
       const originalPostIds = repostItems
         .map(item => item.original_post_id)
-        .filter(Boolean) as string[];
+        .filter((id): id is string => typeof id === 'string');
       
       originalPostsMap = await fetchOriginalPosts(
         originalPostIds,
@@ -138,8 +140,9 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
       throw new Error('Feedback not found');
     }
 
-    // 2. Fetch profile for the feedback author
-    const profilesMap = await fetchProfiles([feedbackData.user_id]);
+    // 2. Fetch profile for the feedback author - ensuring user_id is a string
+    const userIds: string[] = typeof feedbackData.user_id === 'string' ? [feedbackData.user_id] : [];
+    const profilesMap = await fetchProfiles(userIds);
     
     // 3. Add profile to feedback
     const feedbackWithProfile: FeedbackResponse = {
@@ -162,8 +165,10 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
 
     // 6. If it's a repost, fetch the original post
     if (feedbackItem.isRepost && feedbackItem.originalPostId) {
+      const originalPostIds: string[] = [feedbackItem.originalPostId]; // Already typed as string
+      
       const originalPostsMap = await fetchOriginalPosts(
-        [feedbackItem.originalPostId],
+        originalPostIds,
         profilesMap,
         userUpvotes
       );
