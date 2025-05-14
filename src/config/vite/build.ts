@@ -18,7 +18,7 @@ export const configureBuild = () => {
     // Generate chunks for better caching
     chunkSizeWarningLimit: 1000,
     // Enable tree-shaking optimization
-    minify: 'terser',
+    minify: 'terser' as const, // Fix the type by using 'as const'
     terserOptions: {
       compress: {
         drop_console: process.env.NODE_ENV === 'production',

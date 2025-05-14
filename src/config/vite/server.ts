@@ -8,7 +8,6 @@ export const configureServer = () => {
     hmr: {
       overlay: false, // Disable HMR overlay for better performance
     },
-    // Remove the string type for middlewareMode since it expects a boolean or object
     cors: true,
   };
 };
