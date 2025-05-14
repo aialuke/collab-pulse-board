@@ -116,10 +116,10 @@ export async function fetchOriginalPosts(
     const uniqueUserIds = [...new Set(originalPostUserIds)];
     
     // Only fetch profiles we don't already have
-    const missingUserIds = uniqueUserIds.filter(id => !profilesMap[id]);
+    const missingUserIds = uniqueUserIds.filter(id => !profilesMap[id as string]);
     
     if (missingUserIds.length > 0) {
-      const additionalProfilesMap = await fetchProfiles(missingUserIds);
+      const additionalProfilesMap = await fetchProfiles(missingUserIds as string[]);
       // Merge with existing profiles map
       Object.assign(profilesMap, additionalProfilesMap);
     }
@@ -128,11 +128,13 @@ export async function fetchOriginalPosts(
     const originalPostsMap: Record<string, FeedbackResponse> = {};
     
     originalPostsData.forEach(post => {
-      // Add profile to the post
-      originalPostsMap[post.id] = {
-        ...post,
-        profiles: profilesMap[post.user_id]
-      };
+      if (typeof post.user_id === 'string') {
+        // Add profile to the post
+        originalPostsMap[post.id] = {
+          ...post,
+          profiles: profilesMap[post.user_id]
+        };
+      }
     });
     
     return originalPostsMap;
