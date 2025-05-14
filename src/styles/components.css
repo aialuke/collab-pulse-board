@@ -1,5 +1,14 @@
 
 @layer components {
+  /* Input group styling for auth forms */
+  .input-group {
+    @apply relative flex items-center;
+  }
+  
+  .input-icon-container {
+    @apply absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none z-10;
+  }
+
   /* Shout Out animation classes - kept because they're used in the app */
   .shout-out-card {
     @apply relative overflow-hidden rounded-lg;
