@@ -4,15 +4,14 @@
   /* Base colors with high contrast */
   --text-normal: #121212; /* Very dark gray for text on light bg (12:1) */
   --text-light-bg: #121212; /* Very dark gray for text on light bg (12:1) */
-  --text-dark-bg: #ffffff; /* White text on dark bg (21:1) */
+  --text-on-accent: #ffffff; /* White text on accent colors */
   
   --bg-light: #ffffff; /* White for light mode */
-  --bg-dark: #121212; /* Very dark gray for dark mode */
   
   /* Primary brand colors with accessible alternatives */
   --primary-color: #0c4a80; /* Darker blue with sufficient contrast */
   --primary-color-light: #d4e5f9; /* Very light blue for backgrounds */
-  --primary-color-dark: #0b3761; /* Even darker blue for dark mode */
+  --primary-color-accent: #0b3761; /* Even darker blue for accents */
   
   /* Error, success, warning with high contrast */
   --error-color: #ab1212; /* Dark red for error text (7:1) */
@@ -35,7 +34,7 @@
   :root {
     --primary-color: CanvasText;
     --primary-color-light: Canvas;
-    --primary-color-dark: CanvasText;
+    --primary-color-accent: CanvasText;
     --error-color: CanvasText;
     --success-color: CanvasText;
     --warning-color: CanvasText;

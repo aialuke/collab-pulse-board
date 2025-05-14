@@ -129,14 +129,6 @@ textarea {
   }
 }
 
-/* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: 220 20% 10%; /* #121620 */
-    --foreground: 210 15% 92%; /* #EAF0F6 - 7:1 contrast */
-  }
-}
-
 /* High contrast mode overrides */
 @media (forced-colors: active) {
   button, 

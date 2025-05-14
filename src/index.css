@@ -15,12 +15,6 @@
   margin: 0 auto;
 }
 
-/* Custom properties for glow effects */
-:root {
-  --glow-color-light: rgba(255, 215, 0, 0.5); /* Bright gold for light mode */
-  --glow-color-dark: rgba(255, 215, 0, 0.5); /* Also gold for dark mode */
-}
-
 /* Add appropriate focus styles for improved accessibility */
 :focus {
   outline: 2px solid var(--primary);
