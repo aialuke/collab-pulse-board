@@ -1,16 +1,12 @@
 
 import { baseClient } from './base-client';
 
-// Configure auth options directly on the base client
-baseClient.auth.setOptions({
-  storage: localStorage,
-  persistSession: true,
-  autoRefreshToken: true,
-});
-
 // Export only the auth-related methods
 export const supabaseAuth = {
   auth: baseClient.auth,
   getUser: async () => await baseClient.auth.getUser(),
   getSession: async () => await baseClient.auth.getSession(),
 };
+
+// Note: Modern Supabase client doesn't use setOptions directly
+// Auth options should be configured when creating the client in base-client.ts
