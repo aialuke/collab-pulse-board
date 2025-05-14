@@ -1,12 +1,7 @@
 
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from './types';
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './base-client';
-
-// Specialized Supabase client for storage operations
-const storageClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+import { baseClient } from './base-client';
 
 // Export only the storage-related methods
 export const supabaseStorage = {
-  storage: storageClient.storage,
+  storage: baseClient.storage,
 };
