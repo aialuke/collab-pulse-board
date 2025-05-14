@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FeedbackType } from '@/types/feedback';
 import { getFirstName } from '@/services/feedback/utils';
 import { useNavigate } from 'react-router-dom';
+import { ImageWithOverlay } from '@/components/ui/image-with-overlay';
 
 interface RepostCardProps {
   feedback: FeedbackType;
@@ -45,14 +46,14 @@ export function RepostCard({
         
         {feedback.imageUrl && (
           <div className="w-full">
-            <div className="relative w-full h-20 overflow-hidden rounded-sm">
-              <img 
-                src={feedback.imageUrl} 
-                alt="Preview" 
-                className="w-full h-full object-cover"
-                loading="lazy" 
-              />
-            </div>
+            <ImageWithOverlay 
+              src={feedback.imageUrl} 
+              alt="Preview" 
+              aspectRatio={16/9}
+              width={800}
+              height={450}
+              className="rounded-sm"
+            />
           </div>
         )}
       </div>

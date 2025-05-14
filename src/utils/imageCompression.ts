@@ -37,7 +37,9 @@ interface CompressionResult {
   originalSize: number;
   compressedSize: number;
   compressionRatio: number;
-  outputFormat: string; // New field to track the output format (webp or jpeg)
+  outputFormat: string; // Field to track the output format (webp or jpeg)
+  width: number; // Track the output width
+  height: number; // Track the output height
 }
 
 /**
@@ -113,7 +115,9 @@ export const compressImage = async (
           originalSize,
           compressedSize,
           compressionRatio,
-          outputFormat // Include the output format in the result
+          outputFormat,
+          width, // Include width in result
+          height // Include height in result
         });
       };
       

@@ -2,6 +2,7 @@
 import React from 'react';
 import { CompressionStats } from './ImageUtils';
 import { formatFileSize } from '@/utils/imageCompression';
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface ImagePreviewProps {
   image: string;
@@ -12,11 +13,16 @@ export function ImagePreview({ image, compressionStats }: ImagePreviewProps) {
   return (
     <div className="mt-2 space-y-2">
       <div className="relative rounded-md overflow-hidden">
-        <img
-          src={image}
-          alt="Preview"
-          className="w-full max-h-[150px] sm:max-h-[200px] object-contain"
-        />
+        <AspectRatio ratio={4/3} className="bg-muted min-h-[150px]">
+          <img
+            src={image}
+            alt="Preview"
+            className="object-contain w-full h-full"
+            width={1200}
+            height={900}
+            loading="lazy"
+          />
+        </AspectRatio>
       </div>
       
       {compressionStats && (

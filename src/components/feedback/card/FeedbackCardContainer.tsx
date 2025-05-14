@@ -44,8 +44,12 @@ export function FeedbackCardContainer({
     onRepost(feedback.id);
   };
 
+  // Determine if this post has an image to adjust min-height accordingly
+  const hasImage = !!feedback.imageUrl || !!feedback.image;
+  const minHeightClass = hasImage ? "min-h-[240px]" : "min-h-[120px]";
+
   return (
-    <div className="w-full mb-4">
+    <div className={`w-full mb-4 ${minHeightClass}`}>
       <FeedbackCard
         feedback={feedback}
         isManager={isManager}

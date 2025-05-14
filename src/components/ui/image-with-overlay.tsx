@@ -8,21 +8,37 @@ interface ImageWithOverlayProps extends React.ImgHTMLAttributes<HTMLImageElement
   aspectRatio?: number;
   overlayPosition?: 'bottom' | 'top';
   overlayClassName?: string;
+  width?: number;
+  height?: number;
 }
 
 /**
  * An accessible image component with optional text overlay
- * that provides proper contrast for text on images
+ * that provides proper contrast for text on images and prevents layout shift
  */
 const ImageWithOverlay = React.forwardRef<HTMLDivElement, ImageWithOverlayProps>(
-  ({ src, alt, overlay, aspectRatio = 16 / 9, overlayPosition = 'bottom', className, overlayClassName, ...props }, ref) => {
+  ({ 
+    src, 
+    alt, 
+    overlay, 
+    aspectRatio = 16 / 9, 
+    overlayPosition = 'bottom', 
+    className, 
+    overlayClassName, 
+    width = 1200,
+    height = 800,
+    ...props 
+  }, ref) => {
     return (
       <div ref={ref} className={cn("relative overflow-hidden rounded-md", className)}>
         <AspectRatio ratio={aspectRatio} className="bg-muted">
           <img
             src={src}
-            alt={alt}
+            alt={alt || "Image"}
             className="object-cover w-full h-full"
+            width={width}
+            height={height}
+            loading="lazy"
             {...props}
           />
         </AspectRatio>
@@ -36,7 +52,6 @@ const ImageWithOverlay = React.forwardRef<HTMLDivElement, ImageWithOverlayProps>
                 : "top-0 bg-text-overlay-light text-foreground",
               overlayClassName
             )}
-            // Make sure overlay text is properly associated with the image for screen readers
             aria-hidden="false"
           >
             {overlay}

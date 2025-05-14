@@ -19,7 +19,13 @@ export async function uploadImage(file: File, userId: string): Promise<string> {
       .upload(filePath, file, {
         cacheControl: '31536000', // 1 year cache
         upsert: false,
-        contentType: file.type // Explicitly set content-type for proper handling
+        contentType: file.type, // Explicitly set content-type for proper handling
+        // Add metadata for dimensions - this helps with CLS
+        metadata: {
+          width: '1200', // Maximum width from compression
+          height: '1200', // Maximum height from compression
+          format: fileExt
+        }
       });
 
     if (error) {

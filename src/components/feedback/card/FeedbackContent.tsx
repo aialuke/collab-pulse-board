@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { FeedbackType } from '@/types/feedback';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { ImageWithOverlay } from '@/components/ui/image-with-overlay';
 
 interface FeedbackContentProps {
   feedback: FeedbackType;
@@ -20,14 +21,16 @@ export function FeedbackContent({
       {imageSource && (
         <>
           <div 
-            className="mt-2 rounded-md overflow-hidden cursor-pointer"
+            className="mt-2 overflow-hidden cursor-pointer"
             onClick={() => setIsImagePreviewOpen(true)}
           >
-            <img 
+            <ImageWithOverlay
               src={imageSource} 
-              alt="Feedback attachment" 
-              className="w-full object-cover h-auto max-h-[150px] sm:max-h-[200px] hover:opacity-90 transition-opacity"
-              loading="lazy"
+              alt="Feedback attachment"
+              aspectRatio={4/3}
+              width={1200}
+              height={900}
+              className="w-full hover:opacity-90 transition-opacity"
             />
           </div>
           
@@ -38,6 +41,8 @@ export function FeedbackContent({
                   src={imageSource} 
                   alt="Feedback attachment - Full preview" 
                   className="max-w-full max-h-[80vh] object-contain"
+                  width={1200}
+                  height={900}
                 />
               </div>
             </DialogContent>
