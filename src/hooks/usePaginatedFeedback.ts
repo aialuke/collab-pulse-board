@@ -1,10 +1,9 @@
-
 import { useCallback, useEffect } from 'react';
 import { usePagination } from './usePagination';
 import { FeedbackType } from '@/types/feedback';
 import { useToast } from './use-toast';
 import { fetchFeedback } from '@/services/feedbackService';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface UsePaginatedFeedbackOptions {
   pageSize?: number;
@@ -14,6 +13,7 @@ export function usePaginatedFeedback({
   pageSize = 10
 }: UsePaginatedFeedbackOptions = {}) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const {
     page,
@@ -39,14 +39,19 @@ export function usePaginatedFeedback({
   } = useQuery({
     queryKey: ['feedback', 1, pageSize],
     queryFn: async () => {
-      console.log("Fetching initial feedback data with page 1 and pageSize", pageSize);
-      const result = await fetchFeedback(1, pageSize);
-      console.log("Initial fetch result:", result);
-      return result;
+      console.log(`usePaginatedFeedback: Fetching initial feedback data with page 1 and pageSize ${pageSize}`);
+      try {
+        const result = await fetchFeedback(1, pageSize);
+        console.log(`usePaginatedFeedback: Initial fetch returned ${result.items.length} items, hasMore: ${result.hasMore}, total: ${result.total}`);
+        return result;
+      } catch (error) {
+        console.error("usePaginatedFeedback: Error fetching initial data:", error);
+        throw error;
+      }
     },
     meta: {
       onSuccess: (data) => {
-        console.log("Success fetching initial data:", data);
+        console.log(`usePaginatedFeedback: Success fetching initial data, items count: ${data?.items?.length || 0}`);
         if (data) {
           setFeedback(data.items || []);
           setHasMore(data.hasMore || false);
@@ -56,14 +61,18 @@ export function usePaginatedFeedback({
         }
       },
       onError: (error: Error) => {
-        console.error("Error fetching initial data:", error);
+        console.error("usePaginatedFeedback: Error in query:", error);
         toast({
           title: 'Error',
           description: 'Failed to load feedback. Please try again.',
           variant: 'destructive',
         });
       }
-    }
+    },
+    // Only retry once for better UX
+    retry: 1,
+    // Keep cached data for 1 minute
+    staleTime: 60000
   });
   
   const isLoading = initialLoading || loadingMore;
@@ -75,11 +84,11 @@ export function usePaginatedFeedback({
     
     // Only create BroadcastChannel if it's supported by the browser
     if ('BroadcastChannel' in window) {
-      console.log("Setting up BroadcastChannel for cache updates");
+      console.log("usePaginatedFeedback: Setting up BroadcastChannel for cache updates");
       channel = new BroadcastChannel('api-updates');
       channel.addEventListener('message', (event) => {
         if (event.data.type === 'CACHE_UPDATED' && event.data.url === 'feed') {
-          console.log("Cache updated notification received, refreshing data");
+          console.log("usePaginatedFeedback: Cache updated notification received, refreshing data");
           // Refresh data if cache was updated
           refetch();
         }
@@ -96,54 +105,71 @@ export function usePaginatedFeedback({
     if (pageToLoad === 1) return; // First page is handled by React Query
     
     try {
-      console.log(`Loading additional page ${pageToLoad}`);
+      console.log(`usePaginatedFeedback: Loading additional page ${pageToLoad}`);
       setLoadingMore(true);
       setPaginationError(null);
       
       const result = await fetchFeedback(pageToLoad, pageSize);
-      console.log(`Page ${pageToLoad} result:`, result);
+      console.log(`usePaginatedFeedback: Page ${pageToLoad} returned ${result.items.length} items, hasMore: ${result.hasMore}`);
       
       // Use a functional update to prevent race conditions
-      setFeedback(prev => [...prev, ...(result.items || [])]);
+      setFeedback(prev => {
+        // Filter out any duplicates based on ID
+        const existingIds = new Set(prev.map(item => item.id));
+        const newItems = result.items.filter(item => !existingIds.has(item.id));
+        return [...prev, ...newItems];
+      });
       
       // Update hasMore and total from API response
       setHasMore(result.hasMore || false);
       if (result.total !== undefined) {
         setTotal(result.total);
       }
+      
+      // Update the query cache with the new data
+      queryClient.setQueryData(['feedback', pageToLoad, pageSize], result);
+      
     } catch (error: any) {
-      console.error(`Error loading page ${pageToLoad}:`, error);
+      console.error(`usePaginatedFeedback: Error loading page ${pageToLoad}:`, error);
       setPaginationError('Failed to load feedback. Please try again.');
       
       toast({
         title: 'Error',
-        description: 'Failed to load feedback. Please try again.',
+        description: 'Failed to load additional feedback items. Please try again.',
         variant: 'destructive',
       });
     } finally {
       setLoadingMore(false);
     }
-  }, [pageSize, setFeedback, setLoadingMore, setPaginationError, setHasMore, setTotal, toast]);
+  }, [pageSize, setFeedback, setLoadingMore, setPaginationError, setHasMore, setTotal, toast, queryClient]);
   
   // Load next page when page changes
   useEffect(() => {
     if (page > 1) {
-      console.log(`Page changed to ${page}, loading additional data`);
+      console.log(`usePaginatedFeedback: Page changed to ${page}, loading additional data`);
       loadFeedbackPage(page);
     }
   }, [page, loadFeedbackPage]);
   
+  // Clean up function that invalidates queries when component unmounts
+  useEffect(() => {
+    return () => {
+      console.log("usePaginatedFeedback: Cleaning up queries on unmount");
+    };
+  }, []);
+  
   // Modified refresh function to return Promise<void> instead of the refetch result
   const refresh = useCallback(async (): Promise<void> => {
+    console.log("usePaginatedFeedback: Refreshing feedback data");
     try {
-      console.log("Refreshing feedback data");
+      reset(); // Reset pagination state
       await refetch();
       return Promise.resolve();
     } catch (error) {
-      console.error("Error refreshing feedback:", error);
+      console.error("usePaginatedFeedback: Error refreshing feedback:", error);
       return Promise.resolve(); // Still resolve to void
     }
-  }, [refetch]);
+  }, [refetch, reset]);
   
   return {
     feedback,

@@ -51,6 +51,21 @@ export function FeedbackContainer() {
     closeRepostDialog
   } = useRepost();
   
+  // Log when the component mounts and unmounts to track lifecycle
+  useEffect(() => {
+    console.log("FeedbackContainer mounted");
+    return () => {
+      console.log("FeedbackContainer unmounted");
+    };
+  }, []);
+
+  // Log when feedback data changes
+  useEffect(() => {
+    if (feedback) {
+      console.log(`FeedbackContainer received ${feedback.length} feedback items`);
+    }
+  }, [feedback]);
+  
   // Common props for both mobile and desktop views
   const viewProps = {
     feedback,
