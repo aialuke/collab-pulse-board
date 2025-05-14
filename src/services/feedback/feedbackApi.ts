@@ -10,7 +10,7 @@ export function createBaseFeedbackQuery() {
     .from('feedback')
     .select(`
       *,
-      categories(name)
+      categories(name, id)
     `);
 }
 
@@ -87,7 +87,7 @@ export async function fetchOriginalPosts(
       .from('feedback')
       .select(`
         *,
-        categories(name)
+        categories(name, id)
       `)
       .in('id', originalPostIds);
       
@@ -114,11 +114,10 @@ export async function fetchOriginalPosts(
     const originalPostsMap: Record<string, FeedbackResponse> = {};
     
     originalPostsData.forEach(post => {
-      // Add profile to the post and ensure target_user_id is present (null if not defined)
+      // Add profile to the post
       originalPostsMap[post.id] = {
         ...post,
-        profiles: profilesMap[post.user_id],
-        target_user_id: post.target_user_id || null
+        profiles: profilesMap[post.user_id]
       };
     });
     

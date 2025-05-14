@@ -29,7 +29,6 @@ export type FeedbackType = {
   repostComment?: string;
   // Add shout out field
   isShoutOut?: boolean;
-  targetUserId?: string; // ID of the user being shouted out
 };
 
 export type CreateFeedbackInput = {
@@ -41,9 +40,6 @@ export type CreateFeedbackInput = {
   isRepost?: boolean;
   originalPostId?: string;
   repostComment?: string;
-  // Add shout out fields
-  isShoutOut?: boolean;
-  targetUserId?: string;
 };
 
 export type FeedbackFilterOptions = {

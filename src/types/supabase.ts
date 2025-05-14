@@ -16,7 +16,6 @@ export interface FeedbackResponse {
   is_repost: boolean | null;
   original_post_id: string | null;
   repost_comment: string | null;
-  target_user_id: string | null;
   categories?: { name: string; id: number } | null;
   profiles?: { 
     id: string;

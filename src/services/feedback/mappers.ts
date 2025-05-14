@@ -67,7 +67,6 @@ export function mapFeedbackItem(
     originalPostId: item.original_post_id || undefined,
     repostComment: item.repost_comment || undefined,
     isShoutOut, // Set based on category ID
-    targetUserId: item.target_user_id, // Include target user ID if present
   };
   
   // Add original post if this is a repost and we have the original post data

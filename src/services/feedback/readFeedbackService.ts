@@ -42,8 +42,7 @@ export async function fetchFeedback(filterStatus?: string): Promise<FeedbackType
     // 4. Attach profiles to feedback items
     const feedbackWithProfiles: FeedbackResponse[] = feedbackData.map(item => ({
       ...item,
-      profiles: profilesMap[item.user_id],
-      target_user_id: item.target_user_id || null // Ensure target_user_id exists
+      profiles: profilesMap[item.user_id]
     }));
 
     // 5. Get current user's upvotes
@@ -102,8 +101,7 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
     // 3. Add profile to feedback
     const feedbackWithProfile: FeedbackResponse = {
       ...feedbackData,
-      profiles: profilesMap[feedbackData.user_id],
-      target_user_id: feedbackData.target_user_id || null // Ensure target_user_id exists
+      profiles: profilesMap[feedbackData.user_id]
     };
 
     // 4. Get current user's upvotes
