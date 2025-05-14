@@ -28,24 +28,22 @@ export async function fetchProfiles(userIds: string[]): Promise<Record<string, P
     const { data: profilesData, error: profilesError } = await supabaseDb
       .from('profiles')
       .select('id, name, avatar_url, role')
-      .in('id', userIds)
-      .order('name')
-      .limit(userIds.length);  // Use limit directly instead of options
+      .in('id', userIds);
 
     if (profilesError) {
       console.error('Error fetching profiles:', profilesError);
       throw profilesError;
     }
 
-    // Create a map of user_id to profile data for quick lookups
-    const profilesMap: Record<string, ProfileResponse> = {};
-    if (profilesData) {
-      profilesData.forEach(profile => {
-        profilesMap[profile.id] = profile;
-      });
-    }
+    if (!profilesData) return {};
 
-    return profilesMap;
+    // Create a map of user_id to profile data for quick lookups
+    return profilesData.reduce((acc, profile) => {
+      if (profile && profile.id) {
+        acc[profile.id] = profile;
+      }
+      return acc;
+    }, {} as Record<string, ProfileResponse>);
   } catch (error) {
     console.error('Error in fetchProfiles:', error);
     throw error;
@@ -59,17 +57,23 @@ export async function fetchUserUpvotes(userId: string | undefined): Promise<Reco
   try {
     if (!userId) return {};
     
-    const { data: upvotes } = await supabaseDb
+    const { data: upvotes, error } = await supabaseDb
       .from('upvotes')
       .select('feedback_id')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .eq('user_id', userId);
+    
+    if (error) {
+      console.error('Error fetching user upvotes:', error);
+      return {};
+    }
     
     if (!upvotes) return {};
     
     // Use reduce for better performance than object assignment in a loop
     return upvotes.reduce((acc, upvote) => {
-      acc[upvote.feedback_id] = true;
+      if (upvote && upvote.feedback_id) {
+        acc[upvote.feedback_id] = true;
+      }
       return acc;
     }, {} as Record<string, boolean>);
   } catch (error) {
@@ -109,17 +113,17 @@ export async function fetchOriginalPosts(
     
     // Get the profiles for original post authors
     const originalPostUserIds = originalPostsData
-      .map(item => item.user_id)
-      .filter((id): id is string => typeof id === 'string');
+      .filter(item => item && typeof item.user_id === 'string')
+      .map(item => item.user_id);
     
     // Create a Set from the array for uniqueness, then convert back to array
     const uniqueUserIds = [...new Set(originalPostUserIds)];
     
     // Only fetch profiles we don't already have
-    const missingUserIds = uniqueUserIds.filter(id => !profilesMap[id as string]);
+    const missingUserIds = uniqueUserIds.filter(id => !profilesMap[id]);
     
     if (missingUserIds.length > 0) {
-      const additionalProfilesMap = await fetchProfiles(missingUserIds as string[]);
+      const additionalProfilesMap = await fetchProfiles(missingUserIds);
       // Merge with existing profiles map
       Object.assign(profilesMap, additionalProfilesMap);
     }
@@ -128,7 +132,7 @@ export async function fetchOriginalPosts(
     const originalPostsMap: Record<string, FeedbackResponse> = {};
     
     originalPostsData.forEach(post => {
-      if (typeof post.user_id === 'string') {
+      if (post && typeof post.user_id === 'string') {
         // Add profile to the post
         originalPostsMap[post.id] = {
           ...post,

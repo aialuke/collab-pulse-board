@@ -1,14 +1,31 @@
 
-// Re-export all feedback-related services from this directory
-export * from './categoryService';
-export * from './createFeedbackService';
-export * from './deleteFeedbackService';
+// Consolidated exports for feedback services
+// Organize by functionality for better tree-shaking
+
+// Core API services
 export * from './feedbackApi';
-// Export mappers explicitly to avoid conflicts with utils
-export { mapFeedbackItem, mapFeedbackItems, extractCategoryName } from './mappers';
+
+// Feedback CRUD operations
+export * from './createFeedbackService';
 export * from './readFeedbackService';
-export * from './repostService';
-export * from './statusService';
+export * from './deleteFeedbackService';
+
+// Social interaction services
 export * from './upvoteService';
-// Export utils but exclude the conflicting functions
-export { extractProfileInfo, extractCategoryInfo } from './utils';
+export * from './repostService';
+
+// Categorization services
+export * from './categoryService';
+export * from './statusService';
+
+// Data transformation - explicit exports to avoid duplication
+export { 
+  mapFeedbackItem, 
+  mapFeedbackItems, 
+  extractCategoryName, 
+  extractProfileInfo, 
+  getFirstName 
+} from './mappers';
+
+// Image handling
+export * from './imageService';

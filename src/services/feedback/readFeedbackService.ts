@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { FeedbackType } from '@/types/feedback';
 import { createBaseFeedbackQuery, fetchProfiles, fetchUserUpvotes, fetchOriginalPosts } from './feedbackApi';
@@ -48,7 +49,9 @@ export async function fetchFeedback(
     }
 
     // 2. Collect all unique user IDs
-    const userIds = [...new Set(feedbackData.map(item => item.user_id))];
+    const userIds = feedbackData
+      .filter(item => item && typeof item.user_id === 'string')
+      .map(item => item.user_id);
 
     // 3. Fetch profiles in a single query
     const profilesMap = await fetchProfiles(userIds);

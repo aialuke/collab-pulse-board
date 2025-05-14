@@ -1,18 +1,26 @@
 
-// This file provides the main entry point for Supabase services
+// Main Supabase client entry point providing consistent access patterns
 import { baseClient, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './base-client';
+import { supabaseAuth } from './auth-client';
+import { supabaseDb } from './db-client';
+import { supabaseStorage } from './storage-client';
 
 // Export the base client as the default client
 export const supabase = baseClient;
 
-// Export the config values
+// Export config values
 export { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY };
 
-// Dynamically load specialized modules only when needed
+// Export individual services directly for simpler imports
+export { supabaseAuth, supabaseDb, supabaseStorage };
+
+/**
+ * Lazy-loaded specialized modules - only imported when needed
+ * This improves initial bundle size and load time
+ */
 export const supabaseServices = {
   // Lazy-loaded auth module
   auth: async () => {
-    // Only import when needed
     const { createAuthClient } = await import('./auth-service');
     return createAuthClient(baseClient);
   },
@@ -29,8 +37,3 @@ export const supabaseServices = {
     return createStorageClient(baseClient);
   }
 };
-
-// Export individual services directly for backward compatibility and simpler imports
-export { supabaseAuth } from './auth-client';
-export { supabaseDb } from './db-client';
-export { supabaseStorage } from './storage-client';

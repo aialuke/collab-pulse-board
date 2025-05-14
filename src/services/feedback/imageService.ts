@@ -2,6 +2,8 @@
 import { supabaseStorage } from '@/integrations/supabase/storage-client';
 import { supabaseAuth } from '@/integrations/supabase/auth-client';
 
+const FEEDBACK_IMAGES_BUCKET = 'feedback-images';
+
 /**
  * Upload an image to Supabase Storage
  * @param file - The file to upload
@@ -14,30 +16,32 @@ export async function uploadImage(file: File, userId: string): Promise<string> {
     const fileName = `${userId}_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
     const filePath = `${userId}/${fileName}`;
 
-    // Add proper cache-control headers for optimal caching
-    const { data, error } = await supabaseStorage.storage
-      .from('feedback-images')
-      .upload(filePath, file, {
+    // Use the consolidated storage client
+    const { data, error } = await supabaseStorage.uploadFile(
+      FEEDBACK_IMAGES_BUCKET,
+      filePath,
+      file,
+      {
         cacheControl: '31536000', // 1 year cache
-        upsert: false,
-        contentType: file.type, // Explicitly set content-type for proper handling
-        // Add metadata for dimensions - this helps with CLS
+        contentType: file.type,
         metadata: {
           width: '1200', // Maximum width from compression
           height: '1200', // Maximum height from compression
-          format: fileExt
+          format: fileExt || ''
         }
-      });
+      }
+    );
 
     if (error) {
       console.error('Error uploading image:', error);
       throw error;
     }
 
-    // Get the public URL with optimized settings
-    const { data: { publicUrl } } = supabaseStorage.storage
-      .from('feedback-images')
-      .getPublicUrl(filePath);
+    // Get the public URL
+    const { data: { publicUrl } } = supabaseStorage.getPublicUrl(
+      FEEDBACK_IMAGES_BUCKET,
+      filePath
+    );
 
     return publicUrl;
   } catch (error) {
@@ -91,10 +95,11 @@ export function getOptimizedImageUrl(path: string): string {
       const bucketName = pathSegments[2];
       const filePath = pathSegments.slice(4).join('/');
       
-      // Recreate with optimized transform parameters - removed problematic format parameter
-      const { data: { publicUrl } } = supabaseStorage.storage
-        .from(bucketName)
-        .getPublicUrl(filePath);
+      // Recreate with optimized transform parameters
+      const { data: { publicUrl } } = supabaseStorage.getPublicUrl(
+        bucketName,
+        filePath
+      );
         
       return publicUrl;
     }
@@ -120,22 +125,15 @@ export async function checkImageExists(path: string): Promise<boolean> {
     const pathSegments = url.pathname.split('/');
     const bucketName = pathSegments[2];
     const filePath = pathSegments.slice(4).join('/');
+    const folderPath = filePath.split('/').slice(0, -1).join('/');
+    const fileName = filePath.split('/').pop() || '';
     
-    // Use head request to check if file exists without downloading
-    const { data, error } = await supabaseStorage.storage
-      .from(bucketName)
-      .list(filePath.split('/').slice(0, -1).join('/'), {
-        limit: 1,
-        offset: 0,
-        search: filePath.split('/').pop(),
-      });
-    
-    if (error) {
-      console.error('Error checking if image exists:', error);
-      return false;
-    }
-    
-    return data && data.length > 0;
+    // Use consolidated storage client
+    return await supabaseStorage.checkFileExists(
+      bucketName,
+      folderPath,
+      fileName
+    );
   } catch (error) {
     console.error('Error in checkImageExists:', error);
     return false;

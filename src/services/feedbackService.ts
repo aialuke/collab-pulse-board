@@ -1,9 +1,10 @@
 
-// Re-export all feedback-related services from the feedback directory
-export * from './feedback';
+// Centralized export file for all feedback-related services
+// This improves tree-shaking and helps eliminate duplicate imports
 
-// Export image service functions explicitly
+// Export core services
+export { fetchFeedback, fetchFeedbackById } from './feedback/readFeedbackService';
 export { uploadFeedbackImage } from './feedback/imageService';
 
-// Export the read feedback services with a more descriptive name
-export { fetchFeedback, fetchFeedbackById } from './feedback/readFeedbackService';
+// Re-export all other services
+export * from './feedback';

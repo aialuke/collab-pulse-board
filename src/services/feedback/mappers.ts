@@ -5,17 +5,61 @@ import { FeedbackType, FeedbackStatus } from '@/types/feedback';
 // Define the category ID for shout outs
 const SHOUT_OUT_CATEGORY_ID = 5;
 
-// Extract first name from full name
+/**
+ * Extract first name from full name
+ * @param name - Full name
+ * @returns First name
+ */
 export function getFirstName(name: string): string {
   return name.split(' ')[0] || 'User';
 }
 
-// Safely extract category information
+/**
+ * Safely extract category name from category object
+ * @param categories - Category object from database
+ * @returns Category name or "Uncategorized" if not available
+ */
 export function extractCategoryName(categories: { name: string } | null | undefined): string {
   return categories?.name || 'Uncategorized';
 }
 
-// Check if an object is a valid profile response
+/**
+ * Safely extract profile information
+ * @param profiles - Profile data from the database
+ * @returns Structured profile information
+ */
+export function extractProfileInfo(profiles: any): { 
+  name: string; 
+  avatarUrl?: string; 
+  role?: string;
+  id?: string;
+} {
+  let profileInfo = {
+    name: 'Unknown User',
+    avatarUrl: undefined as string | undefined,
+    role: 'user' as string,
+    id: undefined as string | undefined
+  };
+  
+  if (profiles && 
+      typeof profiles === 'object' && 
+      'name' in profiles) {
+    profileInfo = {
+      name: profiles.name || 'Unknown User',
+      avatarUrl: profiles.avatar_url || undefined,
+      role: profiles.role || 'user',
+      id: profiles.id
+    };
+  }
+
+  return profileInfo;
+}
+
+/**
+ * Type guard to check if an object is a valid profile response
+ * @param profiles - Potential profile response
+ * @returns Boolean indicating if it's a valid profile
+ */
 export function isValidProfileResponse(profiles: any): profiles is {
   id: string;
   name: string;
@@ -28,28 +72,19 @@ export function isValidProfileResponse(profiles: any): profiles is {
          'name' in profiles;
 }
 
-// Type guard to check if profiles has required properties
-function isFullProfileInfo(profiles: any): profiles is { 
-  id: string;
-  name: string;
-  avatar_url: string | null;
-  role: string | null;
-} {
-  return profiles && 
-         typeof profiles === 'object' && 
-         !('error' in profiles) &&
-         'name' in profiles &&
-         'avatar_url' in profiles &&
-         'role' in profiles;
-}
-
-// Map database feedback item to frontend model
+/**
+ * Map database feedback item to frontend model
+ * @param item - Database feedback item
+ * @param isUpvoted - Whether the current user upvoted this feedback
+ * @param originalPostsMap - Map of original posts for reposts
+ * @returns Frontend feedback model
+ */
 export function mapFeedbackItem(
   item: FeedbackResponse, 
   isUpvoted: boolean = false,
   originalPostsMap?: Record<string, FeedbackResponse>
 ): FeedbackType {
-  // Handle author information - use type guard for proper type checking
+  // Handle author information using the consolidated function
   const authorId = item.user_id;
   
   // Ensure we have a valid profiles object
@@ -110,7 +145,13 @@ export function mapFeedbackItem(
   return feedbackItem;
 }
 
-// Map a collection of feedback items
+/**
+ * Map a collection of feedback items
+ * @param items - Database feedback items
+ * @param userUpvotes - Map of user upvotes
+ * @param originalPostsMap - Map of original posts for reposts
+ * @returns Array of frontend feedback models
+ */
 export function mapFeedbackItems(
   items: FeedbackResponse[], 
   userUpvotes: Record<string, boolean>,
