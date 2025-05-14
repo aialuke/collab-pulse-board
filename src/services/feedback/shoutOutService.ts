@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { FeedbackType } from '@/types/feedback';
 import { mapFeedbackItem } from './mappers';
+import { FeedbackResponse } from '@/types/supabase';
 
 /**
  * Create a new shout out post
@@ -76,6 +77,7 @@ export const markAsShoutOut = async (feedbackId: string): Promise<boolean> => {
  */
 export const getShoutOutsForUser = async (targetUserId: string): Promise<FeedbackType[]> => {
   try {
+    // Fetch all feedback marked as shout-out for the target user
     const { data, error } = await supabase
       .from('feedback')
       .select('*, author:profiles(*), category:categories(*)')
@@ -88,8 +90,33 @@ export const getShoutOutsForUser = async (targetUserId: string): Promise<Feedbac
       return [];
     }
 
-    // Map each item individually with explicit typing to avoid recursive type issues
-    return data.map(item => mapFeedbackItem(item, false));
+    // Use simpler mapping approach to avoid recursive type issues
+    return data.map(item => {
+      // Extract necessary data from the response and create a FeedbackType object
+      const feedbackItem: FeedbackType = {
+        id: item.id,
+        content: item.content,
+        author: {
+          id: item.user_id,
+          name: item.author?.name || 'Unknown User',
+          avatarUrl: item.author?.avatar_url || undefined,
+          role: item.author?.role || undefined
+        },
+        createdAt: new Date(item.created_at),
+        category: item.category?.name || 'Uncategorized',
+        categoryId: item.category_id,
+        upvotes: item.upvotes_count || 0,
+        comments: item.comments_count || 0,
+        status: item.status,
+        imageUrl: item.image_url || undefined,
+        linkUrl: item.link_url || undefined,
+        isUpvoted: false,
+        isShoutOut: true,
+        targetUserId: item.target_user_id
+      };
+
+      return feedbackItem;
+    });
   } catch (error) {
     console.error('Error getting shout outs for user:', error);
     return [];
