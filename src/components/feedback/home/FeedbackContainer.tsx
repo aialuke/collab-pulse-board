@@ -11,6 +11,8 @@ import { FeedbackSkeleton, FeedbackError } from './LoadingStates';
 export function FeedbackContainer() {
   const isMobile = useIsMobile();
   
+  console.log("Rendering FeedbackContainer");
+  
   // Use the paginated feedback hook for optimized data loading and infinite scroll
   const {
     feedback,
@@ -23,13 +25,21 @@ export function FeedbackContainer() {
     pageSize: 10
   });
   
+  console.log("FeedbackContainer state:", { 
+    feedbackCount: feedback?.length, 
+    isLoading, 
+    loadError, 
+    hasMore 
+  });
+  
   // Use the existing feedback actions hook
   const { 
     handleUpvote, 
     handleReport, 
     handleDelete,
   } = useFeedbackActions(() => {
-    console.log('Feedback updated via actions');
+    console.log('Feedback updated via actions, refreshing data');
+    refresh();
   });
   
   // Use the repost context

@@ -1,4 +1,6 @@
-import { supabase } from '@/integrations/supabase/client';
+
+import { supabaseDb } from '@/integrations/supabase/db-client';
+import { supabaseAuth } from '@/integrations/supabase/auth-client';
 import { FeedbackType } from '@/types/feedback';
 import { createBaseFeedbackQuery, fetchProfiles, fetchUserUpvotes, fetchOriginalPosts } from './feedbackApi';
 import { mapFeedbackItem, mapFeedbackItems } from './mappers';
@@ -16,7 +18,7 @@ export async function fetchFeedback(
     const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
     
     // 1. Build query with pagination
-    let query = supabase
+    let query = supabaseDb
       .from('feedback')
       .select(`
         ${columns},
@@ -24,7 +26,7 @@ export async function fetchFeedback(
       `);
 
     // Count total before applying pagination (for hasMore calculation)
-    const { count } = await supabase.from('feedback').select('*', { count: 'exact', head: true });
+    const { count } = await supabaseDb.from('feedback').select('*', { count: 'exact', head: true });
     
     // Apply pagination
     const from = (page - 1) * limit;
@@ -71,7 +73,7 @@ export async function fetchFeedback(
       });
 
     // 5. Get current user's upvotes - using optimized query
-    const userId = (await supabase.auth.getUser()).data.user?.id;
+    const userId = (await supabaseAuth.getUser()).data.user?.id;
     const userUpvotes = await fetchUserUpvotes(userId);
 
     // 6. Handle reposts efficiently - fetch original posts if needed
@@ -118,7 +120,7 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
     // 1. Fetch the specific feedback item with only necessary columns
     const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
     
-    const { data: feedbackData, error: feedbackError } = await supabase
+    const { data: feedbackData, error: feedbackError } = await supabaseDb
       .from('feedback')
       .select(`
         ${columns},
@@ -152,7 +154,7 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
     };
 
     // 4. Get current user's upvotes
-    const userId = (await supabase.auth.getUser()).data.user?.id;
+    const userId = (await supabaseAuth.getUser()).data.user?.id;
     const userUpvotes = await fetchUserUpvotes(userId);
     
     // 5. Map the feedback item
