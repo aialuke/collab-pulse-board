@@ -37,7 +37,23 @@ export function mapFeedbackItem(
 ): FeedbackType {
   // Handle author information - use type guard for proper type checking
   const authorId = item.user_id;
-  const authorInfo = item.profiles || { name: 'Unknown User' };
+  
+  // Ensure we have a valid profiles object
+  let authorInfo = { name: 'Unknown User', id: authorId, avatar_url: null, role: 'user' as const };
+  
+  if (item.profiles) {
+    if (isFullProfileInfo(item.profiles)) {
+      authorInfo = item.profiles;
+    } else if (typeof item.profiles === 'object') {
+      // Try to extract what we can from the object
+      authorInfo = {
+        id: authorId,
+        name: (item.profiles as any).name || 'Unknown User',
+        avatar_url: (item.profiles as any).avatar_url || null,
+        role: (item.profiles as any).role || 'user'
+      };
+    }
+  }
   
   // Check if this is a shout out post based on category ID
   const isShoutOut = item.category_id === SHOUT_OUT_CATEGORY_ID;
@@ -50,8 +66,8 @@ export function mapFeedbackItem(
     author: {
       id: authorId,
       name: authorInfo.name,
-      avatarUrl: isFullProfileInfo(authorInfo) ? authorInfo.avatar_url || undefined : undefined,
-      role: isFullProfileInfo(authorInfo) ? authorInfo.role || 'user' : 'user',
+      avatarUrl: authorInfo.avatar_url || undefined,
+      role: authorInfo.role || 'user',
     },
     createdAt: new Date(item.created_at),
     category: extractCategoryName(item.categories),

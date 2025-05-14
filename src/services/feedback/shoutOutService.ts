@@ -33,6 +33,27 @@ export const createShoutOut = async (
       return null;
     }
 
+    // Get profile data separately if it's not available or malformed in the response
+    if (!data.profiles || typeof data.profiles === 'string' || !('id' in data.profiles)) {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id, name, avatar_url, role')
+        .eq('id', userId)
+        .single();
+      
+      if (profileData) {
+        data.profiles = profileData;
+      } else {
+        // Provide default profile data if needed
+        data.profiles = {
+          id: userId,
+          name: 'Unknown User',
+          avatar_url: null,
+          role: 'user'
+        };
+      }
+    }
+
     return mapFeedbackItem(data);
   } catch (error) {
     console.error('Error creating shout out:', error);
@@ -64,7 +85,34 @@ export const getAllShoutOuts = async (): Promise<FeedbackType[]> => {
     // Default all to not upvoted for now - we could fetch upvotes if needed
     const userUpvotes = Object.fromEntries(data.map(item => [item.id, false]));
 
-    return data.map(item => mapFeedbackItem(item, userUpvotes[item.id]));
+    // Process profiles data to ensure it matches expected format
+    const processedData = await Promise.all(data.map(async (item) => {
+      if (!item.profiles || typeof item.profiles === 'string' || !('id' in item.profiles)) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('id, name, avatar_url, role')
+          .eq('id', item.user_id)
+          .single();
+        
+        if (profileData) {
+          return { ...item, profiles: profileData };
+        } else {
+          // Provide default profile data
+          return {
+            ...item,
+            profiles: {
+              id: item.user_id,
+              name: 'Unknown User',
+              avatar_url: null,
+              role: 'user'
+            }
+          };
+        }
+      }
+      return item;
+    }));
+
+    return processedData.map(item => mapFeedbackItem(item, userUpvotes[item.id]));
   } catch (error) {
     console.error('Error getting shout outs:', error);
     return [];
@@ -97,7 +145,34 @@ export const getShoutOutsForUser = async (userId: string): Promise<FeedbackType[
     // Default all to not upvoted for now
     const userUpvotes = Object.fromEntries(data.map(item => [item.id, false]));
 
-    return data.map(item => mapFeedbackItem(item, userUpvotes[item.id]));
+    // Process profiles data to ensure it matches expected format
+    const processedData = await Promise.all(data.map(async (item) => {
+      if (!item.profiles || typeof item.profiles === 'string' || !('id' in item.profiles)) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('id, name, avatar_url, role')
+          .eq('id', item.user_id)
+          .single();
+        
+        if (profileData) {
+          return { ...item, profiles: profileData };
+        } else {
+          // Provide default profile data
+          return {
+            ...item,
+            profiles: {
+              id: item.user_id,
+              name: 'Unknown User',
+              avatar_url: null,
+              role: 'user'
+            }
+          };
+        }
+      }
+      return item;
+    }));
+
+    return processedData.map(item => mapFeedbackItem(item, userUpvotes[item.id]));
   } catch (error) {
     console.error('Error getting shout outs for user:', error);
     return [];
