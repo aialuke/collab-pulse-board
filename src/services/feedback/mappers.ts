@@ -15,6 +15,19 @@ export function extractCategoryName(categories: { name: string } | null | undefi
   return categories?.name || 'Uncategorized';
 }
 
+// Check if an object is a valid profile response
+export function isValidProfileResponse(profiles: any): profiles is {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  role: string | null;
+} {
+  return profiles && 
+         typeof profiles === 'object' && 
+         !('error' in profiles) &&
+         'name' in profiles;
+}
+
 // Type guard to check if profiles has required properties
 function isFullProfileInfo(profiles: any): profiles is { 
   id: string;
@@ -24,6 +37,7 @@ function isFullProfileInfo(profiles: any): profiles is {
 } {
   return profiles && 
          typeof profiles === 'object' && 
+         !('error' in profiles) &&
          'name' in profiles &&
          'avatar_url' in profiles &&
          'role' in profiles;
@@ -39,20 +53,20 @@ export function mapFeedbackItem(
   const authorId = item.user_id;
   
   // Ensure we have a valid profiles object
-  let authorInfo = { name: 'Unknown User', id: authorId, avatar_url: null, role: 'user' as const };
+  let authorInfo = { 
+    name: 'Unknown User', 
+    id: authorId, 
+    avatar_url: null as string | null, 
+    role: 'user' as string 
+  };
   
-  if (item.profiles) {
-    if (isFullProfileInfo(item.profiles)) {
-      authorInfo = item.profiles;
-    } else if (typeof item.profiles === 'object') {
-      // Try to extract what we can from the object
-      authorInfo = {
-        id: authorId,
-        name: (item.profiles as any).name || 'Unknown User',
-        avatar_url: (item.profiles as any).avatar_url || null,
-        role: (item.profiles as any).role || 'user'
-      };
-    }
+  if (item.profiles && isValidProfileResponse(item.profiles)) {
+    authorInfo = {
+      id: authorId,
+      name: item.profiles.name,
+      avatar_url: item.profiles.avatar_url,
+      role: item.profiles.role || 'user'
+    };
   }
   
   // Check if this is a shout out post based on category ID

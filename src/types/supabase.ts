@@ -17,12 +17,7 @@ export interface FeedbackResponse {
   original_post_id: string | null;
   repost_comment: string | null;
   categories?: { name: string; id: number } | null;
-  profiles?: { 
-    id: string;
-    name: string;
-    avatar_url: string | null;
-    role: string | null;
-  } | null;
+  profiles?: ProfileResponse | null | { error: true } & String;
 }
 
 export interface ProfileResponse {

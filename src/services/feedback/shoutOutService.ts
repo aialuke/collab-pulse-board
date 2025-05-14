@@ -1,7 +1,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { FeedbackType, FeedbackStatus } from '@/types/feedback';
-import { mapFeedbackItem } from './mappers';
+import { mapFeedbackItem, isValidProfileResponse } from './mappers';
+import { FeedbackResponse, ProfileResponse } from '@/types/supabase';
 
 // Define the category ID for shout outs
 const SHOUT_OUT_CATEGORY_ID = 5;
@@ -34,27 +35,22 @@ export const createShoutOut = async (
     }
 
     // Get profile data separately if it's not available or malformed in the response
-    if (!data.profiles || typeof data.profiles === 'string' || !('id' in data.profiles)) {
+    let feedbackWithProfile: FeedbackResponse = {...data};
+    
+    if (!data.profiles || !isValidProfileResponse(data.profiles)) {
       const { data: profileData } = await supabase
         .from('profiles')
         .select('id, name, avatar_url, role')
         .eq('id', userId)
         .single();
       
+      // Add profile data to the feedback response
       if (profileData) {
-        data.profiles = profileData;
-      } else {
-        // Provide default profile data if needed
-        data.profiles = {
-          id: userId,
-          name: 'Unknown User',
-          avatar_url: null,
-          role: 'user'
-        };
+        feedbackWithProfile.profiles = profileData;
       }
     }
 
-    return mapFeedbackItem(data);
+    return mapFeedbackItem(feedbackWithProfile);
   } catch (error) {
     console.error('Error creating shout out:', error);
     return null;
@@ -85,30 +81,30 @@ export const getAllShoutOuts = async (): Promise<FeedbackType[]> => {
     // Default all to not upvoted for now - we could fetch upvotes if needed
     const userUpvotes = Object.fromEntries(data.map(item => [item.id, false]));
 
-    // Process profiles data to ensure it matches expected format
+    // Process each item and ensure we have valid profile data
     const processedData = await Promise.all(data.map(async (item) => {
-      if (!item.profiles || typeof item.profiles === 'string' || !('id' in item.profiles)) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('id, name, avatar_url, role')
-          .eq('id', item.user_id)
-          .single();
-        
-        if (profileData) {
-          return { ...item, profiles: profileData };
-        } else {
-          // Provide default profile data
-          return {
-            ...item,
-            profiles: {
-              id: item.user_id,
-              name: 'Unknown User',
-              avatar_url: null,
-              role: 'user'
-            }
-          };
+      // Only fetch profile data if it's missing or invalid
+      if (!item.profiles || !isValidProfileResponse(item.profiles)) {
+        try {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('id, name, avatar_url, role')
+            .eq('id', item.user_id)
+            .single();
+          
+          if (profileData) {
+            // Create a new object with the valid profile data
+            return {
+              ...item,
+              profiles: profileData
+            };
+          }
+        } catch (err) {
+          console.error('Error fetching profile data:', err);
         }
       }
+      
+      // Return the item as is if we couldn't get profile data
       return item;
     }));
 
@@ -145,30 +141,30 @@ export const getShoutOutsForUser = async (userId: string): Promise<FeedbackType[
     // Default all to not upvoted for now
     const userUpvotes = Object.fromEntries(data.map(item => [item.id, false]));
 
-    // Process profiles data to ensure it matches expected format
+    // Process each item and ensure we have valid profile data
     const processedData = await Promise.all(data.map(async (item) => {
-      if (!item.profiles || typeof item.profiles === 'string' || !('id' in item.profiles)) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('id, name, avatar_url, role')
-          .eq('id', item.user_id)
-          .single();
-        
-        if (profileData) {
-          return { ...item, profiles: profileData };
-        } else {
-          // Provide default profile data
-          return {
-            ...item,
-            profiles: {
-              id: item.user_id,
-              name: 'Unknown User',
-              avatar_url: null,
-              role: 'user'
-            }
-          };
+      // Only fetch profile data if it's missing or invalid
+      if (!item.profiles || !isValidProfileResponse(item.profiles)) {
+        try {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('id, name, avatar_url, role')
+            .eq('id', item.user_id)
+            .single();
+          
+          if (profileData) {
+            // Create a new object with the valid profile data
+            return {
+              ...item,
+              profiles: profileData
+            };
+          }
+        } catch (err) {
+          console.error('Error fetching profile data:', err);
         }
       }
+      
+      // Return the item as is if we couldn't get profile data
       return item;
     }));
 
