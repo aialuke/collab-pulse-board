@@ -7,28 +7,60 @@
 const MAX_WIDTH = 1200;
 const MAX_HEIGHT = 1200;
 // Default compression quality (0-1)
-const DEFAULT_QUALITY = 0.7;
+const DEFAULT_QUALITY = 0.8; // Updated from 0.7 to 0.8 for better quality
+
+/**
+ * Check if browser supports WebP format
+ * Returns a promise that resolves to true if WebP is supported, false otherwise
+ */
+export const isWebPSupported = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = 1;
+    const ctx = canvas.getContext('2d');
+    
+    if (!ctx) {
+      // If canvas context is not available, assume WebP is not supported
+      resolve(false);
+      return;
+    }
+    
+    // Try to export as WebP and check if the data URL contains "data:image/webp"
+    const dataURL = canvas.toDataURL('image/webp');
+    resolve(dataURL.startsWith('data:image/webp'));
+  });
+};
 
 interface CompressionResult {
   compressedImage: string;
   originalSize: number;
   compressedSize: number;
   compressionRatio: number;
+  outputFormat: string; // New field to track the output format (webp or jpeg)
 }
 
 /**
  * Compresses an image file and returns the compressed data URL
+ * Now with WebP support and JPEG fallback
  */
-export const compressImage = (
+export const compressImage = async (
   file: File,
   maxWidth = MAX_WIDTH,
   maxHeight = MAX_HEIGHT,
   quality = DEFAULT_QUALITY
 ): Promise<CompressionResult> => {
+  // Check WebP support
+  const webpSupported = await isWebPSupported();
+  
+  // Determine output format
+  const outputFormat = webpSupported ? 'webp' : 'jpeg';
+  const mimeType = webpSupported ? 'image/webp' : 'image/jpeg';
+  
+  // Original file size in bytes
+  const originalSize = file.size;
+  
   return new Promise((resolve, reject) => {
-    // Original file size in bytes
-    const originalSize = file.size;
-    
     // Create a FileReader to read the image
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -68,7 +100,8 @@ export const compressImage = (
         ctx.drawImage(img, 0, 0, width, height);
         
         // Convert to data URL with compression
-        const compressedImage = canvas.toDataURL(file.type, quality);
+        // Use WebP if supported, otherwise fall back to JPEG
+        const compressedImage = canvas.toDataURL(mimeType, quality);
         
         // Calculate compressed size and compression ratio
         const base64String = compressedImage.split(',')[1];
@@ -79,7 +112,8 @@ export const compressImage = (
           compressedImage,
           originalSize,
           compressedSize,
-          compressionRatio
+          compressionRatio,
+          outputFormat // Include the output format in the result
         });
       };
       

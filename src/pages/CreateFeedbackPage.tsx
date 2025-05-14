@@ -7,8 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { CreateFeedbackInput } from '@/types/feedback';
-import { createFeedback } from '@/services/feedbackService';
-import { supabase } from '@/integrations/supabase/client';
+import { createFeedback, uploadFeedbackImage } from '@/services/feedbackService';
 
 export default function CreateFeedbackPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,27 +31,12 @@ export default function CreateFeedbackPage() {
       // Handle image upload first if there is an image
       let imageUrl: string | undefined = undefined;
       if (feedback.imageUrl && feedback.imageUrl.startsWith('data:')) {
-        // Convert base64 to file
-        const res = await fetch(feedback.imageUrl);
-        const blob = await res.blob();
-        const file = new File([blob], `feedback-image-${Date.now()}.${blob.type.split('/')[1]}`, { type: blob.type });
-
-        // Upload to Supabase Storage
-        const filePath = `${user.id}/${Date.now()}-${file.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('feedback-images')
-          .upload(filePath, file);
-
-        if (uploadError) {
-          throw uploadError;
-        }
-
-        // Get the public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('feedback-images')
-          .getPublicUrl(uploadData.path);
-
-        imageUrl = publicUrl;
+        // Get the format from the data URL
+        const formatInfo = feedback.imageUrl.split(';')[0].split(':')[1];
+        const outputFormat = formatInfo === 'image/webp' ? 'webp' : 'jpeg';
+        
+        // Upload the image using our new service
+        imageUrl = await uploadFeedbackImage(user.id, feedback.imageUrl, outputFormat);
       } else if (feedback.imageUrl) {
         // If it's already a URL (not base64), use it directly
         imageUrl = feedback.imageUrl;

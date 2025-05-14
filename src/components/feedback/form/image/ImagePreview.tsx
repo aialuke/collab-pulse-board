@@ -22,7 +22,7 @@ export function ImagePreview({ image, compressionStats }: ImagePreviewProps) {
       {compressionStats && (
         <div className="text-xs text-muted-foreground">
           <p>Original: {formatFileSize(compressionStats.originalSize)}</p>
-          <p>Compressed: {formatFileSize(compressionStats.compressedSize)}</p>
+          <p>Compressed: {formatFileSize(compressionStats.compressedSize)} {compressionStats.outputFormat && `(${compressionStats.outputFormat})`}</p>
           <p>Saved: {Math.round((1 - 1/compressionStats.compressionRatio) * 100)}% of original size</p>
         </div>
       )}

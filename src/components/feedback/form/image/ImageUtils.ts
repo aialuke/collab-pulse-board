@@ -6,6 +6,7 @@ export interface CompressionStats {
   originalSize: number;
   compressedSize: number;
   compressionRatio: number;
+  outputFormat?: string; // Added output format field
 }
 
 export const useImageCompression = () => {
@@ -31,12 +32,13 @@ export const useImageCompression = () => {
       const stats: CompressionStats = {
         originalSize: result.originalSize,
         compressedSize: result.compressedSize,
-        compressionRatio: result.compressionRatio
+        compressionRatio: result.compressionRatio,
+        outputFormat: result.outputFormat // Include the output format
       };
       
       toast({
         title: "Image compressed",
-        description: `Reduced from ${formatFileSize(result.originalSize)} to ${formatFileSize(result.compressedSize)}`,
+        description: `Reduced from ${formatFileSize(result.originalSize)} to ${formatFileSize(result.compressedSize)} (${result.outputFormat})`,
       });
 
       return {
