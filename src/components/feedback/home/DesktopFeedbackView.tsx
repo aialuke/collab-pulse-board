@@ -22,6 +22,8 @@ interface DesktopFeedbackViewProps {
   closeRepostDialog: () => void;
   handleRepost: (id: string, comment: string) => Promise<any>;
   handleRetry: () => void;
+  sentinelRef?: React.RefCallback<HTMLDivElement>;
+  hasMore: boolean;
 }
 
 export function DesktopFeedbackView({
@@ -38,7 +40,9 @@ export function DesktopFeedbackView({
   openRepostDialog,
   closeRepostDialog,
   handleRepost,
-  handleRetry
+  handleRetry,
+  sentinelRef,
+  hasMore
 }: DesktopFeedbackViewProps) {
   // Function to render the appropriate content based on loading/error state
   const renderContent = () => {
@@ -50,22 +54,33 @@ export function DesktopFeedbackView({
       return <FeedbackError error={loadError} onRetry={handleRetry} />;
     }
 
-    return filteredFeedback.length > 0 ? (
-      <FeedbackList
-        feedback={filteredFeedback}
-        onUpvote={handleUpvote}
-        onComment={handleComment}
-        onReport={handleReport}
-        onDelete={handleDelete}
-        onRepost={(id) => {
-          const feedbackItem = feedback.find(item => item.id === id);
-          if (feedbackItem) {
-            openRepostDialog(feedbackItem);
-          }
-        }}
-      />
-    ) : (
-      <FeedbackEmptyState />
+    return (
+      <>
+        {filteredFeedback.length > 0 ? (
+          <FeedbackList
+            feedback={filteredFeedback}
+            onUpvote={handleUpvote}
+            onComment={handleComment}
+            onReport={handleReport}
+            onDelete={handleDelete}
+            onRepost={(id) => {
+              const feedbackItem = feedback.find(item => item.id === id);
+              if (feedbackItem) {
+                openRepostDialog(feedbackItem);
+              }
+            }}
+          />
+        ) : (
+          <FeedbackEmptyState />
+        )}
+        
+        {/* Render sentinel for infinite scroll if needed */}
+        {hasMore && sentinelRef && (
+          <div ref={sentinelRef} className="py-4 flex justify-center">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500"></div>
+          </div>
+        )}
+      </>
     );
   };
 

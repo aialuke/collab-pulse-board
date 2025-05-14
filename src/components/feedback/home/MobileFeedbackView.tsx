@@ -24,6 +24,8 @@ interface MobileFeedbackViewProps {
   handleRepost: (id: string, comment: string) => Promise<any>;
   handleRetry: () => void;
   loadFeedback: () => Promise<void>;
+  sentinelRef?: React.RefCallback<HTMLDivElement>;
+  hasMore: boolean;
 }
 
 export function MobileFeedbackView({
@@ -41,7 +43,9 @@ export function MobileFeedbackView({
   closeRepostDialog,
   handleRepost,
   handleRetry,
-  loadFeedback
+  loadFeedback,
+  sentinelRef,
+  hasMore
 }: MobileFeedbackViewProps) {
   const { setRefreshFunction } = useRefresh();
   
@@ -61,19 +65,28 @@ export function MobileFeedbackView({
     }
 
     return filteredFeedback.length > 0 ? (
-      <FeedbackList
-        feedback={filteredFeedback}
-        onUpvote={handleUpvote}
-        onComment={handleComment}
-        onReport={handleReport}
-        onDelete={handleDelete}
-        onRepost={(id) => {
-          const feedbackItem = feedback.find(item => item.id === id);
-          if (feedbackItem) {
-            openRepostDialog(feedbackItem);
-          }
-        }}
-      />
+      <>
+        <FeedbackList
+          feedback={filteredFeedback}
+          onUpvote={handleUpvote}
+          onComment={handleComment}
+          onReport={handleReport}
+          onDelete={handleDelete}
+          onRepost={(id) => {
+            const feedbackItem = feedback.find(item => item.id === id);
+            if (feedbackItem) {
+              openRepostDialog(feedbackItem);
+            }
+          }}
+        />
+        
+        {/* Render sentinel for infinite scroll if needed */}
+        {hasMore && sentinelRef && (
+          <div ref={sentinelRef} className="py-4 flex justify-center">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500"></div>
+          </div>
+        )}
+      </>
     ) : (
       <FeedbackEmptyState />
     );

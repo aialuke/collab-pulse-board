@@ -1,3 +1,4 @@
+
 import { toast } from '@/hooks/use-toast';
 
 // Queue keys for different types of operations
@@ -35,8 +36,14 @@ export const registerBackgroundSync = async (queueName: string): Promise<boolean
     }
 
     const registration = await navigator.serviceWorker.ready;
-    await registration.sync.register(queueName);
-    return true;
+    // Check if sync is supported before using it
+    if ('sync' in registration) {
+      await (registration as any).sync.register(queueName);
+      return true;
+    } else {
+      console.warn('Sync API not supported in this browser');
+      return false;
+    }
   } catch (error) {
     console.error('Failed to register background sync:', error);
     return false;

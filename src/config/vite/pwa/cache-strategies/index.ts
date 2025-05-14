@@ -11,7 +11,7 @@ export const getAllCacheStrategies = () => {
   return [
     ...getAssetCacheStrategies(),
     ...getWorkboxCacheStrategy(),
-    ...getFontsCacheStrategies(),
+    ...getFontsCacheStrategy(),
     ...getPWACacheStrategies(),
     ...getAdvancedAPICacheStrategy(),
     ...getFallbackCacheStrategy(),
