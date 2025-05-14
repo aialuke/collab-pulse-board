@@ -84,7 +84,7 @@ interface CategoryBadgeProps {
 }
 
 export function CategoryBadge({ category }: CategoryBadgeProps) {
-  return <Badge className="bg-teal-500/20 text-teal-700 border-teal-500/30">{category}</Badge>;
+  return <Badge variant="category">{category}</Badge>;
 }
 
 export function LeaderBadge() {
