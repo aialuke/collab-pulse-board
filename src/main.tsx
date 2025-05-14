@@ -52,9 +52,9 @@ if ('serviceWorker' in navigator) {
       
       // Font loading optimization with service worker
       if (registration && 'fonts' in document) {
-        // Trigger font loading and caching
+        // Trigger font loading and caching specifically for our subset fonts
         document.fonts.ready.then(() => {
-          console.log('Fonts loaded and ready');
+          console.log('Subset fonts loaded and ready');
           document.documentElement.classList.remove('fonts-loading');
         }).catch(err => {
           console.error('Font loading error:', err);

@@ -25,11 +25,11 @@
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
     
-    <!-- Resource hints for faster loading -->
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Resource hints for faster loading - removed Google Fonts preconnect -->
     
-    <!-- Optimized Google Fonts loading with variable font -->
-    <link rel="preload" href="https://fonts.gstatic.com/s/manrope/v15/xn7gYHE41ni1AdIRggexSvfedN4.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Preload subsetted local fonts -->
+    <link rel="preload" href="/src/fonts/Manrope-Regular-Subset.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/src/fonts/Manrope-Bold-Subset.woff2" as="font" type="font/woff2" crossorigin />
     
     <!-- Inline critical CSS -->
     <style>
@@ -85,21 +85,27 @@
       }
     </style>
     
-    <!-- Font loading detection script -->
+    <!-- Font loading detection script - modified for subset fonts -->
     <script>
       // Mark body as loading fonts
       document.documentElement.classList.add('fonts-loading');
       
       // Check if the browser supports the Font Loading API
       if ('fonts' in document) {
-        // Optimized to load just the variable font once
-        document.fonts.load('200 1em Manrope')
-          .then(() => document.fonts.load('400 1em Manrope'))
-          .then(() => document.fonts.load('600 1em Manrope'))
-          .then(() => document.fonts.load('700 1em Manrope'))
-          .then(() => {
+        // Load the subset fonts
+        Promise.all([
+          document.fonts.load('400 1em Manrope'),
+          document.fonts.load('500 1em Manrope'),
+          document.fonts.load('600 1em Manrope'),
+          document.fonts.load('700 1em Manrope')
+        ]).then(() => {
+          document.documentElement.classList.remove('fonts-loading');
+        }).catch(() => {
+          // Remove class anyway after a timeout to ensure text is displayed
+          setTimeout(() => {
             document.documentElement.classList.remove('fonts-loading');
-          });
+          }, 300);
+        });
       } else {
         // Fallback font loading detection
         // Remove the class after a reasonable timeout

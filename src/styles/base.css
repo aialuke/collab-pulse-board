@@ -58,7 +58,7 @@
   }
 }
 
-/* Consolidated font loading strategy - using variable font to reduce duplicates */
+/* Optimized font fallback strategy */
 @font-face {
   font-family: 'Manrope Fallback';
   size-adjust: 100%;

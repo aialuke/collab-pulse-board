@@ -1,3 +1,4 @@
+
 import { defineConfig, ConfigEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -9,7 +10,10 @@ import { configureServer } from "./src/config/vite/server";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => ({
-  server: configureServer(),
+  server: {
+    port: 8080,
+    ...configureServer()
+  },
   plugins: [
     react({
       // Add this for production optimization
