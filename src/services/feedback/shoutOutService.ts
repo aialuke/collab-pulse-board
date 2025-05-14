@@ -83,15 +83,12 @@ export const getShoutOutsForUser = async (targetUserId: string): Promise<Feedbac
       .eq('target_user_id', targetUserId)
       .order('created_at', { ascending: false });
 
-    if (error) {
+    if (error || !data) {
       console.error('Error getting shout outs for user:', error);
       return [];
     }
 
-    // Create a map of user upvotes for consistency with the mapFeedbackItems function
-    const userUpvotes: Record<string, boolean> = {};
-    
-    // Map each item individually to ensure types match correctly
+    // Map each item individually with explicit typing to avoid recursive type issues
     return data.map(item => mapFeedbackItem(item, false));
   } catch (error) {
     console.error('Error getting shout outs for user:', error);
