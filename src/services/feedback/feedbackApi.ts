@@ -108,10 +108,15 @@ export async function fetchOriginalPosts(
     if (!originalPostsData) return {};
     
     // Get the profiles for original post authors
-    const originalPostUserIds = [...new Set(originalPostsData.map(item => item.user_id))];
+    const originalPostUserIds = originalPostsData
+      .map(item => item.user_id)
+      .filter((id): id is string => typeof id === 'string');
+    
+    // Create a Set from the array for uniqueness, then convert back to array
+    const uniqueUserIds = [...new Set(originalPostUserIds)];
     
     // Only fetch profiles we don't already have
-    const missingUserIds = originalPostUserIds.filter(id => !profilesMap[id]);
+    const missingUserIds = uniqueUserIds.filter(id => !profilesMap[id]);
     
     if (missingUserIds.length > 0) {
       const additionalProfilesMap = await fetchProfiles(missingUserIds);
