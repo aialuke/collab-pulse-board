@@ -46,11 +46,6 @@ export function useFeedbackActions(
     }
   };
 
-  const handleComment = (id: string) => {
-    // We now handle comments directly in the FeedbackCard component,
-    // this function is kept for tracking analytics or other side effects
-  };
-
   const handleReport = async (id: string) => {
     try {
       await reportFeedback(id);
@@ -91,7 +86,6 @@ export function useFeedbackActions(
 
   return {
     handleUpvote,
-    handleComment,
     handleReport,
     handleDelete
   };

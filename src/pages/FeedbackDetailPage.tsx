@@ -83,10 +83,6 @@ function FeedbackDetailContent() {
     }
   };
 
-  const handleComment = () => {
-    // This is now a no-op as comments are removed
-  };
-
   const handleReport = async (id: string) => {
     try {
       await reportFeedback(id);
@@ -165,11 +161,9 @@ function FeedbackDetailContent() {
       <FeedbackCardContainer
         feedback={feedback}
         onUpvote={handleUpvote}
-        onComment={handleComment}
         onReport={handleReport}
         onDelete={handleDelete}
         onRepost={isManager ? (id) => openRepostDialog(feedback) : undefined}
-        navigateOnComment={false}
       />
     </div>
   );

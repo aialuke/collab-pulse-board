@@ -6,7 +6,6 @@ import { FeedbackType } from '@/types/feedback';
 interface FeedbackListProps {
   feedback: FeedbackType[];
   onUpvote: (id: string) => void;
-  onComment: (id: string) => void;
   onReport: (id: string) => void;
   onDelete?: (id: string) => void;
   onRepost?: (id: string) => void;
@@ -15,7 +14,6 @@ interface FeedbackListProps {
 export function FeedbackList({ 
   feedback,
   onUpvote,
-  onComment,
   onReport,
   onDelete,
   onRepost
@@ -27,11 +25,9 @@ export function FeedbackList({
           key={item.id}
           feedback={item}
           onUpvote={onUpvote}
-          onComment={onComment}
           onReport={onReport}
           onDelete={onDelete}
           onRepost={onRepost}
-          navigateOnComment={false}
         />
       ))}
     </div>

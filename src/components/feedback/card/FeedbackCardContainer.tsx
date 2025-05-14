@@ -8,21 +8,17 @@ import { useFeatureFlags } from '@/contexts/FeatureFlagContext';
 interface FeedbackCardContainerProps {
   feedback: FeedbackType;
   onUpvote: (id: string) => void;
-  onComment: (id: string) => void;
   onReport: (id: string) => void;
   onDelete?: (id: string) => void;
   onRepost?: (id: string) => void;
-  navigateOnComment?: boolean;
 }
 
 export function FeedbackCardContainer({
   feedback,
   onUpvote,
-  onComment,
   onReport,
   onDelete,
-  onRepost,
-  navigateOnComment = false
+  onRepost
 }: FeedbackCardContainerProps) {
   const { user } = useAuth();
   const { features } = useFeatureFlags();
@@ -43,12 +39,6 @@ export function FeedbackCardContainer({
     setIsUpvoted(true);
     setUpvotes(prev => prev + 1);
     onUpvote(feedback.id);
-  };
-
-  const handleCommentClick = () => {
-    if (navigateOnComment) {
-      onComment(feedback.id);
-    }
   };
 
   const handleRepostClick = () => {

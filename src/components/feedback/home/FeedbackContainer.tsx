@@ -26,7 +26,6 @@ export function FeedbackContainer() {
   
   const { 
     handleUpvote, 
-    handleComment, 
     handleReport, 
     handleDelete,
   } = useFeedbackActions(setFeedback);
@@ -57,7 +56,6 @@ export function FeedbackContainer() {
         feedbackToRepost={feedbackToRepost}
         repostDialogOpen={repostDialogOpen}
         handleUpvote={handleUpvote}
-        handleComment={handleComment}
         handleReport={handleReport}
         handleDelete={handleDelete}
         openRepostDialog={openRepostDialog}
@@ -81,7 +79,6 @@ export function FeedbackContainer() {
       feedbackToRepost={feedbackToRepost}
       repostDialogOpen={repostDialogOpen}
       handleUpvote={handleUpvote}
-      handleComment={handleComment}
       handleReport={handleReport}
       handleDelete={handleDelete}
       openRepostDialog={openRepostDialog}

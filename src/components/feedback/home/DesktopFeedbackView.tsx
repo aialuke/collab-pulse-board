@@ -15,7 +15,6 @@ interface DesktopFeedbackViewProps {
   feedbackToRepost: FeedbackType | null;
   repostDialogOpen: boolean;
   handleUpvote: (id: string) => void;
-  handleComment: (id: string) => void;
   handleReport: (id: string) => void;
   handleDelete: (id: string) => void;
   openRepostDialog: (feedback: FeedbackType) => void;
@@ -34,7 +33,6 @@ export function DesktopFeedbackView({
   feedbackToRepost,
   repostDialogOpen,
   handleUpvote,
-  handleComment,
   handleReport,
   handleDelete,
   openRepostDialog,
@@ -60,7 +58,6 @@ export function DesktopFeedbackView({
           <FeedbackList
             feedback={filteredFeedback}
             onUpvote={handleUpvote}
-            onComment={handleComment}
             onReport={handleReport}
             onDelete={handleDelete}
             onRepost={(id) => {

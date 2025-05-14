@@ -32,7 +32,6 @@ export function OptimizedFeedbackContainer() {
   // Combine with our existing feedback actions
   const {
     handleUpvote,
-    handleComment,
     handleReport,
     handleDelete,
   } = useFeedbackActions(setFeedback);
@@ -65,7 +64,6 @@ export function OptimizedFeedbackContainer() {
         <FeedbackList
           feedback={paginatedFeedback}
           onUpvote={handleUpvote}
-          onComment={handleComment}
           onReport={handleReport}
           onDelete={handleDelete}
           onRepost={(id) => {
@@ -93,7 +91,6 @@ export function OptimizedFeedbackContainer() {
         feedbackToRepost={feedbackToRepost}
         repostDialogOpen={repostDialogOpen}
         handleUpvote={handleUpvote}
-        handleComment={handleComment}
         handleReport={handleReport}
         handleDelete={handleDelete}
         openRepostDialog={openRepostDialog}
@@ -116,7 +113,6 @@ export function OptimizedFeedbackContainer() {
       feedbackToRepost={feedbackToRepost}
       repostDialogOpen={repostDialogOpen}
       handleUpvote={handleUpvote}
-      handleComment={handleComment}
       handleReport={handleReport}
       handleDelete={handleDelete}
       openRepostDialog={openRepostDialog}
