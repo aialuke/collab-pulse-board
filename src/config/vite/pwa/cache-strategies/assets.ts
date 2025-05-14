@@ -4,37 +4,37 @@ import { CACHE_NAMES } from '../cache-names';
 // Cache strategies for static assets (JS, CSS, images)
 export const getAssetCacheStrategies = () => {
   return [
-    // Specific cache for main JS bundle files - StaleWhileRevalidate for balance
+    // Specific cache for main JS bundle files - CacheFirst for better performance with long TTL
     {
       urlPattern: /\/assets\/index-[A-Za-z0-9]+\.js$/i,
-      handler: 'StaleWhileRevalidate' as const,
+      handler: 'CacheFirst' as const,
       options: {
         cacheName: CACHE_NAMES.main,
         expiration: {
           maxEntries: 10,
-          maxAgeSeconds: 60 * 60 * 24 * 14, // 14 days
+          maxAgeSeconds: 60 * 60 * 24 * 365, // 365 days for immutable assets
         },
         cacheableResponse: {
           statuses: [0, 200],
         },
       },
     },
-    // Specific cache for main CSS bundle files - StaleWhileRevalidate for balance
+    // Specific cache for main CSS bundle files - CacheFirst for better performance
     {
       urlPattern: /\/assets\/styles-[A-Za-z0-9]+\.css$/i,
-      handler: 'StaleWhileRevalidate' as const,
+      handler: 'CacheFirst' as const,
       options: {
         cacheName: CACHE_NAMES.main,
         expiration: {
           maxEntries: 10,
-          maxAgeSeconds: 60 * 60 * 24 * 14, // 14 days
+          maxAgeSeconds: 60 * 60 * 24 * 365, // 365 days for immutable assets
         },
         cacheableResponse: {
           statuses: [0, 200],
         },
       },
     },
-    // Specific cache for critical CSS
+    // Specific cache for critical CSS - CacheFirst with immutable strategy
     {
       urlPattern: /\/assets\/critical-[A-Za-z0-9]+\.css$/i,
       handler: 'CacheFirst' as const,
@@ -42,14 +42,14 @@ export const getAssetCacheStrategies = () => {
         cacheName: CACHE_NAMES.main,
         expiration: {
           maxEntries: 5,
-          maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+          maxAgeSeconds: 60 * 60 * 24 * 365, // 365 days for immutable assets
         },
         cacheableResponse: {
           statuses: [0, 200],
         },
       },
     },
-    // Cache static assets with hash in filename (JS, CSS) - long term
+    // Cache static assets with hash in filename (JS, CSS) - long term with immutable flag
     {
       urlPattern: /\.(?:js|css)$/i,
       handler: 'CacheFirst' as const,
@@ -64,15 +64,15 @@ export const getAssetCacheStrategies = () => {
         },
       },
     },
-    // Cache images - medium term
+    // Cache images - long term
     {
       urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
       handler: 'CacheFirst' as const,
       options: {
         cacheName: CACHE_NAMES.images,
         expiration: {
-          maxEntries: 60,
-          maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+          maxEntries: 100, // Increased from 60
+          maxAgeSeconds: 60 * 60 * 24 * 90, // 90 days for images
         },
         cacheableResponse: {
           statuses: [0, 200],

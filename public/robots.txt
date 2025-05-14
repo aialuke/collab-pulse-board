@@ -1,5 +1,5 @@
 
-# Cache-Control: max-age=86400
+# Cache-Control: public, max-age=86400, stale-while-revalidate=43200
 User-agent: Googlebot
 Allow: /
 
@@ -14,3 +14,4 @@ Allow: /
 
 User-agent: *
 Allow: /
+

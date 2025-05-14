@@ -32,7 +32,7 @@ export const getAdvancedAPICacheStrategy = () => {
     // Static API data - cache first with longer expiration
     {
       urlPattern: /^https:\/\/.*\/api\/(categories|profiles|settings)(\/.*)?$/i,
-      handler: 'CacheFirst' as const,
+      handler: 'StaleWhileRevalidate' as const,
       options: {
         cacheName: CACHE_NAMES.api,
         expiration: {

@@ -12,7 +12,7 @@ export const getWorkboxCacheStrategy = () => {
         cacheName: CACHE_NAMES.workbox,
         expiration: {
           maxEntries: 5,
-          maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+          maxAgeSeconds: 60 * 60 * 24 * 365, // 365 days for immutable content
         },
         cacheableResponse: {
           statuses: [0, 200],
