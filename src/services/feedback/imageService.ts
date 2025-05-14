@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { getImageFormatInfo } from '@/utils/imageCompression';
 
 /**
  * Upload an image to Supabase Storage
@@ -15,17 +16,22 @@ export async function uploadFeedbackImage(
   imageData: string,
   outputFormat: string = 'jpeg'
 ): Promise<string> {
-  // Get the MIME type from the data URL
-  const mimeType = imageData.split(';')[0].split(':')[1];
+  // Extract MIME type and format info from the data URL
+  const { mimeType, extension } = getImageFormatInfo(imageData);
   
   // Convert base64 to file
   const res = await fetch(imageData);
   const blob = await res.blob();
   
-  // Create a unique filename with the appropriate extension
-  const extension = outputFormat === 'webp' ? 'webp' : 'jpg';
-  const fileName = `feedback-image-${Date.now()}.${extension}`;
-  const file = new File([blob], fileName, { type: mimeType });
+  // Use the detected format or the specified output format
+  // WebP is preferred if the output format specifies it
+  const finalExtension = outputFormat === 'webp' ? 'webp' : extension;
+  const fileName = `feedback-image-${Date.now()}.${finalExtension}`;
+  
+  // Create file with appropriate MIME type
+  // For WebP images, explicitly set the MIME type to image/webp
+  const finalMimeType = outputFormat === 'webp' ? 'image/webp' : mimeType;
+  const file = new File([blob], fileName, { type: finalMimeType });
 
   // Upload to Supabase Storage
   const filePath = `${userId}/${fileName}`;
@@ -63,4 +69,26 @@ export function getImageFormatInfo(dataUrl: string): { mimeType: string; extensi
   }
   
   return { mimeType, extension };
+}
+
+/**
+ * Validates if a given URL is a valid image URL
+ * Helps with error handling in image display components
+ */
+export function isValidImageUrl(url: string | undefined | null): boolean {
+  if (!url) return false;
+  
+  try {
+    const urlObj = new URL(url);
+    // Check if the URL has a valid image extension or is from the storage bucket
+    const path = urlObj.pathname.toLowerCase();
+    return path.endsWith('.jpg') || 
+           path.endsWith('.jpeg') || 
+           path.endsWith('.png') || 
+           path.endsWith('.gif') || 
+           path.endsWith('.webp') ||
+           urlObj.hostname.includes('supabase.co');
+  } catch (e) {
+    return false;
+  }
 }
