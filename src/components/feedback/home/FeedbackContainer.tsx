@@ -42,6 +42,10 @@ export function FeedbackContainer() {
   // Use the filtering hook
   useFilteredFeedback(feedback, filters, setFilteredFeedback);
   
+  // Since we don't have actual pagination implemented in useFeedbackData yet,
+  // we'll set hasMore to false for now - this can be updated when real pagination is implemented
+  const hasMore = false;
+  
   // We now use isMobile from useIsMobile() to determine which view to show
   if (isMobile) {
     return (
@@ -61,6 +65,8 @@ export function FeedbackContainer() {
         handleRepost={handleRepost}
         handleRetry={handleRetry}
         loadFeedback={loadFeedback}
+        hasMore={hasMore}
+        sentinelRef={null} // Adding null for now as we don't have an actual sentinel ref yet
       />
     );
   }
@@ -82,6 +88,8 @@ export function FeedbackContainer() {
       closeRepostDialog={closeRepostDialog}
       handleRepost={handleRepost}
       handleRetry={handleRetry}
+      hasMore={hasMore}
+      sentinelRef={null} // Adding null for now as we don't have an actual sentinel ref yet
     />
   );
 }
