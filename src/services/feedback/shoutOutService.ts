@@ -90,24 +90,28 @@ export const getShoutOutsForUser = async (targetUserId: string): Promise<Feedbac
       return [];
     }
 
-    // Use a direct mapping approach that explicitly creates FeedbackType objects
+    // Avoid using complex mapping to prevent deep instantiation issues
     return data.map(item => {
-      // Extract necessary data from the response and create a FeedbackType object
+      // Type guards to safely handle potentially undefined or null objects
+      const authorData = item.author && typeof item.author === 'object' ? item.author : null;
+      const categoryData = item.category && typeof item.category === 'object' ? item.category : null;
+      
+      // Create a feedback item with explicit typings
       const feedbackItem: FeedbackType = {
         id: item.id,
         content: item.content,
         author: {
           id: item.user_id,
-          name: typeof item.author === 'object' && item.author ? item.author.name || 'Unknown User' : 'Unknown User',
-          avatarUrl: typeof item.author === 'object' && item.author ? item.author.avatar_url || undefined : undefined,
-          role: typeof item.author === 'object' && item.author ? item.author.role || undefined : undefined
+          name: authorData?.name || 'Unknown User',
+          avatarUrl: authorData?.avatar_url,
+          role: authorData?.role
         },
         createdAt: new Date(item.created_at),
-        category: typeof item.category === 'object' && item.category ? item.category.name || 'Uncategorized' : 'Uncategorized',
+        category: categoryData?.name || 'Uncategorized',
         categoryId: item.category_id,
         upvotes: item.upvotes_count || 0,
         comments: item.comments_count || 0,
-        status: item.status as FeedbackStatus, // Explicitly cast to FeedbackStatus
+        status: item.status as FeedbackStatus,
         imageUrl: item.image_url || undefined,
         linkUrl: item.link_url || undefined,
         isUpvoted: false,
