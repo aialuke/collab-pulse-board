@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { 
   Root as DialogRoot,
@@ -9,7 +10,7 @@ import {
   Title as DialogPrimitiveTitle,
   Description as DialogPrimitiveDescription
 } from "@radix-ui/react-dialog"
-import { X } from "lucide-react"
+import { X } from "@/components/icons"
 
 import { cn } from "@/lib/utils"
 

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Bell, Check, Trash2 } from 'lucide-react';
+import { Bell, Check, Trash2 } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,

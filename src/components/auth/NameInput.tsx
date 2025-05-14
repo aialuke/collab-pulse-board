@@ -1,8 +1,7 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UserIcon } from "lucide-react";
+import { UserIcon } from "@/components/icons";
 
 interface NameInputProps {
   id: string;

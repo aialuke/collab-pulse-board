@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Image, Link, Loader2, X } from 'lucide-react';
+import { Image, Link, Loader2, X } from '@/components/icons';
 
 interface ImageActionsProps {
   hasImage: boolean;

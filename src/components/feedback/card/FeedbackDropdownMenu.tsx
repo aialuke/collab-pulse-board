@@ -7,7 +7,7 @@ import {
   DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
-import { Flag, Trash2, Share2 } from 'lucide-react';
+import { Flag, Trash2, Share2 } from '@/components/icons';
 import { FeedbackStatus } from '@/types/feedback';
 
 interface FeedbackDropdownMenuProps {

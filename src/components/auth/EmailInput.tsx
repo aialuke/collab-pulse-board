@@ -1,8 +1,7 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MailIcon } from "lucide-react";
+import { MailIcon } from "@/components/icons";
 
 interface EmailInputProps {
   id: string;

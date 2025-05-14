@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -14,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RepostCard } from '../card/RepostCard';
 import { FeedbackType } from '@/types/feedback';
 import { useToast } from '@/components/ui/use-toast';
-import { Share2 } from 'lucide-react';
+import { Share2 } from '@/components/icons';
 
 interface RepostDialogProps {
   isOpen: boolean;

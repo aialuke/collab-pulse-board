@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { PlusSquare } from 'lucide-react';
+import { PlusSquare } from '@/components/icons';
 
 export function NewFeedbackButton() {
   const navigate = useNavigate();

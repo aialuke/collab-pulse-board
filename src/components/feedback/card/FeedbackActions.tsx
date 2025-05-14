@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp } from '@/components/icons';
 import { 
   Tooltip,
   TooltipContent,

@@ -17,7 +17,7 @@ import {
   Separator as DropdownMenuPrimitiveSeparator,
   ItemIndicator as DropdownMenuPrimitiveItemIndicator
 } from "@radix-ui/react-dropdown-menu"
-import { Check, ChevronRight, Circle } from "lucide-react"
+import { Check, ChevronRight, Circle } from "@/components/icons"
 
 import { cn } from "@/lib/utils"
 

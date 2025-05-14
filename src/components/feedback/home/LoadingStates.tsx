@@ -3,7 +3,7 @@ import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, AlertCircle, WifiOff } from 'lucide-react';
+import { RefreshCw, AlertCircle, WifiOff } from '@/components/icons';
 import { isOnline } from '@/services/offlineService';
 
 export const FeedbackSkeleton = () => {

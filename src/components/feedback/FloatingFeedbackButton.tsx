@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Lightbulb } from 'lucide-react';
+import { Lightbulb } from '@/components/icons';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export function FloatingFeedbackButton() {
