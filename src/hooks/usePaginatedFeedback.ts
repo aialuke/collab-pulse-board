@@ -3,7 +3,8 @@ import { useCallback, useEffect } from 'react';
 import { usePagination } from './usePagination';
 import { FeedbackType } from '@/types/feedback';
 import { useToast } from './use-toast';
-import { isOnline, retryWithBackoff } from '@/services/offlineService';
+import { isOnline } from '@/services/offlineService';
+import { fetchFeedback } from '@/services/feedback/readFeedbackService';
 
 interface UsePaginatedFeedbackOptions {
   pageSize?: number;
@@ -49,35 +50,37 @@ export function usePaginatedFeedback({
       setIsLoading(true);
       setError(null);
       
-      // Construct API URL with pagination and filtering
-      let url = `/api/feedback?page=${pageToLoad}&limit=${pageSize}`;
-      if (filterStatus && filterStatus !== 'all') {
-        url += `&status=${filterStatus}`;
-      }
+      // Calculate start index for pagination
+      const startIndex = (pageToLoad - 1) * pageSize;
       
-      // Network request with retry logic
+      // Use fetchFeedback from Supabase integration instead of REST API
       const fetchData = async () => {
-        if (!isOnline()) {
-          // When offline, we'll use cached data from service worker
-          const response = await fetch(url);
-          return response.json();
-        }
-        
-        // When online, use retry with backoff
-        return retryWithBackoff(async () => {
-          const response = await fetch(url, {
-            headers: {
-              'Accept': 'application/json',
-              'X-Requested-With': 'XMLHttpRequest'
-            }
-          });
-          
-          if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
+        try {
+          if (!isOnline()) {
+            toast({
+              title: 'Offline Mode',
+              description: 'Loading cached feedback. Some content may not be up-to-date.',
+              variant: 'default',
+            });
           }
           
-          return response.json();
-        }, 3);
+          // Use the fetchFeedback function with proper filtering
+          const fetchedFeedback = await fetchFeedback(filterStatus);
+          
+          // Apply pagination manually since we're getting all results
+          const paginatedFeedback = fetchedFeedback.slice(startIndex, startIndex + pageSize);
+          
+          // Check if there are more items
+          const hasMoreItems = startIndex + pageSize < fetchedFeedback.length;
+          
+          return {
+            items: paginatedFeedback,
+            hasMore: hasMoreItems
+          };
+        } catch (error) {
+          console.error('Error in fetchData:', error);
+          throw error;
+        }
       };
       
       const data = await fetchData();
@@ -107,14 +110,14 @@ export function usePaginatedFeedback({
   useEffect(() => {
     reset();
     loadFeedbackPage(1, true);
-  }, [filterStatus]);
+  }, [filterStatus, reset]);
   
   // Load next page when page changes
   useEffect(() => {
     if (page > 1) {
       loadFeedbackPage(page);
     }
-  }, [page]);
+  }, [page, loadFeedbackPage]);
   
   return {
     feedback,
