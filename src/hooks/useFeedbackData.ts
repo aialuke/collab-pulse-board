@@ -12,7 +12,7 @@ export function useFeedbackData() {
   const [retryCount, setRetryCount] = useState(0);
   const { toast } = useToast();
 
-  // Simplified React Query usage with optimized configuration
+  // Properly typed React Query with a queryFn that matches expected signature
   const { 
     data, 
     isLoading, 
@@ -20,7 +20,7 @@ export function useFeedbackData() {
     refetch 
   } = useQuery({
     queryKey: ['feedback', retryCount],
-    queryFn: fetchFeedback,
+    queryFn: async () => await fetchFeedback(), // Simplified queryFn that doesn't take parameters
     meta: {
       onError: (error: Error) => {
         setLoadError('Failed to load feedback. Please try again.');
@@ -35,9 +35,9 @@ export function useFeedbackData() {
 
   useEffect(() => {
     if (data) {
-      // Extract the items array from the response
-      setFeedback(data.items);
-      setFilteredFeedback(data.items);
+      // Make sure we handle data properly
+      setFeedback(data.items || []);
+      setFilteredFeedback(data.items || []);
       setLoadError(null);
     }
   }, [data]);

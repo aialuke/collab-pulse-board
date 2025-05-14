@@ -18,7 +18,7 @@ export function FeedbackContainer() {
     error: loadError,
     hasMore,
     sentinelRef,
-    refresh: handleRetry
+    refresh
   } = usePaginatedFeedback({
     pageSize: 10
   });
@@ -45,7 +45,7 @@ export function FeedbackContainer() {
   const viewProps = {
     feedback,
     isLoading,
-    loadError,
+    loadError: loadError || null,
     feedbackToRepost,
     repostDialogOpen,
     handleUpvote,
@@ -54,7 +54,7 @@ export function FeedbackContainer() {
     openRepostDialog,
     closeRepostDialog,
     handleRepost,
-    handleRetry,
+    handleRetry: refresh, // Use refresh as handleRetry
     hasMore,
     sentinelRef
   };

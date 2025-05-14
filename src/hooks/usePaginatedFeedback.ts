@@ -38,7 +38,7 @@ export function usePaginatedFeedback({
     refetch
   } = useQuery({
     queryKey: ['feedback', 1, pageSize],
-    queryFn: () => fetchFeedback(1, pageSize),
+    queryFn: async () => await fetchFeedback(1, pageSize),
     meta: {
       onSuccess: (data) => {
         if (data) {
@@ -114,12 +114,23 @@ export function usePaginatedFeedback({
     }
   }, [page, loadFeedbackPage]);
   
+  // Modified refresh function to return Promise<void> instead of the refetch result
+  const refresh = useCallback(async (): Promise<void> => {
+    try {
+      await refetch();
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Error refreshing feedback:", error);
+      return Promise.resolve(); // Still resolve to void
+    }
+  }, [refetch]);
+  
   return {
     feedback,
     isLoading,
     error: error ? String(error) : null,
     hasMore,
     sentinelRef,
-    refresh: () => refetch()
+    refresh
   };
 }

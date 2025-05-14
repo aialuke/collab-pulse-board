@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { FeedbackType } from '@/types/feedback';
 import { FeedbackList } from './FeedbackList';
@@ -19,7 +18,7 @@ interface DesktopFeedbackViewProps {
   openRepostDialog: (feedback: FeedbackType) => void;
   closeRepostDialog: () => void;
   handleRepost: (id: string, comment: string) => Promise<any>;
-  handleRetry: () => void;
+  handleRetry: () => Promise<void>;
   sentinelRef?: React.RefCallback<HTMLDivElement>;
   hasMore: boolean;
 }
