@@ -2,7 +2,6 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import { registerSW } from 'virtual:pwa-register'
-import { toast } from '@/components/ui/use-toast'
 
 // Use VitePWA's registration function with more robust options
 if ('serviceWorker' in navigator) {
@@ -27,11 +26,7 @@ if ('serviceWorker' in navigator) {
     },
     onOfflineReady() {
       console.log('App ready to work offline')
-      toast({
-        title: "Offline ready",
-        description: "App is ready for offline use",
-        variant: "default",
-      });
+      // Removed toast notification
     },
     onRegisteredSW(swUrl, registration) {
       console.log('Service worker has been registered successfully')
@@ -41,11 +36,7 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('message', (event) => {
           if (event.data && event.data.type === 'BACKGROUND_SYNC_COMPLETE') {
             // Handle completed background sync
-            toast({
-              title: "Sync complete",
-              description: "Your offline actions have been processed",
-              variant: "default",
-            });
+            console.log('Background sync completed');
           }
         });
       }

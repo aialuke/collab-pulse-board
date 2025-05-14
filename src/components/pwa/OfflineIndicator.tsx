@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Wifi, WifiOff } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { WifiOff } from 'lucide-react';
 
 export const OfflineIndicator: React.FC = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -9,20 +8,10 @@ export const OfflineIndicator: React.FC = () => {
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      toast({
-        title: "You're back online",
-        description: "Your connection has been restored.",
-        variant: "default",
-      });
     };
 
     const handleOffline = () => {
       setIsOnline(false);
-      toast({
-        title: "You're offline",
-        description: "Some features may be limited until connection is restored.",
-        variant: "destructive",
-      });
     };
 
     window.addEventListener('online', handleOnline);

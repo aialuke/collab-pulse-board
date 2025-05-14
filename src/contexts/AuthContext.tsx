@@ -1,6 +1,5 @@
 
 import React, { createContext, useContext, useEffect, ReactNode } from 'react';
-import { toast } from '@/components/ui/use-toast';
 import { User, AuthContextType } from '@/types/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthState } from '@/hooks/useAuthState';
@@ -80,21 +79,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (response.error) {
         throw response.error;
       }
-
-      toast({
-        title: 'Login successful',
-        description: 'Welcome back!',
-      });
       
       return response;
     } catch (error: any) {
       console.error('Login failed:', error);
-      
-      toast({
-        title: 'Login failed',
-        description: error.message || 'Invalid credentials',
-        variant: 'destructive',
-      });
       
       throw error;
     } finally {
@@ -111,21 +99,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (response.error) {
         throw response.error;
       }
-
-      toast({
-        title: 'Registration successful',
-        description: 'Welcome to Team QAB!',
-      });
       
       return response;
     } catch (error: any) {
       console.error('Signup failed:', error);
-      
-      toast({
-        title: 'Signup failed',
-        description: error.message || 'Unable to create account',
-        variant: 'destructive',
-      });
       
       throw error;
     } finally {
@@ -136,19 +113,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     try {
       await signOut();
-      
-      toast({
-        title: 'Logged out',
-        description: 'You have been successfully logged out.',
-      });
     } catch (error: any) {
       console.error('Logout failed:', error);
-      
-      toast({
-        title: 'Logout failed',
-        description: error.message || 'An error occurred during logout',
-        variant: 'destructive',
-      });
     }
   };
 
