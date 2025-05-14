@@ -1,80 +1,16 @@
+
 @layer components {
-  /* Typography utility classes */
-  .heading-1 {
-    @apply text-heading-1 md:text-[2.5rem] md:leading-[2.75rem] font-semibold tracking-[-0.02em];
-  }
-  
-  .heading-2 {
-    @apply text-heading-2 md:text-[2rem] md:leading-[2.25rem] font-semibold tracking-[-0.02em];
-  }
-  
-  .heading-3 {
-    @apply text-heading-3 md:text-[1.75rem] md:leading-[2rem] font-semibold tracking-[-0.01em];
-  }
-  
-  .subheading {
-    @apply text-subheading md:text-[1.25rem] md:leading-[1.75rem] font-medium tracking-[-0.01em];
-  }
-  
-  .body-text {
-    @apply text-body;
-  }
-  
-  .body-text-small {
-    @apply text-body-small;
-  }
-  
-  /* WCAG AAA Compliant Button Components */
+  /* WCAG AAA Compliant Button Components (keeping only what's needed) */
   .btn-primary {
     @apply flex items-center justify-center px-4 py-2 min-h-[44px] min-w-[44px] font-medium text-neutral-900 bg-gradient-yellow hover:shadow-glow rounded-full transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-yellow-500;
   }
   
-  .btn-secondary {
-    @apply flex items-center justify-center px-4 py-2 min-h-[44px] min-w-[44px] font-medium text-white bg-gradient-blue hover:shadow-blue-glow rounded-full transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500;
-  }
-
-  .btn-outline {
-    @apply flex items-center justify-center px-4 py-2 min-h-[44px] min-w-[44px] font-medium text-blue-800 border-2 border-blue-800 bg-transparent hover:bg-blue-700/10 rounded-full transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500;
-  }
-
-  .btn-danger {
-    @apply flex items-center justify-center px-4 py-2 min-h-[44px] min-w-[44px] font-medium text-white bg-red-600 hover:bg-red-700 rounded-full transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500;
-  }
-
-  .link {
-    @apply text-blue-800 hover:text-blue-900 transition-colors duration-200 ease-in-out underline-offset-4 hover:underline inline-flex min-h-[44px] items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2;
-  }
-
   /* WCAG AAA Compliant Cards */
   .card {
     @apply bg-white rounded-lg border border-neutral-300 overflow-hidden transition-all duration-200 ease-in-out hover:shadow-sm backdrop-blur-sm w-full;
   }
 
-  /* WCAG AAA Compliant Input & Form Elements */
-  .input-group {
-    @apply relative flex items-center w-full;
-  }
-
-  .input-icon-container {
-    @apply absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-blue-700 w-6 h-6 pointer-events-none;
-  }
-
-  .input-wrapper {
-    @apply relative;
-  }
-
-  .input-icon {
-    @apply absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-blue-700;
-  }
-
-  .input-action {
-    @apply absolute right-3 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center;
-  }
-
-  .input-with-icon {
-    @apply pl-12 pr-3;
-  }
-
+  /* WCAG AAA Compliant Input & Form Elements - reduced to just commonly used ones */
   .input {
     @apply px-3 py-2 min-h-[44px] bg-white border-2 border-neutral-400 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:border-blue-700 text-neutral-800 placeholder:text-neutral-500 placeholder:opacity-70;
   }
@@ -84,49 +20,9 @@
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium min-h-6;
   }
 
-  .badge-blue {
-    @apply bg-blue-700/30 text-blue-900 border border-blue-700/50;
-  }
-  
-  .badge-green {
-    @apply bg-green-100 text-green-800 border border-green-700/50;
-  }
-  
-  .badge-red {
-    @apply bg-red-100 text-red-800 border border-red-700/50;
-  }
-
   /* Glass Card with WCAG AAA Compliant contrast */
   .glass-card {
     @apply backdrop-blur-md bg-white/95 border border-neutral-300 shadow-sm transition-all duration-200 w-full;
-  }
-  
-  /* Feed content layout - Mobile first */
-  .centered-post {
-    @apply w-full mx-auto md:max-w-[600px];
-  }
-  
-  /* Text color utilities - WCAG AAA Compliant */
-  .text-teal {
-    @apply text-teal-700;
-  }
-  
-  .text-royal-blue {
-    @apply text-royal-blue-700;
-  }
-  
-  /* Reply text with improved contrast */
-  .reply-text {
-    @apply font-bold italic text-royal-blue-700;
-  }
-  
-  /* Accessibility enhanced image overlays */
-  .image-text-overlay {
-    @apply relative overflow-hidden;
-  }
-  
-  .image-text-overlay-content {
-    @apply absolute bottom-0 left-0 right-0 p-3 bg-text-overlay-dark text-white;
   }
   
   /* High contrast focus indicator */
@@ -139,24 +35,18 @@
     @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
   }
 
-  /* Shout Out animation classes - ENHANCED WITH UNIFORM GOLDEN GLOW */
+  /* Shout Out animation classes */
   .shout-out-card {
     @apply relative overflow-hidden rounded-lg;
   }
 
-  /* Soft Glow Fade animation for Shout Out cards - ENHANCED FOR ROUNDED CORNERS */
   .shout-out-card.animate {
-    /* Use filter for cleaner glow that properly follows the rounded corners */
     filter: drop-shadow(0 0 8px var(--glow-color));
-    /* Add will-change to optimize GPU rendering */
     will-change: filter;
-    /* Add border-radius to match card rounding */
     border-radius: 0.5rem;
-    /* Add animation property */
     animation: soft-glow-fade 2.5s ease-in-out infinite;
   }
 
-  /* Soft Glow Fade animation keyframes - IMPROVED FOR UNIFORM DISTRIBUTION */
   @keyframes soft-glow-fade {
     0%, 100% { 
       filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.2));

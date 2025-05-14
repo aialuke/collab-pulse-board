@@ -37,24 +37,9 @@
     --ring: 50 100% 50%; /* Ring matches primary gold */
 
     --radius: 0.75rem;
-
-    /* High contrast mode overrides */
-    --high-contrast-text: 0 0% 0%;
-    --high-contrast-bg: 0 0% 100%;
-    --high-contrast-border: 0 0% 0%;
     
     /* Glow color - unified value */
     --glow-color: rgba(255, 215, 0, 0.5); /* Bright gold */
-  }
-
-  /* High contrast mode overrides - keeping for accessibility */
-  @media (forced-colors: active) {
-    :root {
-      --background: var(--high-contrast-bg);
-      --foreground: var(--high-contrast-text);
-      --border: var(--high-contrast-border);
-      --ring: var(--high-contrast-text);
-    }
   }
 }
 
@@ -109,34 +94,16 @@
   input::placeholder,
   textarea::placeholder {
     @apply text-muted-foreground opacity-60 transition-opacity;
-    /* Prevent placeholder from adding render delay */
     will-change: opacity;
     visibility: visible;
   }
 
-  /* Improved touch targets for form elements - WCAG AAA */
-  button, 
-  input[type="submit"],
-  input[type="reset"],
-  input[type="button"] {
-    @apply min-h-[44px] min-w-[44px]; /* WCAG AAA minimum touch target size */
-    touch-action: manipulation;
-  }
-
-  /* Improve placeholder appearance when input is focused */
-  input:focus::placeholder,
-  textarea:focus::placeholder {
-    @apply opacity-30;
-  }
-
-  /* Enhanced focus states for accessibility with higher contrast */
+  /* Consolidated focus states for accessibility with higher contrast */
   a:focus-visible, 
   button:focus-visible, 
   input:focus-visible, 
   select:focus-visible, 
   textarea:focus-visible {
     @apply outline-none ring-2 ring-primary ring-offset-2;
-    outline: 2px solid hsl(var(--primary));
-    outline-offset: 2px;
   }
 }

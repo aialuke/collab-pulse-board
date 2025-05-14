@@ -10,7 +10,10 @@ import { configureServer } from "./src/config/vite/server";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => ({
-  server: configureServer(), // Remove duplicate port specification
+  server: {
+    port: 8080,
+    ...configureServer()
+  },
   plugins: [
     react({
       // Add this for production optimization

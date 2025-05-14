@@ -4,43 +4,9 @@
   @apply bg-gradient-to-r from-yellow-500 to-yellow-600 bg-clip-text text-transparent;
 }
 
-.text-gradient-teal {
-  @apply bg-gradient-to-r from-teal-500 to-teal-600 bg-clip-text text-transparent;
-}
-
-.text-gradient-royal-blue {
-  @apply bg-gradient-to-r from-royal-blue-500 to-royal-blue-600 bg-clip-text text-transparent;
-}
-
-.gradient-border {
-  border: 1px solid transparent;
-  background: linear-gradient(#ffffff, #ffffff) padding-box, 
-              linear-gradient(to right, #FFD700, #D4B300) border-box;
-}
-
-.royal-blue-gradient-border {
-  border: 1px solid transparent;
-  background: linear-gradient(#ffffff, #ffffff) padding-box, 
-              linear-gradient(to right, #1A2F6D, #4865B7) border-box;
-}
-
-.blue-gradient-border {
-  border: 1px solid transparent;
-  background: linear-gradient(#ffffff, #ffffff) padding-box, 
-              linear-gradient(to right, rgba(26, 50, 110, 0.6), rgba(26, 50, 110, 0.4)) border-box;
-}
-
 /* Special Effects - consolidated */
 .glow-on-hover:hover {
   box-shadow: 0 0 0.9375rem rgba(255, 215, 0, 0.5);
-}
-
-.blue-glow-on-hover:hover {
-  box-shadow: 0 0 0.9375rem rgba(26, 50, 110, 0.5);
-}
-
-.royal-blue-glow-on-hover:hover {
-  box-shadow: 0 0 0.9375rem rgba(26, 47, 109, 0.5);
 }
 
 .glass-effect {
@@ -48,14 +14,6 @@
 }
 
 /* Responsive spacing utilities */
-.spacing-x-sm {
-  @apply px-2 sm:px-3 md:px-4;
-}
-
-.spacing-y-sm {
-  @apply py-1 sm:py-2 md:py-3;
-}
-
 .spacing-x-md {
   @apply px-3 sm:px-4 md:px-6;
 }
@@ -87,15 +45,7 @@
   @apply text-sm sm:text-base md:text-lg;
 }
 
-.text-responsive-small {
-  @apply text-xs sm:text-sm md:text-base;
-}
-
 /* Responsive width utilities */
-.max-w-responsive-sm {
-  @apply max-w-[300px] sm:max-w-[400px] md:max-w-[500px];
-}
-
 .max-w-responsive-md {
   @apply max-w-[400px] sm:max-w-[500px] md:max-w-[600px];
 }
@@ -123,19 +73,6 @@
 
 .sr-only-focusable:focus {
   @apply not-sr-only static h-auto w-auto overflow-visible whitespace-normal;
-}
-
-/* High contrast mode utilities - consolidated */
-@media (forced-colors: active) {
-  .forced-colors-border {
-    border: 1px solid CanvasText;
-  }
-  
-  .forced-colors-button {
-    border: 1px solid CanvasText;
-    background-color: ButtonFace;
-    color: ButtonText;
-  }
 }
 
 /* Image accessibility utilities */

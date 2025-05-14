@@ -17,9 +17,6 @@
   --error-color: #ab1212; /* Dark red for error text (7:1) */
   --success-color: #0d652d; /* Dark green for success (7:1) */
   --warning-color: #974c00; /* Dark orange for warnings (7:1) */
-  
-  /* Focus states */
-  --focus-ring: 0 0 0 3px rgba(12, 74, 128, 0.5); /* Thicker focus ring */
 }
 
 /* High contrast focus styles */
@@ -44,30 +41,6 @@
   *:focus {
     outline: 3px solid CanvasText;
   }
-}
-
-/* Increase font sizes for better readability */
-body {
-  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
-  font-weight: 400;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-h1 {
-  font-size: 2.5rem; /* 40px */
-}
-
-h2 {
-  font-size: 2rem; /* 32px */
 }
 
 /* Make sure all interactive elements have sufficient touch target size */
@@ -126,13 +99,4 @@ input[type="reset"],
   padding: 16px;
   color: var(--error-color);
   background-color: rgba(171, 18, 18, 0.05);
-}
-
-/* Improved offline indicator */
-.offline-indicator {
-  background-color: var(--warning-color);
-  color: white;
-  font-weight: 600;
-  text-align: center;
-  padding: 8px 16px;
 }
