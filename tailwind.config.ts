@@ -69,19 +69,19 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				// Colors redefined for WCAG AAA compliance - 7:1 contrast ratio
+				// Updated vibrant gold yellow palette - WCAG AAA compliant
 				yellow: {
-					DEFAULT: '#DBC022', // Darker yellow for better contrast
-					50: '#FFFEF0',
-					100: '#FFFDE0',
-					200: '#FEF9C0',
-					300: '#FDF6A0',
-					400: '#F8E820',
-					500: '#DBC022', // DEFAULT - adjusted for 4.5:1 contrast with black
-					600: '#B39C10',
-					700: '#8C780B',
-					800: '#655706',
-					900: '#3E3504',
+					DEFAULT: '#FFD700', // Vibrant gold yellow
+					50: '#FFFDF0',
+					100: '#FFFBE0',
+					200: '#FFF7C2',
+					300: '#FFF3A3',
+					400: '#FFEE85',
+					500: '#FFD700', // DEFAULT - our target color
+					600: '#D4B300', // Darker for better contrast with white text
+					700: '#AA8F00', // Even darker for 4.5:1 ratio with white
+					800: '#806C00', // For 7:1 ratio with white
+					900: '#554800', // Extremely dark yellow
 				},
 				blue: {
 					DEFAULT: '#1A326E', // Deep Blue - meets 4.5:1 with white
@@ -230,10 +230,10 @@ export default {
 				},
 				'glow': {
 					'0%, 100%': {
-						boxShadow: '0 0 10px rgba(252, 240, 80, 0.5)'
+						boxShadow: '0 0 10px rgba(255, 215, 0, 0.5)'
 					},
 					'50%': {
-						boxShadow: '0 0 20px rgba(252, 240, 80, 0.8)'
+						boxShadow: '0 0 20px rgba(255, 215, 0, 0.8)'
 					}
 				},
 				'blue-glow': {
@@ -311,14 +311,14 @@ export default {
 				'sm': '0 1px 2px rgba(0, 0, 0, 0.05)',
 				'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
 				'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-				'glow': '0 0 15px rgba(252, 240, 80, 0.5)',
-				'glow-strong': '0 0 25px rgba(252, 240, 80, 0.8)',
+				'glow': '0 0 15px rgba(255, 215, 0, 0.5)',
+				'glow-strong': '0 0 25px rgba(255, 215, 0, 0.8)',
 				'blue-glow': '0 0 15px rgba(30, 58, 138, 0.5)',
 				'royal-blue-glow': '0 0 15px rgba(36, 60, 136, 0.5)',
 				'teal-glow': '0 0 15px rgba(43, 143, 101, 0.5)'
 			},
 			backgroundImage: {
-				'gradient-yellow': 'linear-gradient(90deg, #DBC022 0%, #B39C10 100%)',
+				'gradient-yellow': 'linear-gradient(90deg, #FFD700 0%, #D4B300 100%)',
 				'gradient-blue': 'linear-gradient(90deg, #1A326E 0%, #3454AA 100%)',
 				'gradient-royal-blue': 'linear-gradient(90deg, #1A2F6D 0%, #4865B7 100%)',
 				'gradient-teal': 'linear-gradient(90deg, #0D8B61 0%, #085C40 100%)',

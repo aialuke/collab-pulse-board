@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,9 +14,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 10% 11%;
 
-    /* Yellow - Adjusted for 4.5:1 contrast ratio with black text */
-    --primary: 53 95% 45%; /* Darkened yellow for AAA contrast with text */
-    --primary-foreground: 210 10% 11%;
+    /* New vibrant yellow - #FFD700 Gold */
+    --primary: 50 100% 50%; /* #FFD700 - vibrant gold */
+    --primary-foreground: 210 10% 11%; /* Darker text for contrast with gold */
 
     /* Deep Blue - Meets 3:1 contrast with white text */
     --secondary: 222 68% 30%; /* #1A326E */
@@ -34,7 +33,7 @@
 
     --border: 220 13% 80%; /* Darkened for better visibility - 3:1 contrast with background */
     --input: 220 13% 80%; /* Matched with border */
-    --ring: 53 95% 45%; /* Ring matches primary */
+    --ring: 50 100% 50%; /* Ring matches primary gold */
 
     --radius: 0.75rem;
 
@@ -55,9 +54,9 @@
     --popover: 222 20% 13%;
     --popover-foreground: 210 15% 92%;
 
-    /* Yellow - Adjusted for proper contrast on dark background */
-    --primary: 53 95% 65%; /* #F5E457 */
-    --primary-foreground: 222 20% 13%;
+    /* Vibrant yellow adjusted for dark mode */
+    --primary: 50 100% 60%; /* Brighter gold for dark mode */
+    --primary-foreground: 222 20% 13%; /* Dark text on gold background */
 
     /* Light color for secondary elements */
     --secondary: 210 15% 92%; /* #EAF0F6 */
@@ -66,7 +65,7 @@
     --muted: 222 20% 18%; /* #202736 */
     --muted-foreground: 210 15% 80%; /* #C7D5E8 - Lightened for better contrast */
 
-    --accent: 53 95% 65%; /* #F5E457 */
+    --accent: 50 100% 60%; /* Gold accent */
     --accent-foreground: 222 20% 13%;
 
     --destructive: 0 84% 60%; /* #FF4A4A */
@@ -75,7 +74,7 @@
     /* Enhanced borders and inputs for dark mode */
     --border: 222 20% 30%; /* #2D3A55 - 3:1 contrast with background */
     --input: 222 20% 30%;
-    --ring: 53 95% 65%;
+    --ring: 50 100% 60%; /* Gold ring */
 
     /* High contrast mode overrides for dark mode */
     --high-contrast-text: 0 0% 100%;

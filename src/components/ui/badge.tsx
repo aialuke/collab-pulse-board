@@ -16,10 +16,11 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "border-foreground text-foreground",
-        // New variants with guaranteed 4.5:1 contrast ratio
+        // New variants with guaranteed 4.5:1 contrast ratio - updated yellow/gold
         blue: "bg-blue-700/30 text-blue-900 border border-blue-700/50",
         green: "bg-green-100 text-green-800 border border-green-700/50",
         red: "bg-red-100 text-red-800 border border-red-700/50",
+        yellow: "bg-yellow-100 text-yellow-800 border border-yellow-500/50", // New vibrant yellow badge
       },
     },
     defaultVariants: {

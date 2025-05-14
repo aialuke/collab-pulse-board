@@ -1,4 +1,3 @@
-
 /* Gradient Effects - mobile-first responsive */
 .text-gradient {
   @apply bg-gradient-to-r from-yellow-500 to-yellow-600 bg-clip-text text-transparent;
@@ -15,7 +14,7 @@
 .gradient-border {
   border: 1px solid transparent;
   background: linear-gradient(#ffffff, #ffffff) padding-box, 
-              linear-gradient(to right, #DBC022, #B39C10) border-box;
+              linear-gradient(to right, #FFD700, #D4B300) border-box;
 }
 
 .royal-blue-gradient-border {
@@ -32,7 +31,7 @@
 
 /* Special Effects */
 .glow-on-hover:hover {
-  box-shadow: 0 0 0.9375rem rgba(219, 192, 34, 0.5);
+  box-shadow: 0 0 0.9375rem rgba(255, 215, 0, 0.5);
 }
 
 .blue-glow-on-hover:hover {
