@@ -8,14 +8,27 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function HomePage() {
   const { isAuthenticated, user } = useAuth();
 
-  // Add logging to track component lifecycle and auth state
+  // Add detailed logging to track component lifecycle and auth state
   useEffect(() => {
-    console.log("HomePage mounted");
-    console.log("Auth state:", { isAuthenticated, userId: user?.id });
+    console.log("HomePage mounted with auth state:", { 
+      isAuthenticated, 
+      userId: user?.id,
+      userRole: user?.role 
+    });
     
+    // Log when auth state changes
     return () => {
       console.log("HomePage unmounted");
     };
+  }, [isAuthenticated, user]);
+
+  // Log whenever auth state changes
+  useEffect(() => {
+    console.log("Auth state changed on HomePage:", { 
+      isAuthenticated, 
+      userId: user?.id,
+      userRole: user?.role 
+    });
   }, [isAuthenticated, user]);
 
   return (

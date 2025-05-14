@@ -1,9 +1,11 @@
-import { useCallback, useEffect } from 'react';
+
+import { useCallback, useEffect, useState } from 'react';
 import { usePagination } from './usePagination';
 import { FeedbackType } from '@/types/feedback';
 import { useToast } from './use-toast';
 import { fetchFeedback } from '@/services/feedbackService';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface UsePaginatedFeedbackOptions {
   pageSize?: number;
@@ -14,6 +16,16 @@ export function usePaginatedFeedback({
 }: UsePaginatedFeedbackOptions = {}) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isAuthenticated, user } = useAuth();
+  const [isReady, setIsReady] = useState(false);
+  
+  // Set isReady when auth state is determined
+  useEffect(() => {
+    if (typeof isAuthenticated !== 'undefined') {
+      console.log('usePaginatedFeedback: Auth state determined', { isAuthenticated, userId: user?.id });
+      setIsReady(true);
+    }
+  }, [isAuthenticated, user]);
   
   const {
     page,
@@ -30,19 +42,26 @@ export function usePaginatedFeedback({
     setTotal
   } = usePagination<FeedbackType>({ pageSize });
   
-  // Use React Query for the initial data fetch for better caching and state management
+  // Use React Query for the initial data fetch with auth state as dependency
   const {
     data,
     isLoading: initialLoading,
     error: queryError,
     refetch
   } = useQuery({
-    queryKey: ['feedback', 1, pageSize],
+    queryKey: ['feedback', 1, pageSize, isAuthenticated, user?.id],
     queryFn: async () => {
-      console.log(`usePaginatedFeedback: Fetching initial feedback data with page 1 and pageSize ${pageSize}`);
+      console.log(`usePaginatedFeedback: Fetching initial feedback data with page 1 and pageSize ${pageSize}, auth:`, 
+        { isAuthenticated, userId: user?.id });
+      
+      if (!isAuthenticated) {
+        console.log('usePaginatedFeedback: Not authenticated, skipping fetch');
+        return { items: [], hasMore: false, total: 0 };
+      }
+      
       try {
         const result = await fetchFeedback(1, pageSize);
-        console.log(`usePaginatedFeedback: Initial fetch returned ${result.items.length} items, hasMore: ${result.hasMore}, total: ${result.total}`);
+        console.log(`usePaginatedFeedback: Initial fetch returned ${result.items?.length || 0} items, hasMore: ${result.hasMore}, total: ${result.total}`);
         return result;
       } catch (error) {
         console.error("usePaginatedFeedback: Error fetching initial data:", error);
@@ -69,6 +88,8 @@ export function usePaginatedFeedback({
         });
       }
     },
+    // Only enable query when auth is ready
+    enabled: isReady,
     // Only retry once for better UX
     retry: 1,
     // Keep cached data for 1 minute
@@ -103,6 +124,10 @@ export function usePaginatedFeedback({
   // Load additional pages when needed
   const loadFeedbackPage = useCallback(async (pageToLoad: number) => {
     if (pageToLoad === 1) return; // First page is handled by React Query
+    if (!isAuthenticated) {
+      console.log('usePaginatedFeedback: Not authenticated, skipping additional page fetch');
+      return;
+    }
     
     try {
       console.log(`usePaginatedFeedback: Loading additional page ${pageToLoad}`);
@@ -127,7 +152,7 @@ export function usePaginatedFeedback({
       }
       
       // Update the query cache with the new data
-      queryClient.setQueryData(['feedback', pageToLoad, pageSize], result);
+      queryClient.setQueryData(['feedback', pageToLoad, pageSize, isAuthenticated, user?.id], result);
       
     } catch (error: any) {
       console.error(`usePaginatedFeedback: Error loading page ${pageToLoad}:`, error);
@@ -141,15 +166,15 @@ export function usePaginatedFeedback({
     } finally {
       setLoadingMore(false);
     }
-  }, [pageSize, setFeedback, setLoadingMore, setPaginationError, setHasMore, setTotal, toast, queryClient]);
+  }, [pageSize, setFeedback, setLoadingMore, setPaginationError, setHasMore, setTotal, toast, queryClient, isAuthenticated, user?.id]);
   
   // Load next page when page changes
   useEffect(() => {
-    if (page > 1) {
+    if (page > 1 && isAuthenticated) {
       console.log(`usePaginatedFeedback: Page changed to ${page}, loading additional data`);
       loadFeedbackPage(page);
     }
-  }, [page, loadFeedbackPage]);
+  }, [page, loadFeedbackPage, isAuthenticated]);
   
   // Clean up function that invalidates queries when component unmounts
   useEffect(() => {

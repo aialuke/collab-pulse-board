@@ -15,6 +15,16 @@ export async function fetchFeedback(
 ): Promise<{ items: FeedbackType[], hasMore: boolean, total: number }> {
   try {
     console.log(`Fetching feedback page ${page} with limit ${limit}`);
+    console.log('Auth state before request:', await supabaseAuth.getSession());
+    
+    // Check auth state before proceeding
+    const sessionResponse = await supabaseAuth.getSession();
+    const isAuthenticated = !!sessionResponse.data.session;
+    
+    if (!isAuthenticated) {
+      console.warn('fetchFeedback called without authentication, returning empty result');
+      return { items: [], hasMore: false, total: 0 };
+    }
     
     // Select only the columns we need to improve query performance
     const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
@@ -61,7 +71,7 @@ export async function fetchFeedback(
       return { items: [], hasMore: false, total: count || 0 };
     }
     
-    console.log(`Successfully fetched ${feedbackData.length} feedback items`);
+    console.log(`Successfully fetched ${feedbackData.length} feedback items:`, feedbackData);
 
     // 2. Collect all unique user IDs with proper type safety
     const userIds: string[] = feedbackData
