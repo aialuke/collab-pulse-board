@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { FeedbackType } from '@/types/feedback';
 import { createBaseFeedbackQuery, fetchProfiles, fetchUserUpvotes, fetchOriginalPosts } from './feedbackApi';
@@ -6,10 +5,9 @@ import { mapFeedbackItem, mapFeedbackItems } from './mappers';
 import { FeedbackResponse } from '@/types/supabase';
 
 /**
- * Optimized function to fetch all feedback items with pagination and filtering
+ * Optimized function to fetch all feedback items with pagination and sorting by newest first
  */
 export async function fetchFeedback(
-  filterStatus?: string, 
   page: number = 1, 
   limit: number = 10
 ): Promise<{ items: FeedbackType[], hasMore: boolean, total: number }> {
@@ -17,7 +15,7 @@ export async function fetchFeedback(
     // Select only the columns we need to improve query performance
     const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
     
-    // 1. Build query with pagination and filtering
+    // 1. Build query with pagination
     let query = supabase
       .from('feedback')
       .select(`
@@ -25,23 +23,14 @@ export async function fetchFeedback(
         categories(name, id)
       `);
 
-    // Apply status filter if provided
-    if (filterStatus && filterStatus !== 'all') {
-      query = query.eq('status', filterStatus);
-    }
-
     // Count total before applying pagination (for hasMore calculation)
-    const countQuery = filterStatus && filterStatus !== 'all' 
-      ? supabase.from('feedback').select('*', { count: 'exact', head: true }).eq('status', filterStatus)
-      : supabase.from('feedback').select('*', { count: 'exact', head: true });
-    
-    const { count } = await countQuery;
+    const { count } = await supabase.from('feedback').select('*', { count: 'exact', head: true });
     
     // Apply pagination
     const from = (page - 1) * limit;
     const to = from + limit - 1;
     
-    // Default sorting by newest with pagination
+    // Default sorting by newest
     query = query
       .order('created_at', { ascending: false })
       .range(from, to);

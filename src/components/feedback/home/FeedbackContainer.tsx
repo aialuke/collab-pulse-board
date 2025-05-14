@@ -3,7 +3,6 @@ import React, { useEffect } from 'react';
 import { FeedbackType } from '@/types/feedback';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useFeedbackActions } from '@/hooks/useFeedbackActions';
-import { useFeedbackFilters } from '@/hooks/useFeedbackFilters';
 import { useRepost } from '@/contexts/RepostContext';
 import { usePaginatedFeedback } from '@/hooks/usePaginatedFeedback';
 import { MobileFeedbackView } from './MobileFeedbackView';
@@ -12,9 +11,9 @@ import { FeedbackSkeleton, FeedbackError, LoadMoreSentinel } from './LoadingStat
 
 export function FeedbackContainer() {
   const isMobile = useIsMobile();
-  const { filters } = useFeedbackFilters();
   
   // Use the paginated feedback hook for optimized data loading and infinite scroll
+  // No longer passing filterStatus parameter
   const {
     feedback,
     isLoading,
@@ -23,7 +22,6 @@ export function FeedbackContainer() {
     sentinelRef,
     refresh: handleRetry
   } = usePaginatedFeedback({
-    filterStatus: filters.status,
     pageSize: 10
   });
   
@@ -46,14 +44,11 @@ export function FeedbackContainer() {
     closeRepostDialog
   } = useRepost();
   
-  // Since we're now using the optimized version with proper pagination
-  const filteredFeedback = feedback;
-  
   // We now use isMobile from useIsMobile() to determine which view to show
   if (isMobile) {
     return (
       <MobileFeedbackView
-        filteredFeedback={filteredFeedback}
+        filteredFeedback={feedback}
         isLoading={isLoading}
         loadError={loadError}
         feedback={feedback}
@@ -76,7 +71,7 @@ export function FeedbackContainer() {
   // Desktop view for larger screens
   return (
     <DesktopFeedbackView
-      filteredFeedback={filteredFeedback}
+      filteredFeedback={feedback}
       isLoading={isLoading}
       loadError={loadError}
       feedback={feedback}

@@ -8,12 +8,10 @@ import { fetchFeedback } from '@/services/feedbackService';
 
 interface UsePaginatedFeedbackOptions {
   pageSize?: number;
-  filterStatus?: string;
 }
 
 export function usePaginatedFeedback({
-  pageSize = 10,
-  filterStatus
+  pageSize = 10
 }: UsePaginatedFeedbackOptions = {}) {
   const { toast } = useToast();
   
@@ -49,14 +47,14 @@ export function usePaginatedFeedback({
     return () => channel.close();
   }, []);
   
-  // Load feedback with pagination - optimized version
+  // Load feedback with pagination - simplified version without filtering
   const loadFeedbackPage = useCallback(async (pageToLoad: number, reset: boolean = false) => {
     try {
       setIsLoading(true);
       setError(null);
       
-      // Use the fetchFeedback service directly
-      const result = await fetchFeedback(filterStatus, pageToLoad, pageSize);
+      // Use the fetchFeedback service directly with only pagination parameters
+      const result = await fetchFeedback(pageToLoad, pageSize);
       
       if (reset) {
         setFeedback(result.items || []);
@@ -82,18 +80,18 @@ export function usePaginatedFeedback({
     } finally {
       setIsLoading(false);
     }
-  }, [pageSize, filterStatus, setFeedback, setIsLoading, setError, setHasMore, setTotal, toast]);
+  }, [pageSize, setFeedback, setIsLoading, setError, setHasMore, setTotal, toast]);
   
-  // Load first page on mount or when filter changes
+  // Load first page on mount
   useEffect(() => {
-    // Add a small delay to prevent multiple requests when filters change rapidly
+    // Add a small delay to prevent multiple requests
     const timeoutId = setTimeout(() => {
       reset();
       loadFeedbackPage(1, true);
     }, 100);
     
     return () => clearTimeout(timeoutId);
-  }, [filterStatus, reset]);
+  }, [reset]);
   
   // Load next page when page changes
   useEffect(() => {

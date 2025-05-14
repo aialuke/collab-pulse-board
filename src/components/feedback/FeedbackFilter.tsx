@@ -14,7 +14,7 @@ interface FeedbackFilterProps {
   categories: string[];
 }
 
-// Empty component as we're not using this anymore
+// Empty component as we're not using filters anymore
 export function FeedbackFilter({ filters, onFilterChange }: FeedbackFilterProps) {
   return null;
 }
