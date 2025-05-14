@@ -77,6 +77,25 @@ input[type="reset"],
   text-decoration: none;
 }
 
+/* Consolidated accessibility utilities */
+.sr-only {
+  @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+}
+
+.sr-only-focusable:focus {
+  @apply not-sr-only static h-auto w-auto overflow-visible whitespace-normal;
+}
+
+/* Image accessibility utilities */
+.img-alt-text {
+  @apply sr-only;
+}
+
+/* Text overlay for images with proper contrast */
+.text-overlay {
+  @apply absolute bottom-0 left-0 right-0 p-4 bg-text-overlay-dark;
+}
+
 /* Custom loading and error states */
 .loading-skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);

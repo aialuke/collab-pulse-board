@@ -1,14 +1,17 @@
 
+/* Consolidated utility classes - central location for all utilities */
+
 /* Gradient Effects - mobile-first responsive */
 .text-gradient {
   @apply bg-gradient-to-r from-yellow-500 to-yellow-600 bg-clip-text text-transparent;
 }
 
-/* Special Effects - consolidated */
+/* Special Effects */
 .glow-on-hover:hover {
   box-shadow: 0 0 0.9375rem rgba(255, 215, 0, 0.5);
 }
 
+/* Glass effect utilities - consolidated from multiple files */
 .glass-effect {
   @apply backdrop-blur-sm bg-white/80 border border-blue-700/20;
 }
@@ -22,7 +25,7 @@
   @apply py-2 sm:py-3 md:py-4;
 }
 
-/* Consolidated touch target - centralized definition */
+/* Touch target - consolidated definition used in multiple places */
 .touch-target {
   @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
 }
@@ -66,26 +69,29 @@
   }
 }
 
-/* Consolidated accessibility utilities */
-.sr-only {
-  @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+/* Consolidated line-clamp utilities (moved from index.css) */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.sr-only-focusable:focus {
-  @apply not-sr-only static h-auto w-auto overflow-visible whitespace-normal;
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Image accessibility utilities */
-.img-alt-text {
-  @apply sr-only;
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Text overlay for images with proper contrast */
-.text-overlay {
-  @apply absolute bottom-0 left-0 right-0 p-4 bg-text-overlay-dark;
-}
-
-/* Focus ring utilities - 3:1 contrast ratio for focus indicators */
+/* High contrast focus utility - consolidated from multiple files */
 .focus-ring {
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary transition-all duration-150;
 }

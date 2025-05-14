@@ -34,40 +34,6 @@
   transition-timing-function: ease;
 }
 
-/* Responsive containers - mobile-first */
-.container {
-  width: 100%;
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Responsive breakpoints */
-@media (min-width: 640px) {
-  .container {
-    max-width: 640px;
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .container {
-    max-width: 768px;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .container {
-    max-width: 1024px;
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-}
-
 /* Mobile-optimized grids */
 .responsive-grid {
   @apply grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3;
