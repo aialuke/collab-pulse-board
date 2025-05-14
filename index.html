@@ -29,13 +29,6 @@
     <link rel="preconnect" href="https://xvdpcpsmcehzliyuqeuh.supabase.co" crossorigin />
     <link rel="dns-prefetch" href="https://xvdpcpsmcehzliyuqeuh.supabase.co" />
     
-    <!-- Preconnect to Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Load Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <!-- Inline critical CSS -->
     <style>
       /* Critical CSS inlined for first paint */
@@ -90,14 +83,14 @@
       }
     </style>
     
-    <!-- Font loading detection script - modified for Google Fonts -->
+    <!-- Font loading detection script - modified for local fonts -->
     <script>
       // Mark body as loading fonts
       document.documentElement.classList.add('fonts-loading');
       
       // Check if the browser supports the Font Loading API
       if ('fonts' in document) {
-        // Wait for Google Fonts to load
+        // Wait for local fonts to load
         Promise.all([
           document.fonts.load('400 1em Manrope'),
           document.fonts.load('500 1em Manrope'),

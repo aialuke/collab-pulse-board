@@ -41,11 +41,11 @@ if ('serviceWorker' in navigator) {
         });
       }
       
-      // Font loading optimization with Google Fonts
+      // Font loading optimization with local fonts
       if (registration && 'fonts' in document) {
         // Trigger font loading and caching
         document.fonts.ready.then(() => {
-          console.log('Google Fonts loaded and ready');
+          console.log('Local fonts loaded and ready');
           document.documentElement.classList.remove('fonts-loading');
         }).catch(err => {
           console.error('Font loading error:', err);
