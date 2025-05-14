@@ -14,7 +14,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 10% 11%;
 
-    /* New vibrant yellow - #FFD700 Gold */
+    /* Vibrant yellow - #FFD700 Gold */
     --primary: 50 100% 50%; /* #FFD700 - vibrant gold */
     --primary-foreground: 210 10% 11%; /* Darker text for contrast with gold */
 
@@ -41,48 +41,12 @@
     --high-contrast-text: 0 0% 0%;
     --high-contrast-bg: 0 0% 100%;
     --high-contrast-border: 0 0% 0%;
+    
+    /* Glow color - unified value */
+    --glow-color: rgba(255, 215, 0, 0.5); /* Bright gold */
   }
 
-  .dark {
-    /* Dark mode - Background is deep blue-gray #121620 */
-    --background: 220 20% 10%; /* #121620 */
-    --foreground: 210 15% 92%; /* #EAF0F6 - 7:1 contrast with background */
-
-    --card: 222 20% 13%; /* #171E2B */
-    --card-foreground: 210 15% 92%; /* #EAF0F6 */
-
-    --popover: 222 20% 13%;
-    --popover-foreground: 210 15% 92%;
-
-    /* Vibrant yellow adjusted for dark mode */
-    --primary: 50 100% 60%; /* Brighter gold for dark mode */
-    --primary-foreground: 222 20% 13%; /* Dark text on gold background */
-
-    /* Light color for secondary elements */
-    --secondary: 210 15% 92%; /* #EAF0F6 */
-    --secondary-foreground: 222 20% 10%;
-
-    --muted: 222 20% 18%; /* #202736 */
-    --muted-foreground: 210 15% 80%; /* #C7D5E8 - Lightened for better contrast */
-
-    --accent: 50 100% 60%; /* Gold accent */
-    --accent-foreground: 222 20% 13%;
-
-    --destructive: 0 84% 60%; /* #FF4A4A */
-    --destructive-foreground: 210 15% 92%;
-
-    /* Enhanced borders and inputs for dark mode */
-    --border: 222 20% 30%; /* #2D3A55 - 3:1 contrast with background */
-    --input: 222 20% 30%;
-    --ring: 50 100% 60%; /* Gold ring */
-
-    /* High contrast mode overrides for dark mode */
-    --high-contrast-text: 0 0% 100%;
-    --high-contrast-bg: 0 0% 0%;
-    --high-contrast-border: 0 0% 100%;
-  }
-
-  /* High contrast mode overrides */
+  /* High contrast mode overrides - keeping for accessibility */
   @media (forced-colors: active) {
     :root {
       --background: var(--high-contrast-bg);

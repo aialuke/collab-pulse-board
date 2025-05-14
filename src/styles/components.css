@@ -1,4 +1,3 @@
-
 @layer components {
   /* Typography utility classes */
   .heading-1 {
@@ -148,11 +147,13 @@
   /* Soft Glow Fade animation for Shout Out cards - ENHANCED FOR ROUNDED CORNERS */
   .shout-out-card.animate {
     /* Use filter for cleaner glow that properly follows the rounded corners */
-    filter: drop-shadow(0 0 8px var(--glow-color-light));
+    filter: drop-shadow(0 0 8px var(--glow-color));
     /* Add will-change to optimize GPU rendering */
     will-change: filter;
     /* Add border-radius to match card rounding */
     border-radius: 0.5rem;
+    /* Add animation property */
+    animation: soft-glow-fade 2.5s ease-in-out infinite;
   }
 
   /* Soft Glow Fade animation keyframes - IMPROVED FOR UNIFORM DISTRIBUTION */
@@ -172,30 +173,4 @@
       filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.3));
     }
   }
-
-  /* Dark mode support for animations with golden glow */
-  @media (prefers-color-scheme: dark) {
-    .shout-out-card.animate {
-      animation: soft-glow-fade-dark 2.5s ease-in-out infinite;
-      filter: drop-shadow(0 0 8px var(--glow-color-dark));
-    }
-    
-    @keyframes soft-glow-fade-dark {
-      0%, 100% { 
-        filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.3));
-      }
-      50% { 
-        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
-      }
-    }
-
-    /* Honor reduced motion in dark mode */
-    @media (prefers-reduced-motion: reduce) {
-      .shout-out-card.animate {
-        animation: none !important;
-        filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.4));
-      }
-    }
-  }
 }
-
