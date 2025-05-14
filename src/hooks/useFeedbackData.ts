@@ -12,6 +12,7 @@ export function useFeedbackData() {
   const [retryCount, setRetryCount] = useState(0);
   const { toast } = useToast();
 
+  // Simplified React Query usage with optimized configuration
   const { 
     data, 
     isLoading, 
@@ -19,17 +20,9 @@ export function useFeedbackData() {
     refetch 
   } = useQuery({
     queryKey: ['feedback', retryCount],
-    queryFn: async () => {
-      try {
-        return await fetchFeedback();
-      } catch (error) {
-        console.error('Error loading feedback:', error);
-        throw error; // Let React Query handle the error
-      }
-    },
+    queryFn: fetchFeedback,
     meta: {
       onError: (error: Error) => {
-        // This will run when the query encounters an error
         setLoadError('Failed to load feedback. Please try again.');
         toast({
           title: 'Error',

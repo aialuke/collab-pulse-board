@@ -4,6 +4,7 @@ import { usePagination } from './usePagination';
 import { FeedbackType } from '@/types/feedback';
 import { useToast } from './use-toast';
 import { fetchFeedback } from '@/services/feedbackService';
+import { useQuery } from '@tanstack/react-query';
 
 interface UsePaginatedFeedbackOptions {
   pageSize?: number;
@@ -18,16 +19,41 @@ export function usePaginatedFeedback({
     page,
     items: feedback,
     setItems: setFeedback,
-    isLoading,
-    setIsLoading,
+    isLoading: loadingMore,
+    setIsLoading: setLoadingMore,
     hasMore,
     setHasMore,
-    error,
-    setError,
+    error: paginationError,
+    setError: setPaginationError,
     sentinelRef,
     reset,
     setTotal
   } = usePagination<FeedbackType>({ pageSize });
+  
+  // Use React Query for the initial data fetch for better caching and state management
+  const {
+    data,
+    isLoading: initialLoading,
+    error: queryError,
+    refetch
+  } = useQuery({
+    queryKey: ['feedback', 1, pageSize],
+    queryFn: () => fetchFeedback(1, pageSize),
+    meta: {
+      onSuccess: (data) => {
+        if (data) {
+          setFeedback(data.items || []);
+          setHasMore(data.hasMore || false);
+          if (data.total !== undefined) {
+            setTotal(data.total);
+          }
+        }
+      }
+    }
+  });
+  
+  const isLoading = initialLoading || loadingMore;
+  const error = queryError || paginationError;
 
   // Listen for cache updates from the service worker
   useEffect(() => {
@@ -38,12 +64,8 @@ export function usePaginatedFeedback({
       channel = new BroadcastChannel('api-updates');
       channel.addEventListener('message', (event) => {
         if (event.data.type === 'CACHE_UPDATED' && event.data.url === 'feed') {
-          // Refresh data if cache was updated, but use a debounce to avoid multiple refreshes
-          const timeoutId = setTimeout(() => {
-            loadFeedbackPage(1, true);
-          }, 300);
-          
-          return () => clearTimeout(timeoutId);
+          // Refresh data if cache was updated
+          refetch();
         }
       });
     }
@@ -51,23 +73,20 @@ export function usePaginatedFeedback({
     return () => {
       if (channel) channel.close();
     };
-  }, []);
+  }, [refetch]);
   
-  // Load feedback with pagination - simplified version without filtering
-  const loadFeedbackPage = useCallback(async (pageToLoad: number, reset: boolean = false) => {
+  // Load additional pages when needed
+  const loadFeedbackPage = useCallback(async (pageToLoad: number) => {
+    if (pageToLoad === 1) return; // First page is handled by React Query
+    
     try {
-      setIsLoading(true);
-      setError(null);
+      setLoadingMore(true);
+      setPaginationError(null);
       
-      // Use the fetchFeedback service directly with only pagination parameters
       const result = await fetchFeedback(pageToLoad, pageSize);
       
-      if (reset) {
-        setFeedback(result.items || []);
-      } else {
-        // Use a functional update to prevent race conditions
-        setFeedback(prev => [...prev, ...(result.items || [])]);
-      }
+      // Use a functional update to prevent race conditions
+      setFeedback(prev => [...prev, ...(result.items || [])]);
       
       // Update hasMore and total from API response
       setHasMore(result.hasMore || false);
@@ -76,29 +95,17 @@ export function usePaginatedFeedback({
       }
     } catch (error: any) {
       console.error('Error loading feedback:', error);
-      setError('Failed to load feedback. Please try again.');
+      setPaginationError('Failed to load feedback. Please try again.');
       
-      // Use minimalist toast import
       toast({
         title: 'Error',
         description: 'Failed to load feedback. Please try again.',
         variant: 'destructive',
       });
     } finally {
-      setIsLoading(false);
+      setLoadingMore(false);
     }
-  }, [pageSize, setFeedback, setIsLoading, setError, setHasMore, setTotal, toast]);
-  
-  // Load first page on mount
-  useEffect(() => {
-    // Add a small delay to prevent multiple requests
-    const timeoutId = setTimeout(() => {
-      reset();
-      loadFeedbackPage(1, true);
-    }, 100);
-    
-    return () => clearTimeout(timeoutId);
-  }, [reset]);
+  }, [pageSize, setFeedback, setLoadingMore, setPaginationError, setHasMore, setTotal, toast]);
   
   // Load next page when page changes
   useEffect(() => {
@@ -110,9 +117,9 @@ export function usePaginatedFeedback({
   return {
     feedback,
     isLoading,
-    error,
+    error: error ? String(error) : null,
     hasMore,
     sentinelRef,
-    refresh: () => loadFeedbackPage(1, true)
+    refresh: () => refetch()
   };
 }

@@ -2,13 +2,24 @@
 import { QueryClient } from "@tanstack/react-query";
 
 /**
- * Optimized React Query client configuration
- * - Stale time: 60 seconds (data considered fresh for 1 minute)
- * - Cache time: 5 minutes (unused data kept in memory for 5 minutes)
- * - Retry configuration: 1 retry with exponential backoff
- * - Error handling: Better error logging and reporting
+ * Basic React Query client configuration
+ * Uses minimal settings for reduced bundle size
  */
-export const createQueryClient = () => new QueryClient({
+export const createBasicQueryClient = () => new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute
+      gcTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+/**
+ * Advanced React Query client configuration with error handling
+ * and retry logic for more complex applications
+ */
+export const createAdvancedQueryClient = () => new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60 * 1000, // 1 minute
@@ -35,3 +46,7 @@ export const createQueryClient = () => new QueryClient({
     },
   },
 });
+
+// Export the createQueryClient function for backward compatibility
+// This now uses the simpler configuration by default
+export const createQueryClient = createBasicQueryClient;
