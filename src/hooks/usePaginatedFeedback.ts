@@ -4,6 +4,7 @@ import { usePagination } from './usePagination';
 import { FeedbackType } from '@/types/feedback';
 import { useToast } from './use-toast';
 import { isOnline, retryWithBackoff } from '@/services/offlineService';
+import { fetchFeedback } from '@/services/feedbackService';
 
 interface UsePaginatedFeedbackOptions {
   pageSize?: number;
@@ -54,66 +55,22 @@ export function usePaginatedFeedback({
       setIsLoading(true);
       setError(null);
       
-      // Construct API URL with pagination and filtering
-      let url = `/api/feedback?page=${pageToLoad}&limit=${pageSize}`;
-      if (filterStatus && filterStatus !== 'all') {
-        url += `&status=${filterStatus}`;
-      }
-      
-      // Network request with retry logic and caching strategy
-      const fetchData = async () => {
-        if (!isOnline()) {
-          // When offline, we'll use cached data from service worker
-          const response = await fetch(url, {
-            headers: {
-              'Accept': 'application/json',
-              'X-Requested-With': 'XMLHttpRequest'
-            }
-          });
-          return response.json();
-        }
-        
-        // When online, use retry with backoff
-        return retryWithBackoff(async () => {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-          
-          try {
-            const response = await fetch(url, {
-              headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Cache-Control': 'no-cache' // Prevent stale data issues
-              },
-              signal: controller.signal
-            });
-            
-            if (!response.ok) {
-              throw new Error(`API error: ${response.status}`);
-            }
-            
-            return response.json();
-          } finally {
-            clearTimeout(timeoutId);
-          }
-        }, 3);
-      };
-      
-      const data = await fetchData();
+      // Use the fetchFeedback service directly
+      const result = await fetchFeedback(filterStatus, pageToLoad, pageSize);
       
       if (reset) {
-        setFeedback(data.items || []);
+        setFeedback(result.items || []);
       } else {
         // Use a functional update to prevent race conditions
-        setFeedback(prev => [...prev, ...(data.items || [])]);
+        setFeedback(prev => [...prev, ...(result.items || [])]);
       }
       
       // Update hasMore and total from API response
-      setHasMore(data.hasMore || false);
-      if (data.total !== undefined) {
-        setTotal(data.total);
+      setHasMore(result.hasMore || false);
+      if (result.total !== undefined) {
+        setTotal(result.total);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading feedback:', error);
       setError('Failed to load feedback. Please try again.');
       
@@ -136,7 +93,7 @@ export function usePaginatedFeedback({
     }, 100);
     
     return () => clearTimeout(timeoutId);
-  }, [filterStatus]);
+  }, [filterStatus, reset]);
   
   // Load next page when page changes
   useEffect(() => {
@@ -151,7 +108,6 @@ export function usePaginatedFeedback({
     error,
     hasMore,
     sentinelRef,
-    loadFeedbackPage,
     refresh: () => loadFeedbackPage(1, true)
   };
 }

@@ -4,3 +4,6 @@ export * from './feedback';
 
 // Export image service functions explicitly
 export { uploadFeedbackImage } from './feedback/imageService';
+
+// Export the read feedback services with a more descriptive name
+export { fetchFeedback, fetchFeedbackById } from './feedback/readFeedbackService';
