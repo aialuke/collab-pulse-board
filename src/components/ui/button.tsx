@@ -21,10 +21,10 @@ const buttonVariants = cva(
         link: "text-blue-800 underline-offset-4 hover:underline hover:text-blue-900",
       },
       size: {
-        default: "min-h-10 sm:min-h-12 min-w-10 sm:min-w-12 px-3 sm:px-4 py-1.5 sm:py-2", // Responsive touch target
-        sm: "min-h-8 sm:min-h-10 min-w-8 sm:min-w-10 rounded-md px-2 sm:px-3 py-1 sm:py-1.5", // Slightly increased for better touch
-        lg: "min-h-12 sm:min-h-14 min-w-12 sm:min-w-14 rounded-md px-6 sm:px-8 py-2 sm:py-2.5", // Larger size
-        icon: "h-10 w-10 sm:h-12 sm:w-12", // Responsive icon button
+        default: "min-h-[44px] min-w-[44px] px-4 py-2", // WCAG AAA minimum touch target
+        sm: "min-h-[44px] min-w-[44px] rounded-md px-3 py-1.5", // Minimum 44px touch target
+        lg: "min-h-[44px] min-w-[44px] rounded-md px-8 py-2.5", // Larger size but still minimum 44px
+        icon: "h-[44px] w-[44px]", // WCAG AAA icon button
       },
     },
     defaultVariants: {

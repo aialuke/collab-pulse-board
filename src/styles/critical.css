@@ -1,8 +1,8 @@
 
-/* Critical CSS for above-the-fold content - Mobile First */
+/* Critical CSS for above-the-fold content - Mobile First with WCAG AAA compliance */
 :root {
-  --background: 214 80% 95%; /* #E8F0FE */
-  --foreground: 220 40% 20%; /* Darkened for 7:1 contrast ratio */
+  --background: 210 17% 98%; /* #F8F9FA */
+  --foreground: 210 10% 11%; /* #171E28 - 7:1 contrast with background */
 }
 
 body {
@@ -25,10 +25,10 @@ body {
   width: 100%;
 }
 
-/* Mobile-first header layout */
+/* Mobile-first header layout with enhanced contrast */
 header {
   background: white;
-  border-bottom: 1px solid rgba(0,0,0,0.2); /* Enhanced contrast border */
+  border-bottom: 1px solid rgba(0,0,0,0.3); /* Enhanced contrast border */
   height: 64px;
   display: flex;
   align-items: center;
@@ -54,13 +54,13 @@ main {
   overflow-x: hidden;
 }
 
-/* Typography base sizes - mobile first with enhanced contrast */
+/* Typography base sizes - mobile first with enhanced contrast for WCAG AAA */
 h1 {
   font-size: 2rem;
   line-height: 2.25rem;
   letter-spacing: -0.02em;
   font-weight: 600;
-  color: hsl(220, 40%, 15%); /* Darker for better contrast */
+  color: hsl(210, 10%, 11%); /* #171E28 - 7:1 contrast ratio */
 }
 
 h2 {
@@ -68,13 +68,19 @@ h2 {
   line-height: 2rem;
   letter-spacing: -0.02em;
   font-weight: 600;
-  color: hsl(220, 40%, 15%); /* Darker for better contrast */
+  color: hsl(210, 10%, 11%); /* #171E28 */
 }
 
 p {
   font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: hsl(220, 40%, 20%); /* Consistent with foreground */
+  line-height: 1.375rem;
+  color: hsl(210, 10%, 11%); /* #171E28 - 7:1 contrast ratio */
+}
+
+/* Enhanced focus styles for WCAG AAA */
+:focus-visible {
+  outline: 2px solid hsl(53, 95%, 45%); /* Primary color */
+  outline-offset: 2px;
 }
 
 /* Safe area insets for modern mobile devices */
@@ -94,6 +100,17 @@ p {
   }
 }
 
+/* Touch target sizes for WCAG AAA */
+button, 
+a, 
+[role="button"], 
+input, 
+select, 
+textarea {
+  min-height: 44px;
+  min-width: 44px;
+}
+
 /* Desktop typography - applied with media query */
 @media (min-width: 768px) {
   h1 {
@@ -109,5 +126,22 @@ p {
   p {
     font-size: 1rem;
     line-height: 1.5rem;
+  }
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 220 20% 10%; /* #121620 */
+    --foreground: 210 15% 92%; /* #EAF0F6 - 7:1 contrast */
+  }
+}
+
+/* High contrast mode overrides */
+@media (forced-colors: active) {
+  button, 
+  a, 
+  [role="button"] {
+    border: 1px solid CanvasText;
   }
 }

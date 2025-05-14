@@ -51,7 +51,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-sm text-neutral-600", className)} // Improved contrast from muted-foreground
     {...props}
   />
 ))
@@ -77,4 +77,28 @@ const CardFooter = React.forwardRef<
 ))
 CardFooter.displayName = "CardFooter"
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+// New ImageOverlay component for accessible text on images
+const CardImageOverlay = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "absolute bottom-0 left-0 right-0 p-4 bg-text-overlay-dark text-white",
+      className
+    )}
+    {...props}
+  />
+))
+CardImageOverlay.displayName = "CardImageOverlay"
+
+export { 
+  Card, 
+  CardHeader, 
+  CardFooter, 
+  CardTitle, 
+  CardDescription, 
+  CardContent,
+  CardImageOverlay
+}
