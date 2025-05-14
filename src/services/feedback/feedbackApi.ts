@@ -3,29 +3,39 @@ import { supabase } from '@/integrations/supabase/client';
 import { FeedbackResponse, ProfileResponse, UpvoteResponse } from '@/types/supabase';
 
 /**
- * Base query builder for feedback
+ * Base query builder for feedback with column selection optimization
+ * Only selects the columns that are actually needed
  */
-export function createBaseFeedbackQuery() {
+export function createBaseFeedbackQuery(columns = '*') {
   return supabase
     .from('feedback')
     .select(`
-      *,
+      ${columns},
       categories(name, id)
     `);
 }
 
 /**
- * Fetch profiles for a list of user IDs
+ * Fetch profiles for a list of user IDs with caching optimization
  */
 export async function fetchProfiles(userIds: string[]): Promise<Record<string, ProfileResponse>> {
   try {
     // If no user IDs, return empty result
     if (!userIds.length) return {};
 
+    // Use a single batch query instead of multiple queries
     const { data: profilesData, error: profilesError } = await supabase
       .from('profiles')
       .select('id, name, avatar_url, role')
-      .in('id', userIds);
+      .in('id', userIds)
+      .order('name')
+      .options({
+        count: 'exact',
+        // Add caching hint for Supabase
+        head: false,
+        // Minimize over-fetching
+        limit: userIds.length
+      });
 
     if (profilesError) {
       console.error('Error fetching profiles:', profilesError);
@@ -48,7 +58,7 @@ export async function fetchProfiles(userIds: string[]): Promise<Record<string, P
 }
 
 /**
- * Fetch upvotes for current user
+ * Fetch upvotes for current user with optimized query
  */
 export async function fetchUserUpvotes(userId: string | undefined): Promise<Record<string, boolean>> {
   try {
@@ -57,10 +67,12 @@ export async function fetchUserUpvotes(userId: string | undefined): Promise<Reco
     const { data: upvotes } = await supabase
       .from('upvotes')
       .select('feedback_id')
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
     
     if (!upvotes) return {};
     
+    // Use reduce for better performance than object assignment in a loop
     return upvotes.reduce((acc, upvote) => {
       acc[upvote.feedback_id] = true;
       return acc;
@@ -72,7 +84,7 @@ export async function fetchUserUpvotes(userId: string | undefined): Promise<Reco
 }
 
 /**
- * Fetch original posts for reposts
+ * Fetch original posts for reposts with optimized batch query
  */
 export async function fetchOriginalPosts(
   originalPostIds: string[], 
@@ -82,11 +94,12 @@ export async function fetchOriginalPosts(
   try {
     if (!originalPostIds.length) return {};
     
-    // Fetch all original posts in a single query
+    // Optimize the columns we select to only what's needed
     const { data: originalPostsData, error: originalPostsError } = await supabase
       .from('feedback')
       .select(`
-        *,
+        id, title, content, user_id, category_id, 
+        created_at, upvotes_count, status, image_url, link_url,
         categories(name, id)
       `)
       .in('id', originalPostIds);

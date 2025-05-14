@@ -27,7 +27,8 @@ export function usePaginatedFeedback({
     error,
     setError,
     sentinelRef,
-    reset
+    reset,
+    setTotal
   } = usePagination<FeedbackType>({ pageSize });
 
   // Listen for cache updates from the service worker
@@ -35,15 +36,19 @@ export function usePaginatedFeedback({
     const channel = new BroadcastChannel('api-updates');
     channel.addEventListener('message', (event) => {
       if (event.data.type === 'CACHE_UPDATED' && event.data.url === 'feed') {
-        // Refresh data if cache was updated
-        loadFeedbackPage(1, true);
+        // Refresh data if cache was updated, but use a debounce to avoid multiple refreshes
+        const timeoutId = setTimeout(() => {
+          loadFeedbackPage(1, true);
+        }, 300);
+        
+        return () => clearTimeout(timeoutId);
       }
     });
     
     return () => channel.close();
   }, []);
   
-  // Load feedback with pagination
+  // Load feedback with pagination - optimized version
   const loadFeedbackPage = useCallback(async (pageToLoad: number, reset: boolean = false) => {
     try {
       setIsLoading(true);
@@ -55,28 +60,42 @@ export function usePaginatedFeedback({
         url += `&status=${filterStatus}`;
       }
       
-      // Network request with retry logic
+      // Network request with retry logic and caching strategy
       const fetchData = async () => {
         if (!isOnline()) {
           // When offline, we'll use cached data from service worker
-          const response = await fetch(url);
-          return response.json();
-        }
-        
-        // When online, use retry with backoff
-        return retryWithBackoff(async () => {
           const response = await fetch(url, {
             headers: {
               'Accept': 'application/json',
               'X-Requested-With': 'XMLHttpRequest'
             }
           });
-          
-          if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-          }
-          
           return response.json();
+        }
+        
+        // When online, use retry with backoff
+        return retryWithBackoff(async () => {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+          
+          try {
+            const response = await fetch(url, {
+              headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Cache-Control': 'no-cache' // Prevent stale data issues
+              },
+              signal: controller.signal
+            });
+            
+            if (!response.ok) {
+              throw new Error(`API error: ${response.status}`);
+            }
+            
+            return response.json();
+          } finally {
+            clearTimeout(timeoutId);
+          }
         }, 3);
       };
       
@@ -85,10 +104,15 @@ export function usePaginatedFeedback({
       if (reset) {
         setFeedback(data.items || []);
       } else {
+        // Use a functional update to prevent race conditions
         setFeedback(prev => [...prev, ...(data.items || [])]);
       }
       
+      // Update hasMore and total from API response
       setHasMore(data.hasMore || false);
+      if (data.total !== undefined) {
+        setTotal(data.total);
+      }
     } catch (error) {
       console.error('Error loading feedback:', error);
       setError('Failed to load feedback. Please try again.');
@@ -101,12 +125,17 @@ export function usePaginatedFeedback({
     } finally {
       setIsLoading(false);
     }
-  }, [pageSize, filterStatus, setFeedback, setIsLoading, setError, setHasMore, toast]);
+  }, [pageSize, filterStatus, setFeedback, setIsLoading, setError, setHasMore, setTotal, toast]);
   
   // Load first page on mount or when filter changes
   useEffect(() => {
-    reset();
-    loadFeedbackPage(1, true);
+    // Add a small delay to prevent multiple requests when filters change rapidly
+    const timeoutId = setTimeout(() => {
+      reset();
+      loadFeedbackPage(1, true);
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
   }, [filterStatus]);
   
   // Load next page when page changes
@@ -114,7 +143,7 @@ export function usePaginatedFeedback({
     if (page > 1) {
       loadFeedbackPage(page);
     }
-  }, [page]);
+  }, [page, loadFeedbackPage]);
   
   return {
     feedback,

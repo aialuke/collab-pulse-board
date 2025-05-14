@@ -1,56 +1,45 @@
-
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 interface UsePaginationOptions {
-  initialPage?: number;
   pageSize?: number;
-  threshold?: number;
-  rootMargin?: string;
 }
 
-export function usePagination<T>({
-  initialPage = 1,
-  pageSize = 10,
-  threshold = 0.1,
-  rootMargin = '0px 0px 200px 0px' // Load earlier before reaching bottom
-}: UsePaginationOptions = {}) {
-  const [page, setPage] = useState<number>(initialPage);
+export function usePagination<T>({ pageSize = 10 }: UsePaginationOptions = {}) {
+  const [page, setPage] = useState<number>(1);
   const [items, setItems] = useState<T[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Reference to the observer
+  // Add a state for total items count
+  const [total, setTotal] = useState<number>(0);
+
   const observer = useRef<IntersectionObserver | null>(null);
-  
-  // Reference to the sentinel element
-  const sentinelRef = useCallback((node: HTMLDivElement | null) => {
-    // Skip if already loading or no more items
-    if (isLoading || !hasMore) return;
-    
-    // Disconnect previous observer
-    if (observer.current) {
-      observer.current.disconnect();
-    }
-    
-    // Create new observer
-    observer.current = new IntersectionObserver(
-      (entries) => {
-        // If sentinel is visible and we're not already loading
-        if (entries[0]?.isIntersecting && hasMore && !isLoading) {
-          setPage((prev) => prev + 1);
+  const sentinelRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (isLoading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage(prevPage => prevPage + 1);
         }
-      },
-      { threshold, rootMargin }
-    );
-    
-    // Observe new sentinel
-    if (node) {
-      observer.current.observe(node);
-    }
-  }, [isLoading, hasMore, threshold, rootMargin]);
-  
-  // Clean up observer on unmount
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, hasMore]
+  );
+
+  // Reset function to clear items and reset page
+  const reset = useCallback(() => {
+    setItems([]);
+    setPage(1);
+    setHasMore(false);
+    setError(null);
+    setTotal(0);
+  }, []);
+
   useEffect(() => {
     return () => {
       if (observer.current) {
@@ -58,15 +47,7 @@ export function usePagination<T>({
       }
     };
   }, []);
-  
-  // Reset function to start over from page 1
-  const reset = useCallback(() => {
-    setPage(initialPage);
-    setItems([]);
-    setHasMore(true);
-    setError(null);
-  }, [initialPage]);
-  
+
   return {
     page,
     items,
@@ -78,7 +59,8 @@ export function usePagination<T>({
     error,
     setError,
     sentinelRef,
-    pageSize,
-    reset
+    reset,
+    total,
+    setTotal
   };
 }

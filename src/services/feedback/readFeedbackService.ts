@@ -6,20 +6,40 @@ import { mapFeedbackItem, mapFeedbackItems } from './mappers';
 import { FeedbackResponse } from '@/types/supabase';
 
 /**
- * Fetches all feedback items with optional status filter
+ * Optimized function to fetch all feedback items with pagination and filtering
  */
-export async function fetchFeedback(filterStatus?: string): Promise<FeedbackType[]> {
+export async function fetchFeedback(
+  filterStatus?: string, 
+  page: number = 1, 
+  limit: number = 10
+): Promise<{ items: FeedbackType[], hasMore: boolean, total: number }> {
   try {
-    // 1. Build and execute query
-    let query = createBaseFeedbackQuery();
+    // Select only the columns we need to improve query performance
+    const columns = 'id, title, content, user_id, category_id, created_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
+    
+    // 1. Build query with pagination and filtering
+    let query = createBaseFeedbackQuery(columns);
 
     // Apply status filter if provided
     if (filterStatus && filterStatus !== 'all') {
       query = query.eq('status', filterStatus);
     }
 
-    // Default sorting by newest
-    query = query.order('created_at', { ascending: false });
+    // Count total before applying pagination (for hasMore calculation)
+    const { count } = await supabase
+      .from('feedback')
+      .select('*', { count: 'exact', head: true })
+      .eq(filterStatus && filterStatus !== 'all' ? 'status' : 'id', 
+           filterStatus && filterStatus !== 'all' ? filterStatus : supabase.not('id', 'is', null));
+    
+    // Apply pagination
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+    
+    // Default sorting by newest with pagination
+    query = query
+      .order('created_at', { ascending: false })
+      .range(from, to);
 
     // Execute query
     const { data: feedbackData, error: feedbackError } = await query;
@@ -30,7 +50,7 @@ export async function fetchFeedback(filterStatus?: string): Promise<FeedbackType
     }
 
     if (!feedbackData || feedbackData.length === 0) {
-      return [];
+      return { items: [], hasMore: false, total: count || 0 };
     }
 
     // 2. Collect all unique user IDs
@@ -45,11 +65,11 @@ export async function fetchFeedback(filterStatus?: string): Promise<FeedbackType
       profiles: profilesMap[item.user_id]
     }));
 
-    // 5. Get current user's upvotes
+    // 5. Get current user's upvotes - using optimized query
     const userId = (await supabase.auth.getUser()).data.user?.id;
     const userUpvotes = await fetchUserUpvotes(userId);
 
-    // 6. Handle reposts - fetch original posts if needed
+    // 6. Handle reposts efficiently - fetch original posts if needed
     const repostItems = feedbackWithProfiles.filter(item => 
       item.is_repost && item.original_post_id
     );
@@ -69,7 +89,16 @@ export async function fetchFeedback(filterStatus?: string): Promise<FeedbackType
     }
 
     // 7. Map to frontend models
-    return mapFeedbackItems(feedbackWithProfiles, userUpvotes, originalPostsMap);
+    const mappedItems = mapFeedbackItems(feedbackWithProfiles, userUpvotes, originalPostsMap);
+    
+    // 8. Determine if there are more items
+    const hasMore = count ? from + feedbackData.length < count : false;
+    
+    return {
+      items: mappedItems,
+      hasMore,
+      total: count || 0
+    };
   } catch (error) {
     console.error('Error in fetchFeedback:', error);
     throw error;
@@ -77,14 +106,16 @@ export async function fetchFeedback(filterStatus?: string): Promise<FeedbackType
 }
 
 /**
- * Fetches a single feedback item by ID
+ * Optimized function to fetch a single feedback item by ID
  */
 export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
   try {
-    // 1. Fetch the specific feedback item
-    const { data: feedbackData, error: feedbackError } = await createBaseFeedbackQuery()
+    // 1. Fetch the specific feedback item with only necessary columns
+    const columns = 'id, title, content, user_id, category_id, created_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
+    
+    const { data: feedbackData, error: feedbackError } = await createBaseFeedbackQuery(columns)
       .eq('id', id)
-      .single();
+      .maybeSingle(); // Use maybeSingle instead of single for better error handling
 
     if (feedbackError) {
       console.error('Error fetching feedback by id:', feedbackError);

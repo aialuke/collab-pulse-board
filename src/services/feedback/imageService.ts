@@ -3,91 +3,115 @@ import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Upload an image to Supabase Storage
- * Supports WebP and standard image formats
- * 
- * @param userId The user ID for the file path
- * @param imageData The data URL of the image
- * @param outputFormat The format of the image (webp or jpeg)
- * @returns The public URL of the uploaded image
+ * @param file - The file to upload
+ * @param userId - The ID of the user uploading the file
+ * @returns URL of the uploaded image
  */
-export async function uploadFeedbackImage(
-  userId: string, 
-  imageData: string,
-  outputFormat: string = 'jpeg'
-): Promise<string> {
-  // Extract MIME type and format info from the data URL
-  const { mimeType, extension } = getImageFormatInfo(imageData);
-  
-  // Convert base64 to file
-  const res = await fetch(imageData);
-  const blob = await res.blob();
-  
-  // Use the detected format or the specified output format
-  // WebP is preferred if the output format specifies it
-  const finalExtension = outputFormat === 'webp' ? 'webp' : extension;
-  const fileName = `feedback-image-${Date.now()}.${finalExtension}`;
-  
-  // Create file with appropriate MIME type
-  // For WebP images, explicitly set the MIME type to image/webp
-  const finalMimeType = outputFormat === 'webp' ? 'image/webp' : mimeType;
-  const file = new File([blob], fileName, { type: finalMimeType });
+export async function uploadImage(file: File, userId: string): Promise<string> {
+  try {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId}_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+    const filePath = `${userId}/${fileName}`;
 
-  // Upload to Supabase Storage
-  const filePath = `${userId}/${fileName}`;
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from('feedback-images')
-    .upload(filePath, file);
+    // Add proper cache-control headers for optimal caching
+    const { data, error } = await supabase.storage
+      .from('feedback-images')
+      .upload(filePath, file, {
+        cacheControl: '31536000', // 1 year cache
+        upsert: false,
+        contentType: file.type // Explicitly set content-type for proper handling
+      });
 
-  if (uploadError) {
-    console.error('Error uploading image:', uploadError);
-    throw uploadError;
+    if (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+
+    // Get the public URL with optimized settings
+    const { data: { publicUrl } } = supabase.storage
+      .from('feedback-images')
+      .getPublicUrl(filePath, {
+        transform: {
+          quality: 80 // Optimize quality for better performance
+        }
+      });
+
+    return publicUrl;
+  } catch (error) {
+    console.error('Error in uploadImage:', error);
+    throw error;
   }
-
-  // Get the public URL
-  const { data: { publicUrl } } = supabase.storage
-    .from('feedback-images')
-    .getPublicUrl(uploadData.path);
-
-  return publicUrl;
 }
 
 /**
- * Get MIME type and extension from a data URL
- * Helper function to extract format information
+ * Get optimized image URL for a given path
+ * @param path - The path to the image
+ * @returns Optimized image URL
  */
-export function getImageFormatInfo(dataUrl: string): { mimeType: string; extension: string } {
-  const mimeType = dataUrl.split(';')[0].split(':')[1];
-  let extension = 'jpg'; // Default extension
-  
-  if (mimeType === 'image/webp') {
-    extension = 'webp';
-  } else if (mimeType === 'image/png') {
-    extension = 'png';
-  } else if (mimeType === 'image/gif') {
-    extension = 'gif';
-  }
-  
-  return { mimeType, extension };
-}
-
-/**
- * Validates if a given URL is a valid image URL
- * Helps with error handling in image display components
- */
-export function isValidImageUrl(url: string | undefined | null): boolean {
-  if (!url) return false;
+export function getOptimizedImageUrl(path: string): string {
+  if (!path) return '';
   
   try {
-    const urlObj = new URL(url);
-    // Check if the URL has a valid image extension or is from the storage bucket
-    const path = urlObj.pathname.toLowerCase();
-    return path.endsWith('.jpg') || 
-           path.endsWith('.jpeg') || 
-           path.endsWith('.png') || 
-           path.endsWith('.gif') || 
-           path.endsWith('.webp') ||
-           urlObj.hostname.includes('supabase.co');
-  } catch (e) {
+    // Check if it's already a Supabase URL
+    if (path.includes('supabase.co')) {
+      // Extract the bucket and filepath from the URL
+      const url = new URL(path);
+      const pathSegments = url.pathname.split('/');
+      const bucketName = pathSegments[2];
+      const filePath = pathSegments.slice(4).join('/');
+      
+      // Recreate with optimized transform parameters
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(filePath, {
+          transform: {
+            quality: 80,
+            format: 'webp'
+          }
+        });
+        
+      return publicUrl;
+    }
+    
+    // For external URLs, return as is
+    return path;
+  } catch (error) {
+    console.error('Error optimizing image URL:', error);
+    return path;
+  }
+}
+
+/**
+ * Check if image exists in storage
+ * @param path - Path to check
+ */
+export async function checkImageExists(path: string): Promise<boolean> {
+  try {
+    if (!path || !path.includes('supabase.co')) return false;
+    
+    // Extract bucket and file path from URL
+    const url = new URL(path);
+    const pathSegments = url.pathname.split('/');
+    const bucketName = pathSegments[2];
+    const filePath = pathSegments.slice(4).join('/');
+    
+    // Use head request to check if file exists without downloading
+    const { data, error } = await supabase.storage
+      .from(bucketName)
+      .list(filePath.split('/').slice(0, -1).join('/'), {
+        limit: 1,
+        offset: 0,
+        search: filePath.split('/').pop(),
+      });
+    
+    if (error) {
+      console.error('Error checking if image exists:', error);
+      return false;
+    }
+    
+    return data && data.length > 0;
+  } catch (error) {
+    console.error('Error in checkImageExists:', error);
     return false;
   }
 }
