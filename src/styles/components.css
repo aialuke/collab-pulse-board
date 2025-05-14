@@ -140,23 +140,26 @@
     @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
   }
 
-  /* Shout Out animation classes */
+  /* Shout Out animation classes - ENHANCED WITH BRIGHTER COLORS */
   .shout-out-card {
     @apply relative overflow-hidden;
   }
 
-  /* Soft Glow Fade animation for Shout Out cards */
+  /* Soft Glow Fade animation for Shout Out cards - ENHANCED */
   .shout-out-card.animate {
+    /* Enhanced animation with brighter gold color, increased opacity and spread */
     animation: soft-glow-fade 2.5s ease-in-out infinite;
+    /* Add will-change to optimize GPU rendering */
+    will-change: box-shadow;
   }
 
-  /* Soft Glow Fade animation keyframes */
+  /* Soft Glow Fade animation keyframes - ENHANCED */
   @keyframes soft-glow-fade {
     0%, 100% { 
-      box-shadow: 0 0 0 0 rgba(0, 95, 153, 0.2); 
+      box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.2); /* Bright gold with low opacity */
     }
     50% { 
-      box-shadow: 0 0 12px 4px rgba(0, 95, 153, 0.3); 
+      box-shadow: 0 0 16px 4px rgba(255, 215, 0, 0.5); /* Bright gold with higher opacity and larger spread */
     }
   }
 
@@ -164,11 +167,11 @@
   @media (prefers-reduced-motion: reduce) {
     .shout-out-card.animate {
       animation: none !important;
-      box-shadow: 0 0 4px 1px rgba(0, 95, 153, 0.2);
+      box-shadow: 0 0 4px 1px rgba(255, 215, 0, 0.3); /* Static subtle glow for reduced motion */
     }
   }
 
-  /* Dark mode support for animations */
+  /* Dark mode support for animations with cyan glow */
   @media (prefers-color-scheme: dark) {
     .shout-out-card.animate {
       animation: soft-glow-fade-dark 2.5s ease-in-out infinite;
@@ -176,10 +179,17 @@
     
     @keyframes soft-glow-fade-dark {
       0%, 100% { 
-        box-shadow: 0 0 0 0 rgba(77, 168, 255, 0.2); 
+        box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.2); /* Cyan glow with low opacity */
       }
       50% { 
-        box-shadow: 0 0 12px 4px rgba(77, 168, 255, 0.3); 
+        box-shadow: 0 0 16px 4px rgba(0, 255, 255, 0.5); /* Cyan glow with higher opacity and larger spread */
+      }
+    }
+
+    /* Honor reduced motion in dark mode */
+    @media (prefers-reduced-motion: reduce) {
+      .shout-out-card.animate {
+        box-shadow: 0 0 4px 1px rgba(0, 255, 255, 0.3); /* Static subtle cyan glow for reduced motion */
       }
     }
   }
