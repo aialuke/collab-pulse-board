@@ -20,7 +20,7 @@ export function FeedbackContent({
       {imageSource && (
         <>
           <div 
-            className="mt-2 rounded-md overflow-hidden cursor-pointer pr-8 sm:pr-10"
+            className="mt-2 rounded-md overflow-hidden cursor-pointer"
             onClick={() => setIsImagePreviewOpen(true)}
           >
             <img 
