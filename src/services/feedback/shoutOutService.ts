@@ -36,7 +36,13 @@ export const createShoutOut = async (
       return null;
     }
 
-    return mapFeedbackItem(data);
+    // Add target_user_id field if it doesn't exist in the response
+    const responseWithTarget = {
+      ...data,
+      target_user_id: data.target_user_id || null
+    };
+
+    return mapFeedbackItem(responseWithTarget);
   } catch (error) {
     console.error('Error creating shout out:', error);
     return null;
@@ -68,7 +74,13 @@ export const getAllShoutOuts = async (): Promise<FeedbackType[]> => {
     // Default all to not upvoted for now - we could fetch upvotes if needed
     const userUpvotes = Object.fromEntries(data.map(item => [item.id, false]));
 
-    return data.map(item => mapFeedbackItem(item, userUpvotes[item.id]));
+    return data.map(item => {
+      const enhancedItem = {
+        ...item,
+        target_user_id: item.target_user_id || null
+      };
+      return mapFeedbackItem(enhancedItem, userUpvotes[item.id]);
+    });
   } catch (error) {
     console.error('Error getting shout outs:', error);
     return [];
@@ -101,7 +113,13 @@ export const getShoutOutsForUser = async (userId: string): Promise<FeedbackType[
     // Default all to not upvoted for now
     const userUpvotes = Object.fromEntries(data.map(item => [item.id, false]));
 
-    return data.map(item => mapFeedbackItem(item, userUpvotes[item.id]));
+    return data.map(item => {
+      const enhancedItem = {
+        ...item,
+        target_user_id: item.target_user_id || null
+      };
+      return mapFeedbackItem(enhancedItem, userUpvotes[item.id]);
+    });
   } catch (error) {
     console.error('Error getting shout outs for user:', error);
     return [];

@@ -114,10 +114,11 @@ export async function fetchOriginalPosts(
     const originalPostsMap: Record<string, FeedbackResponse> = {};
     
     originalPostsData.forEach(post => {
-      // Add profile to the post
+      // Add profile to the post and ensure target_user_id is present (null if not defined)
       originalPostsMap[post.id] = {
         ...post,
-        profiles: profilesMap[post.user_id]
+        profiles: profilesMap[post.user_id],
+        target_user_id: post.target_user_id || null
       };
     });
     
