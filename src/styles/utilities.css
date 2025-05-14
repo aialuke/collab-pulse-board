@@ -1,3 +1,4 @@
+
 /* Gradient Effects - mobile-first responsive */
 .text-gradient {
   @apply bg-gradient-to-r from-yellow-500 to-yellow-600 bg-clip-text text-transparent;
@@ -29,7 +30,7 @@
               linear-gradient(to right, rgba(26, 50, 110, 0.6), rgba(26, 50, 110, 0.4)) border-box;
 }
 
-/* Special Effects */
+/* Special Effects - consolidated */
 .glow-on-hover:hover {
   box-shadow: 0 0 0.9375rem rgba(255, 215, 0, 0.5);
 }
@@ -63,7 +64,7 @@
   @apply py-2 sm:py-3 md:py-4;
 }
 
-/* Accessibility-enhanced touch targets */
+/* Consolidated touch target - centralized definition */
 .touch-target {
   @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
 }
@@ -115,7 +116,7 @@
   }
 }
 
-/* WCAG AAA Accessibility Utilities */
+/* Consolidated accessibility utilities */
 .sr-only {
   @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
 }
@@ -124,7 +125,7 @@
   @apply not-sr-only static h-auto w-auto overflow-visible whitespace-normal;
 }
 
-/* High contrast mode utilities */
+/* High contrast mode utilities - consolidated */
 @media (forced-colors: active) {
   .forced-colors-border {
     border: 1px solid CanvasText;
@@ -150,36 +151,4 @@
 /* Focus ring utilities - 3:1 contrast ratio for focus indicators */
 .focus-ring {
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary transition-all duration-150;
-}
-
-/* Reduced motion preference adjustments */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Line clamp utilities */
-.line-clamp-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
