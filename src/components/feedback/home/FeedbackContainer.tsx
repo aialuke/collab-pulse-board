@@ -1,36 +1,42 @@
 
 import React from 'react';
-import { FeedbackType } from '@/types/feedback';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useFeedbackActions } from '@/hooks/useFeedbackActions';
+import { usePaginatedFeedback } from '@/hooks/usePaginatedFeedback';
 import { useFeedbackFilters } from '@/hooks/useFeedbackFilters';
+import { useFeedbackActions } from '@/hooks/useFeedbackActions';
 import { useRepost } from '@/contexts/RepostContext';
-import { useFeedbackData } from '@/hooks/useFeedbackData';
-import { useFilteredFeedback } from '@/hooks/useFilteredFeedback';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileFeedbackView } from './MobileFeedbackView';
 import { DesktopFeedbackView } from './DesktopFeedbackView';
 
 export function FeedbackContainer() {
   const isMobile = useIsMobile();
   const { filters } = useFeedbackFilters();
+  
+  // Use our optimized paginated feedback hook
   const {
     feedback,
-    setFeedback,
-    filteredFeedback,
-    setFilteredFeedback,
     isLoading,
-    loadError,
-    handleRetry,
-    loadFeedback
-  } = useFeedbackData();
+    error: loadError,
+    hasMore,
+    sentinelRef,
+    refresh: handleRetry
+  } = usePaginatedFeedback({
+    filterStatus: filters.status,
+    pageSize: 10
+  });
   
-  const { 
-    handleUpvote, 
-    handleReport, 
+  // Use feedback actions
+  const {
+    handleUpvote,
+    handleReport,
     handleDelete,
-  } = useFeedbackActions(setFeedback);
+  } = useFeedbackActions((newFeedback) => {
+    // This is a no-op since usePaginatedFeedback manages its own state
+    // We just need to pass a function to satisfy the API
+  });
   
-  const { 
+  // Use the repost context
+  const {
     feedbackToRepost,
     repostDialogOpen,
     handleRepost,
@@ -38,18 +44,11 @@ export function FeedbackContainer() {
     closeRepostDialog
   } = useRepost();
 
-  // Use the filtering hook
-  useFilteredFeedback(feedback, filters, setFilteredFeedback);
-  
-  // Since we don't have actual pagination implemented in useFeedbackData yet,
-  // we'll set hasMore to false for now - this can be updated when real pagination is implemented
-  const hasMore = false;
-  
   // We now use isMobile from useIsMobile() to determine which view to show
   if (isMobile) {
     return (
       <MobileFeedbackView
-        filteredFeedback={filteredFeedback}
+        filteredFeedback={feedback}
         isLoading={isLoading}
         loadError={loadError}
         feedback={feedback}
@@ -62,9 +61,9 @@ export function FeedbackContainer() {
         closeRepostDialog={closeRepostDialog}
         handleRepost={handleRepost}
         handleRetry={handleRetry}
-        loadFeedback={loadFeedback}
+        loadFeedback={handleRetry}
+        sentinelRef={sentinelRef}
         hasMore={hasMore}
-        sentinelRef={null} // Adding null for now as we don't have an actual sentinel ref yet
       />
     );
   }
@@ -72,7 +71,7 @@ export function FeedbackContainer() {
   // Desktop view for larger screens
   return (
     <DesktopFeedbackView
-      filteredFeedback={filteredFeedback}
+      filteredFeedback={feedback}
       isLoading={isLoading}
       loadError={loadError}
       feedback={feedback}
@@ -85,8 +84,8 @@ export function FeedbackContainer() {
       closeRepostDialog={closeRepostDialog}
       handleRepost={handleRepost}
       handleRetry={handleRetry}
+      sentinelRef={sentinelRef}
       hasMore={hasMore}
-      sentinelRef={null} // Adding null for now as we don't have an actual sentinel ref yet
     />
   );
 }
