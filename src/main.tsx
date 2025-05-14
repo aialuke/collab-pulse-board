@@ -50,6 +50,19 @@ if ('serviceWorker' in navigator) {
         });
       }
       
+      // Font loading optimization with service worker
+      if (registration && 'fonts' in document) {
+        // Trigger font loading and caching
+        document.fonts.ready.then(() => {
+          console.log('Fonts loaded and ready');
+          document.documentElement.classList.remove('fonts-loading');
+        }).catch(err => {
+          console.error('Font loading error:', err);
+          // Remove class anyway to ensure content is visible
+          document.documentElement.classList.remove('fonts-loading');
+        });
+      }
+      
       // Periodically check for updates (every hour)
       if (registration) {
         setInterval(() => {
@@ -61,6 +74,11 @@ if ('serviceWorker' in navigator) {
       console.error('Service worker registration failed:', error)
     }
   })
+}
+
+// Font loading class initialization
+if (window.document) {
+  document.documentElement.classList.add('fonts-loading');
 }
 
 // Use requestIdleCallback for non-critical initialization
