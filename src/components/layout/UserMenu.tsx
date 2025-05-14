@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogOut, User, Settings, BarChart } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 
 export function UserMenu() {
   const { user, logout } = useAuth();
@@ -50,16 +50,6 @@ export function UserMenu() {
         <DropdownMenuItem className="hover:bg-royal-blue-500/10" onClick={() => navigate('/profile')}>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
-        </DropdownMenuItem>
-        {isManager && (
-          <DropdownMenuItem className="hover:bg-royal-blue-500/10" onClick={() => navigate('/dashboard')}>
-            <BarChart className="mr-2 h-4 w-4" />
-            <span>Dashboard</span>
-          </DropdownMenuItem>
-        )}
-        <DropdownMenuItem className="hover:bg-royal-blue-500/10" onClick={() => navigate('/settings')}>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-neutral-200" />
         <DropdownMenuItem className="hover:bg-royal-blue-500/10" onClick={handleLogout}>
