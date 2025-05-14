@@ -115,7 +115,7 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 
-// Add necessary type and hook exports
+// Define ToasterToast type
 export type ToasterToast = {
   id: string
   title?: React.ReactNode
@@ -126,6 +126,7 @@ export type ToasterToast = {
   onOpenChange?: (open: boolean) => void
 }
 
+// Define useToast hook properly as a React hook
 export const useToast = () => {
   const [toasts, setToasts] = React.useState<ToasterToast[]>([])
 
