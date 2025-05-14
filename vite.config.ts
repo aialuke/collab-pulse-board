@@ -1,3 +1,4 @@
+
 import { defineConfig, ConfigEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -6,10 +7,15 @@ import { configureCompression } from "./src/config/vite/compression";
 import { configureBuild } from "./src/config/vite/build";
 import { configureDevelopment } from "./src/config/vite/development";
 import { configureServer } from "./src/config/vite/server";
+import { splitVendorChunkPlugin } from 'vite';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => ({
-  server: configureServer(),
+  server: {
+    port: 8080,
+    ...configureServer()
+  },
   plugins: [
     react({
       // Add this for production optimization
@@ -18,6 +24,14 @@ export default defineConfig(({ mode }: ConfigEnv) => ({
     mode === 'development' && configureDevelopment(),
     configurePWA(),
     ...(mode === 'production' ? configureCompression() : []),
+    // Add vendor chunk splitting plugin
+    splitVendorChunkPlugin(),
+    // Add bundle analyzer in build mode with stats option
+    mode === 'production' && visualizer({
+      filename: './dist/stats.html',
+      open: false,
+      gzipSize: true,
+    }),
   ].filter(Boolean),
   resolve: {
     alias: {
@@ -49,12 +63,50 @@ export default defineConfig(({ mode }: ConfigEnv) => ({
           
           return 'assets/[name]-[hash].[ext]';
         },
-        // Optimize chunking strategy for better performance
-        manualChunks: {
-          'vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui': ['@/components/ui/button', '@/components/ui/card', '@/components/ui/dialog'],
-          'feedback': ['@/components/feedback/home/FeedbackContainer', '@/components/feedback/card/FeedbackCard'],
-          'utils': ['@/lib/utils', '@/services/offlineService']
+        // Improved chunking strategy for better tree-shaking
+        manualChunks: (id) => {
+          // Core React dependencies
+          if (id.includes('node_modules/react/') || 
+              id.includes('node_modules/react-dom/') || 
+              id.includes('node_modules/scheduler/')) {
+            return 'react-core';
+          }
+          
+          // React Router
+          if (id.includes('node_modules/react-router') || 
+              id.includes('node_modules/@remix-run/router')) {
+            return 'router';
+          }
+          
+          // UI component library (Radix UI)
+          if (id.includes('node_modules/@radix-ui/')) {
+            const componentName = id.split('@radix-ui/')[1]?.split('/')[0];
+            // Group similar components together
+            if (componentName?.includes('react-dialog') || 
+                componentName?.includes('react-popover') || 
+                componentName?.includes('react-modal')) {
+              return 'ui-overlays';
+            }
+            if (componentName?.includes('react-form') || 
+                componentName?.includes('react-label') || 
+                componentName?.includes('react-select') ||
+                componentName?.includes('react-checkbox') ||
+                componentName?.includes('react-switch')) {
+              return 'ui-form';
+            }
+            return 'ui-components';
+          }
+          
+          // Tanstack/React-Query
+          if (id.includes('node_modules/@tanstack/react-query')) {
+            return 'tanstack-query';
+          }
+          
+          // Icons and visual libraries
+          if (id.includes('node_modules/lucide-react') || 
+              id.includes('node_modules/recharts')) {
+            return 'ui-visuals';
+          }
         }
       },
       external: []

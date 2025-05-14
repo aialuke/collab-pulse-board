@@ -16,6 +16,14 @@ export const configureBuild = () => {
     outDir: 'dist',
     emptyOutDir: true,
     // Generate chunks for better caching
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 1000,
+    // Enable tree-shaking optimization
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: process.env.NODE_ENV === 'production',
+        drop_debugger: process.env.NODE_ENV === 'production',
+      }
+    },
   };
 };

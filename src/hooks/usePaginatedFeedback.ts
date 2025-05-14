@@ -3,7 +3,6 @@ import { useCallback, useEffect } from 'react';
 import { usePagination } from './usePagination';
 import { FeedbackType } from '@/types/feedback';
 import { useToast } from './use-toast';
-import { isOnline, retryWithBackoff } from '@/services/offlineService';
 import { fetchFeedback } from '@/services/feedbackService';
 
 interface UsePaginatedFeedbackOptions {
@@ -32,19 +31,26 @@ export function usePaginatedFeedback({
 
   // Listen for cache updates from the service worker
   useEffect(() => {
-    const channel = new BroadcastChannel('api-updates');
-    channel.addEventListener('message', (event) => {
-      if (event.data.type === 'CACHE_UPDATED' && event.data.url === 'feed') {
-        // Refresh data if cache was updated, but use a debounce to avoid multiple refreshes
-        const timeoutId = setTimeout(() => {
-          loadFeedbackPage(1, true);
-        }, 300);
-        
-        return () => clearTimeout(timeoutId);
-      }
-    });
+    let channel: BroadcastChannel | null = null;
     
-    return () => channel.close();
+    // Only create BroadcastChannel if it's supported by the browser
+    if ('BroadcastChannel' in window) {
+      channel = new BroadcastChannel('api-updates');
+      channel.addEventListener('message', (event) => {
+        if (event.data.type === 'CACHE_UPDATED' && event.data.url === 'feed') {
+          // Refresh data if cache was updated, but use a debounce to avoid multiple refreshes
+          const timeoutId = setTimeout(() => {
+            loadFeedbackPage(1, true);
+          }, 300);
+          
+          return () => clearTimeout(timeoutId);
+        }
+      });
+    }
+    
+    return () => {
+      if (channel) channel.close();
+    };
   }, []);
   
   // Load feedback with pagination - simplified version without filtering
@@ -72,6 +78,7 @@ export function usePaginatedFeedback({
       console.error('Error loading feedback:', error);
       setError('Failed to load feedback. Please try again.');
       
+      // Use minimalist toast import
       toast({
         title: 'Error',
         description: 'Failed to load feedback. Please try again.',

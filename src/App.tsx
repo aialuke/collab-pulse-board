@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,20 +10,31 @@ import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import { RefreshProvider } from "@/contexts/RefreshContext";
 import { TermsOfUseDialog } from "@/components/terms/TermsOfUseDialog";
 
-// Pages
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import CreateFeedbackPage from "./pages/CreateFeedbackPage";
-import FeedbackDetailPage from "./pages/FeedbackDetailPage";
-import ProfilePage from "./pages/ProfilePage";
-import NotFound from "./pages/NotFound";
-
 // Layout
 import { AppLayout } from "./components/layout/AppLayout";
 
 // PWA Components
 import { PWAInstallPrompt } from "./components/pwa/PWAInstallPrompt";
 import { OfflineIndicator } from "./components/pwa/OfflineIndicator";
+import { Skeleton } from "./components/ui/skeleton";
+
+// Lazy loaded pages
+const HomePage = lazy(() => import("./pages/HomePage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const CreateFeedbackPage = lazy(() => import("./pages/CreateFeedbackPage"));
+const FeedbackDetailPage = lazy(() => import("./pages/FeedbackDetailPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Loading fallback component
+const PageLoading = () => (
+  <div className="w-full h-full min-h-[50vh] flex flex-col space-y-4 p-8">
+    <Skeleton className="h-8 w-3/4 mx-auto" />
+    <Skeleton className="h-64 w-full mx-auto" />
+    <Skeleton className="h-8 w-2/4 mx-auto" />
+    <Skeleton className="h-32 w-5/6 mx-auto" />
+  </div>
+);
 
 // Protected route component that also checks for terms acceptance
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -39,7 +51,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }, [isAuthenticated, user]);
 
   if (isLoading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return <PageLoading />;
   }
 
   if (!isAuthenticated) {
@@ -59,14 +71,20 @@ const AppRoutesWithAuth = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return <PageLoading />;
   }
 
   return (
     <Routes>
       <Route 
         path="/login" 
-        element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />} 
+        element={
+          isAuthenticated ? 
+          <Navigate to="/" replace /> : 
+          <Suspense fallback={<PageLoading />}>
+            <LoginPage />
+          </Suspense>
+        } 
       />
       
       <Route
@@ -77,13 +95,33 @@ const AppRoutesWithAuth = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<HomePage />} />
-        <Route path="create" element={<CreateFeedbackPage />} />
-        <Route path="feedback/:id" element={<FeedbackDetailPage />} />
-        <Route path="profile" element={<ProfilePage />} />
+        <Route index element={
+          <Suspense fallback={<PageLoading />}>
+            <HomePage />
+          </Suspense>
+        } />
+        <Route path="create" element={
+          <Suspense fallback={<PageLoading />}>
+            <CreateFeedbackPage />
+          </Suspense>
+        } />
+        <Route path="feedback/:id" element={
+          <Suspense fallback={<PageLoading />}>
+            <FeedbackDetailPage />
+          </Suspense>
+        } />
+        <Route path="profile" element={
+          <Suspense fallback={<PageLoading />}>
+            <ProfilePage />
+          </Suspense>
+        } />
       </Route>
       
-      <Route path="*" element={<NotFound />} />
+      <Route path="*" element={
+        <Suspense fallback={<PageLoading />}>
+          <NotFound />
+        </Suspense>
+      } />
     </Routes>
   );
 };
