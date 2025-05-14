@@ -4,24 +4,19 @@ import { useRef, useEffect, useState } from 'react';
 interface UseAnimationOnScrollOptions {
   threshold?: number;
   rootMargin?: string;
-  once?: boolean;
   disabled?: boolean;
 }
 
 /**
- * Custom hook to apply a class when an element is in viewport
- * @param options Configuration options
- * @returns Object containing ref to be attached to the element and boolean indicating visibility
+ * Simplified animation hook optimized for "once" animation pattern
  */
 export function useAnimationOnScroll({
   threshold = 0.1,
   rootMargin = '0px',
-  once = true,
   disabled = false
 }: UseAnimationOnScrollOptions = {}) {
   const [isVisible, setIsVisible] = useState(false);
   const elementRef = useRef<HTMLDivElement | null>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
   
   // Check if user prefers reduced motion
   const prefersReducedMotion = useRef(
@@ -32,7 +27,7 @@ export function useAnimationOnScroll({
 
   useEffect(() => {
     // Skip if animations are disabled or if the user prefers reduced motion
-    if (disabled || prefersReducedMotion.current) {
+    if (disabled || prefersReducedMotion.current || isVisible) {
       setIsVisible(true);
       return;
     }
@@ -40,39 +35,25 @@ export function useAnimationOnScroll({
     const element = elementRef.current;
     if (!element) return;
 
-    // Cleanup previous observer
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
-
-    // Create new observer
-    observerRef.current = new IntersectionObserver(
+    // Create observer
+    const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
         if (entry.isIntersecting) {
           setIsVisible(true);
-          
-          // If once is true, disconnect the observer after triggering once
-          if (once && observerRef.current) {
-            observerRef.current.disconnect();
-          }
-        } else if (!once) {
-          setIsVisible(false);
+          // Always disconnect after triggering once
+          observer.disconnect();
         }
       },
       { threshold, rootMargin }
     );
 
     // Start observing
-    observerRef.current.observe(element);
+    observer.observe(element);
 
-    // Cleanup on unmount
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, [threshold, rootMargin, once, disabled]);
+    // Cleanup
+    return () => observer.disconnect();
+  }, [threshold, rootMargin, disabled, isVisible]);
 
   return { ref: elementRef, isVisible };
 }

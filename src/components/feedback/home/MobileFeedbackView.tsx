@@ -4,15 +4,14 @@ import { FeedbackType } from '@/types/feedback';
 import { FeedbackList } from './FeedbackList';
 import { FeedbackEmptyState } from './FeedbackEmptyState';
 import { FeedbackLoading } from './FeedbackLoading';
-import { FeedbackError } from './FeedbackError';
+import { FeedbackError } from './LoadingStates';
 import { RepostDialog } from '../repost/RepostDialog';
 import { useRefresh } from '@/contexts/RefreshContext';
 
 interface MobileFeedbackViewProps {
-  filteredFeedback: FeedbackType[];
+  feedback: FeedbackType[];
   isLoading: boolean;
   loadError: string | null;
-  feedback: FeedbackType[];
   feedbackToRepost: FeedbackType | null;
   repostDialogOpen: boolean;
   handleUpvote: (id: string) => void;
@@ -22,16 +21,14 @@ interface MobileFeedbackViewProps {
   closeRepostDialog: () => void;
   handleRepost: (id: string, comment: string) => Promise<any>;
   handleRetry: () => void;
-  loadFeedback: () => Promise<void>;
-  sentinelRef?: React.RefCallback<HTMLDivElement>;
   hasMore: boolean;
+  sentinelRef?: React.RefCallback<HTMLDivElement>;
 }
 
 export function MobileFeedbackView({
-  filteredFeedback,
+  feedback,
   isLoading,
   loadError,
-  feedback,
   feedbackToRepost,
   repostDialogOpen,
   handleUpvote,
@@ -41,16 +38,15 @@ export function MobileFeedbackView({
   closeRepostDialog,
   handleRepost,
   handleRetry,
-  loadFeedback,
   sentinelRef,
   hasMore
 }: MobileFeedbackViewProps) {
   const { setRefreshFunction } = useRefresh();
   
-  // Register the loadFeedback function with the RefreshContext
+  // Register the refresh function with the RefreshContext
   useEffect(() => {
-    setRefreshFunction(loadFeedback);
-  }, [loadFeedback, setRefreshFunction]);
+    setRefreshFunction(handleRetry);
+  }, [handleRetry, setRefreshFunction]);
 
   // Function to render the appropriate content based on loading/error state
   const renderContent = () => {
@@ -62,10 +58,10 @@ export function MobileFeedbackView({
       return <FeedbackError error={loadError} onRetry={handleRetry} />;
     }
 
-    return filteredFeedback.length > 0 ? (
+    return feedback.length > 0 ? (
       <>
         <FeedbackList
-          feedback={filteredFeedback}
+          feedback={feedback}
           onUpvote={handleUpvote}
           onReport={handleReport}
           onDelete={handleDelete}

@@ -34,12 +34,7 @@ export const FeedbackSkeleton = () => {
   );
 };
 
-interface FeedbackErrorProps {
-  message: string;
-  onRetry: () => void;
-}
-
-export const FeedbackError = ({ message, onRetry }: FeedbackErrorProps) => {
+export const FeedbackError = ({ error, onRetry }: { error: string, onRetry: () => void }) => {
   const online = isOnline();
   
   return (
@@ -52,7 +47,7 @@ export const FeedbackError = ({ message, onRetry }: FeedbackErrorProps) => {
       <div className="ml-2">
         <AlertTitle>{online ? 'Error loading feed' : 'You\'re offline'}</AlertTitle>
         <AlertDescription>
-          <p className="mb-3">{message}</p>
+          <p className="mb-3">{error}</p>
           <Button 
             variant="outline"
             size="sm" 

@@ -15,18 +15,16 @@ export type FeedbackType = {
   category: string;
   categoryId: number;
   upvotes: number;
-  status: FeedbackStatus; // Now supporting 'shout-out' status
+  status: FeedbackStatus;
   imageUrl?: string;
   linkUrl?: string;
   isUpvoted?: boolean;
-  // Add image property for backward compatibility with existing components
-  image?: string;
-  // Add repost fields
+  // Repost fields
   isRepost?: boolean;
   originalPostId?: string;
   originalPost?: FeedbackType;
   repostComment?: string;
-  // Add shout out field
+  // Shout out field
   isShoutOut?: boolean;
 };
 
@@ -35,17 +33,9 @@ export type CreateFeedbackInput = {
   categoryId: number;
   imageUrl?: string;
   linkUrl?: string;
-  // Add repost fields
   isRepost?: boolean;
   originalPostId?: string;
   repostComment?: string;
-};
-
-export type FeedbackFilterOptions = {
-  search: string;
-  category: string;
-  status: string; // Keeping for backward compatibility
-  sortBy: 'newest' | 'oldest' | 'upvotes';
 };
 
 export type Category = {

@@ -1,19 +1,17 @@
 
 import React, { useEffect } from 'react';
-import { FeedbackType } from '@/types/feedback';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useFeedbackActions } from '@/hooks/useFeedbackActions';
 import { useRepost } from '@/contexts/RepostContext';
 import { usePaginatedFeedback } from '@/hooks/usePaginatedFeedback';
 import { MobileFeedbackView } from './MobileFeedbackView';
 import { DesktopFeedbackView } from './DesktopFeedbackView';
-import { FeedbackSkeleton, FeedbackError, LoadMoreSentinel } from './LoadingStates';
+import { FeedbackSkeleton, FeedbackError } from './LoadingStates';
 
 export function FeedbackContainer() {
   const isMobile = useIsMobile();
   
   // Use the paginated feedback hook for optimized data loading and infinite scroll
-  // No longer passing filterStatus parameter
   const {
     feedback,
     isLoading,
@@ -30,8 +28,7 @@ export function FeedbackContainer() {
     handleUpvote, 
     handleReport, 
     handleDelete,
-  } = useFeedbackActions((newFeedback) => {
-    // This is a no-op now as pagination handles state management
+  } = useFeedbackActions(() => {
     console.log('Feedback updated via actions');
   });
   
@@ -44,48 +41,28 @@ export function FeedbackContainer() {
     closeRepostDialog
   } = useRepost();
   
-  // We now use isMobile from useIsMobile() to determine which view to show
+  // Common props for both mobile and desktop views
+  const viewProps = {
+    feedback,
+    isLoading,
+    loadError,
+    feedbackToRepost,
+    repostDialogOpen,
+    handleUpvote,
+    handleReport,
+    handleDelete,
+    openRepostDialog,
+    closeRepostDialog,
+    handleRepost,
+    handleRetry,
+    hasMore,
+    sentinelRef
+  };
+  
+  // Render the appropriate view based on device type
   if (isMobile) {
-    return (
-      <MobileFeedbackView
-        filteredFeedback={feedback}
-        isLoading={isLoading}
-        loadError={loadError}
-        feedback={feedback}
-        feedbackToRepost={feedbackToRepost}
-        repostDialogOpen={repostDialogOpen}
-        handleUpvote={handleUpvote}
-        handleReport={handleReport}
-        handleDelete={handleDelete}
-        openRepostDialog={openRepostDialog}
-        closeRepostDialog={closeRepostDialog}
-        handleRepost={handleRepost}
-        handleRetry={handleRetry}
-        loadFeedback={handleRetry}
-        hasMore={hasMore}
-        sentinelRef={sentinelRef}
-      />
-    );
+    return <MobileFeedbackView {...viewProps} />;
   }
 
-  // Desktop view for larger screens
-  return (
-    <DesktopFeedbackView
-      filteredFeedback={feedback}
-      isLoading={isLoading}
-      loadError={loadError}
-      feedback={feedback}
-      feedbackToRepost={feedbackToRepost}
-      repostDialogOpen={repostDialogOpen}
-      handleUpvote={handleUpvote}
-      handleReport={handleReport}
-      handleDelete={handleDelete}
-      openRepostDialog={openRepostDialog}
-      closeRepostDialog={closeRepostDialog}
-      handleRepost={handleRepost}
-      handleRetry={handleRetry}
-      hasMore={hasMore}
-      sentinelRef={sentinelRef}
-    />
-  );
+  return <DesktopFeedbackView {...viewProps} />;
 }

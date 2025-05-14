@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { FeedbackType } from '@/types/feedback';
 import { repostFeedback } from '@/services/feedback/repostService';
 import { useAuth } from './AuthContext';
@@ -11,7 +11,6 @@ interface RepostContextType {
   openRepostDialog: (feedback: FeedbackType) => void;
   closeRepostDialog: () => void;
   handleRepost: (id: string, comment: string) => Promise<FeedbackType>;
-  isReposting: boolean;
 }
 
 const RepostContext = createContext<RepostContextType | undefined>(undefined);
@@ -32,7 +31,6 @@ interface RepostProviderProps {
 export function RepostProvider({ children, onRepostSuccess }: RepostProviderProps) {
   const [repostDialogOpen, setRepostDialogOpen] = useState(false);
   const [feedbackToRepost, setFeedbackToRepost] = useState<FeedbackType | null>(null);
-  const [isReposting, setIsReposting] = useState(false);
   const { toast } = useToast();
   const { isAuthenticated, user } = useAuth();
   const isManager = user?.role === 'manager' || user?.role === 'admin';
@@ -66,7 +64,6 @@ export function RepostProvider({ children, onRepostSuccess }: RepostProviderProp
       throw new Error("Permission denied");
     }
 
-    setIsReposting(true);
     try {
       const repostedFeedback = await repostFeedback(id, comment);
       
@@ -80,6 +77,7 @@ export function RepostProvider({ children, onRepostSuccess }: RepostProviderProp
         onRepostSuccess(repostedFeedback);
       }
       
+      closeRepostDialog();
       return repostedFeedback;
     } catch (error) {
       console.error(`Error reposting feedback ${id}:`, error);
@@ -89,9 +87,6 @@ export function RepostProvider({ children, onRepostSuccess }: RepostProviderProp
         variant: "destructive",
       });
       throw error;
-    } finally {
-      setIsReposting(false);
-      closeRepostDialog();
     }
   };
 
@@ -100,8 +95,7 @@ export function RepostProvider({ children, onRepostSuccess }: RepostProviderProp
     feedbackToRepost,
     openRepostDialog,
     closeRepostDialog,
-    handleRepost,
-    isReposting
+    handleRepost
   };
 
   return <RepostContext.Provider value={value}>{children}</RepostContext.Provider>;

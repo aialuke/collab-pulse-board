@@ -10,7 +10,10 @@ import { configureServer } from "./src/config/vite/server";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => ({
-  server: configureServer(),
+  server: {
+    port: 8080,
+    ...configureServer()
+  },
   plugins: [
     react({
       // Add this for production optimization
@@ -50,14 +53,14 @@ export default defineConfig(({ mode }: ConfigEnv) => ({
           
           return 'assets/[name]-[hash].[ext]';
         },
-        // Fix chunking strategy by using specific files rather than directories
+        // Optimize chunking strategy for better performance
         manualChunks: {
           'vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-components': ['src/components/ui/button.tsx'], // Use a specific file instead of directory
-          'features': ['src/components/feedback/home/FeedbackContainer.tsx']
+          'ui': ['@/components/ui/button', '@/components/ui/card', '@/components/ui/dialog'],
+          'feedback': ['@/components/feedback/home/FeedbackContainer', '@/components/feedback/card/FeedbackCard'],
+          'utils': ['@/lib/utils', '@/services/offlineService']
         }
       },
-      // Add external packages that should not be bundled
       external: []
     },
   },

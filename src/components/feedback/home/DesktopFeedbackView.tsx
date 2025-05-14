@@ -4,14 +4,13 @@ import { FeedbackType } from '@/types/feedback';
 import { FeedbackList } from './FeedbackList';
 import { FeedbackEmptyState } from './FeedbackEmptyState';
 import { FeedbackLoading } from './FeedbackLoading';
-import { FeedbackError } from './FeedbackError';
+import { FeedbackError } from './LoadingStates';
 import { RepostDialog } from '../repost/RepostDialog';
 
 interface DesktopFeedbackViewProps {
-  filteredFeedback: FeedbackType[];
+  feedback: FeedbackType[];
   isLoading: boolean;
   loadError: string | null;
-  feedback: FeedbackType[];
   feedbackToRepost: FeedbackType | null;
   repostDialogOpen: boolean;
   handleUpvote: (id: string) => void;
@@ -26,10 +25,9 @@ interface DesktopFeedbackViewProps {
 }
 
 export function DesktopFeedbackView({
-  filteredFeedback,
+  feedback,
   isLoading,
   loadError,
-  feedback,
   feedbackToRepost,
   repostDialogOpen,
   handleUpvote,
@@ -54,9 +52,9 @@ export function DesktopFeedbackView({
 
     return (
       <>
-        {filteredFeedback.length > 0 ? (
+        {feedback.length > 0 ? (
           <FeedbackList
-            feedback={filteredFeedback}
+            feedback={feedback}
             onUpvote={handleUpvote}
             onReport={handleReport}
             onDelete={handleDelete}
