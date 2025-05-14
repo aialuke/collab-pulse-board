@@ -1,4 +1,3 @@
-
 export type FeedbackStatus = 'pending' | 'in-progress' | 'completed';
 
 export type FeedbackType = {
@@ -27,6 +26,8 @@ export type FeedbackType = {
   originalPostId?: string;
   originalPost?: FeedbackType;
   repostComment?: string;
+  // Add shout out field
+  isShoutOut?: boolean;
 };
 
 export type CreateFeedbackInput = {

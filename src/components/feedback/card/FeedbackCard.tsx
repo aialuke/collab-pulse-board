@@ -7,6 +7,8 @@ import { FeedbackActions } from './FeedbackActions';
 import { RepostDisplay } from './RepostDisplay';
 import { StandardFeedback } from './StandardFeedback';
 import { FeedbackComments } from '../comments/FeedbackComments';
+import { TrophyIcon } from '@/components/icons/TrophyIcon';
+import { useAnimationOnScroll } from '@/hooks/useAnimationOnScroll';
 
 interface FeedbackCardProps {
   feedback: FeedbackType;
@@ -52,13 +54,23 @@ export function FeedbackCard({
   const dropdownTriggerRef = useRef<HTMLButtonElement>(null);
   const isManagerPost = feedback.author.role === 'manager' || feedback.author.role === 'admin';
   const isOwnFeedback = isAuthor;
+  const isShoutOut = feedback.isShoutOut;
+  
+  // Use the animation on scroll hook for shout out cards
+  const { ref: animationRef, isVisible } = useAnimationOnScroll({
+    threshold: 0.2,
+    once: true,
+    disabled: !isShoutOut
+  });
   
   // Special class for cards
   const cardBorderClass = isManagerPost ? 'royal-blue-gradient-border' : 'gradient-border';
-  const cardClass = `w-full transition-all hover:shadow-md animate-fade-in bg-white border-neutral-200 ${cardBorderClass} text-neutral-900`;
+  const shoutOutClass = isShoutOut ? 'shout-out-card' : '';
+  const animateClass = isShoutOut && isVisible ? 'animate' : '';
+  const cardClass = `w-full transition-all hover:shadow-md animate-fade-in bg-white border-neutral-200 ${cardBorderClass} ${shoutOutClass} ${animateClass} text-neutral-900`;
 
   return (
-    <Card className={cardClass}>
+    <Card className={cardClass} ref={animationRef}>
       {/* If this is a repost, show the RepostDisplay component */}
       {feedback.isRepost ? (
         <RepostDisplay 
@@ -76,6 +88,13 @@ export function FeedbackCard({
           onDelete={onDelete}
           onRepost={onRepost}
         />
+      )}
+      
+      {/* Show trophy icon for shout out posts */}
+      {isShoutOut && (
+        <div className="flex justify-end px-4 pb-2">
+          <TrophyIcon size={20} />
+        </div>
       )}
       
       {/* Show footer with actions */}
