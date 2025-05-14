@@ -7,7 +7,6 @@ import { FeedbackActions } from './FeedbackActions';
 import { RepostDisplay } from './RepostDisplay';
 import { StandardFeedback } from './StandardFeedback';
 import { FeedbackComments } from '../comments/FeedbackComments';
-import { TrophyIcon } from '@/components/icons/TrophyIcon';
 import { useAnimationOnScroll } from '@/hooks/useAnimationOnScroll';
 
 // Define the category ID for shout outs
@@ -93,13 +92,6 @@ export function FeedbackCard({
           onDelete={onDelete}
           onRepost={onRepost}
         />
-      )}
-      
-      {/* Show trophy icon for shout out posts */}
-      {isShoutOut && (
-        <div className="flex justify-end px-4 pb-2">
-          <TrophyIcon size={20} />
-        </div>
       )}
       
       {/* Show footer with actions */}
