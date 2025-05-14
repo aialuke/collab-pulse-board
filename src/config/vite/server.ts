@@ -10,47 +10,79 @@ export const configureServer = (): ServerOptions => {
       overlay: false, // Disable HMR overlay for better performance
     },
     cors: true,
-    // Set appropriate cache control headers
-    // Format: pattern -> header -> value
+    // Set appropriate cache control headers properly typed for Vite
     headers: {
       // Static assets with hash-based filenames (immutable)
-      '*.js': {
-        'Cache-Control': 'public, max-age=31536000, immutable'
-      },
-      '*.css': {
-        'Cache-Control': 'public, max-age=31536000, immutable'
-      },
+      '*.js': [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=31536000, immutable'
+        }
+      ],
+      '*.css': [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=31536000, immutable'
+        }
+      ],
       // Image assets
-      '*.png': {
-        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400'
-      },
-      '*.jpg': {
-        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400'
-      },
-      '*.jpeg': {
-        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400'
-      },
-      '*.gif': {
-        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400'
-      },
-      '*.webp': {
-        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400'
-      },
-      '*.svg': {
-        'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400'
-      },
+      '*.png': [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=604800, stale-while-revalidate=86400'
+        }
+      ],
+      '*.jpg': [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=604800, stale-while-revalidate=86400'
+        }
+      ],
+      '*.jpeg': [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=604800, stale-while-revalidate=86400'
+        }
+      ],
+      '*.gif': [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=604800, stale-while-revalidate=86400'
+        }
+      ],
+      '*.webp': [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=604800, stale-while-revalidate=86400'
+        }
+      ],
+      '*.svg': [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=604800, stale-while-revalidate=86400'
+        }
+      ],
       // PWA manifest
-      'manifest.webmanifest': {
-        'Cache-Control': 'public, max-age=86400'
-      },
+      'manifest.webmanifest': [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=86400'
+        }
+      ],
       // Service worker - no caching
-      'sw.js': {
-        'Cache-Control': 'public, max-age=0, must-revalidate'
-      },
+      'sw.js': [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=0, must-revalidate'
+        }
+      ],
       // Default for all other files
-      '**': {
-        'Cache-Control': 'public, max-age=3600'
-      }
+      '**': [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=3600'
+        }
+      ]
     }
   };
 };
