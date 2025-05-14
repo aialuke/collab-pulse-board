@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -6,7 +5,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { FeatureFlagProvider } from "@/contexts/FeatureFlagContext";
 import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import { RefreshProvider } from "@/contexts/RefreshContext";
 import { TermsOfUseDialog } from "@/components/terms/TermsOfUseDialog";
@@ -107,19 +105,17 @@ function App() {
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <FeatureFlagProvider>
-              <NotificationsProvider>
-                <RefreshProvider>
-                  <TooltipProvider>
-                    <Toaster />
-                    <Sonner />
-                    <AppRoutesWithAuth />
-                    <PWAInstallPrompt />
-                    <OfflineIndicator />
-                  </TooltipProvider>
-                </RefreshProvider>
-              </NotificationsProvider>
-            </FeatureFlagProvider>
+            <NotificationsProvider>
+              <RefreshProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <Sonner />
+                  <AppRoutesWithAuth />
+                  <PWAInstallPrompt />
+                  <OfflineIndicator />
+                </TooltipProvider>
+              </RefreshProvider>
+            </NotificationsProvider>
           </AuthProvider>
         </QueryClientProvider>
       </BrowserRouter>

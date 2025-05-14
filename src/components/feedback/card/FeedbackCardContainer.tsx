@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { FeedbackCard } from './FeedbackCard';
 import { FeedbackType } from '@/types/feedback';
 import { useAuth } from '@/contexts/AuthContext';
-import { useFeatureFlags } from '@/contexts/FeatureFlagContext';
 
 interface FeedbackCardContainerProps {
   feedback: FeedbackType;
@@ -21,7 +20,6 @@ export function FeedbackCardContainer({
   onRepost
 }: FeedbackCardContainerProps) {
   const { user } = useAuth();
-  const { features } = useFeatureFlags();
   const [isUpvoted, setIsUpvoted] = useState(feedback.isUpvoted || false);
   const [upvotes, setUpvotes] = useState(feedback.upvotes);
 

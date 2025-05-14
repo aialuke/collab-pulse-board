@@ -1,18 +1,18 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+// This file is kept as a minimal placeholder to avoid breaking imports
+// The feature flag functionality has been removed as it was adding overhead without benefits
 
-interface FeatureFlags {
-  // Comment functionality has been removed
-}
+import React, { createContext, useContext, ReactNode } from 'react';
+
+// Empty interface as we're removing all feature flags
+interface FeatureFlags {}
 
 interface FeatureFlagContextType {
   features: FeatureFlags;
-  toggleFeature: (featureName: keyof FeatureFlags) => void;
+  toggleFeature: (featureName: string) => void;
 }
 
-const defaultFeatures: FeatureFlags = {
-  // Empty object as comments functionality has been removed
-};
+const defaultFeatures: FeatureFlags = {};
 
 const FeatureFlagContext = createContext<FeatureFlagContextType | undefined>(undefined);
 
@@ -30,19 +30,15 @@ interface FeatureFlagProviderProps {
 }
 
 export function FeatureFlagProvider({ 
-  children, 
+  children,
   initialFeatures = {} 
 }: FeatureFlagProviderProps) {
-  const [features, setFeatures] = useState<FeatureFlags>({
-    ...defaultFeatures,
-    ...initialFeatures
-  });
-
-  const toggleFeature = (featureName: keyof FeatureFlags) => {
-    setFeatures(prev => ({
-      ...prev,
-      [featureName]: !prev[featureName]
-    }));
+  // Simplified implementation that does nothing but satisfies the interface
+  const features = {} as FeatureFlags;
+  
+  const toggleFeature = () => {
+    // No-op function as we've removed feature flags
+    console.log('Feature flags have been removed from the application');
   };
 
   return (
