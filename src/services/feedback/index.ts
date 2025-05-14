@@ -1,7 +1,6 @@
 
 // Re-export all feedback-related services from this directory
 export * from './categoryService';
-export * from './commentService';
 export * from './createFeedbackService';
 export * from './deleteFeedbackService';
 export * from './feedbackApi';

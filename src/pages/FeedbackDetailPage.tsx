@@ -84,7 +84,7 @@ function FeedbackDetailContent() {
   };
 
   const handleComment = () => {
-    // On the detail page, this is a no-op as comments are always visible
+    // This is now a no-op as comments are removed
   };
 
   const handleReport = async (id: string) => {

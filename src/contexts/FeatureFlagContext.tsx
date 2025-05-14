@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface FeatureFlags {
-  enableComments: boolean;
+  // Comment functionality has been removed
 }
 
 interface FeatureFlagContextType {
@@ -11,7 +11,7 @@ interface FeatureFlagContextType {
 }
 
 const defaultFeatures: FeatureFlags = {
-  enableComments: false, // Disabled by default as requested
+  // Empty object as comments functionality has been removed
 };
 
 const FeatureFlagContext = createContext<FeatureFlagContextType | undefined>(undefined);

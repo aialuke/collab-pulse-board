@@ -15,7 +15,6 @@ export type FeedbackType = {
   category: string;
   categoryId: number;
   upvotes: number;
-  comments: number;
   status: FeedbackStatus; // Now supporting 'shout-out' status
   imageUrl?: string;
   linkUrl?: string;
@@ -46,7 +45,7 @@ export type FeedbackFilterOptions = {
   search: string;
   category: string;
   status: string; // Keeping for backward compatibility
-  sortBy: 'newest' | 'oldest' | 'upvotes' | 'comments';
+  sortBy: 'newest' | 'oldest' | 'upvotes';
 };
 
 export type Category = {

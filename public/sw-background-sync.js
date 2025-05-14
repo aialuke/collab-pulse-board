@@ -5,7 +5,6 @@ self.addEventListener('sync', (event) => {
   console.log('Background sync event received:', event.tag);
   
   if (event.tag.startsWith('feedback-') || 
-      event.tag.startsWith('comment-') || 
       event.tag.startsWith('upvote-') || 
       event.tag.startsWith('report-')) {
     event.waitUntil(syncData(event.tag));
@@ -51,10 +50,6 @@ async function syncData(queueName) {
           endpoint = '/api/feedback';
           method = 'POST';
           body = item.data;
-        } else if (queueName === 'comment-create-queue') {
-          endpoint = `/api/feedback/${item.data.feedbackId}/comments`;
-          method = 'POST';
-          body = { content: item.data.content };
         } else if (queueName === 'upvote-toggle-queue') {
           endpoint = `/api/feedback/${item.data.feedbackId}/upvote`;
           method = 'POST';
