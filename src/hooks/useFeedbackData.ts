@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { FeedbackType } from '@/types/feedback';
 import { fetchFeedback } from '@/services/feedbackService';
@@ -15,6 +15,7 @@ export function useFeedbackData() {
   const { 
     data, 
     isLoading, 
+    error,
     refetch 
   } = useQuery({
     queryKey: ['feedback', retryCount],
@@ -23,15 +24,20 @@ export function useFeedbackData() {
         return await fetchFeedback();
       } catch (error) {
         console.error('Error loading feedback:', error);
+        throw error; // Let React Query handle the error
+      }
+    },
+    meta: {
+      onError: (error: Error) => {
+        // This will run when the query encounters an error
         setLoadError('Failed to load feedback. Please try again.');
         toast({
           title: 'Error',
           description: 'Failed to load feedback. Please try again.',
           variant: 'destructive',
         });
-        throw error;
       }
-    },
+    }
   });
 
   useEffect(() => {
@@ -43,18 +49,18 @@ export function useFeedbackData() {
     }
   }, [data]);
 
-  const loadFeedback = async () => {
+  const loadFeedback = useCallback(async () => {
     try {
       await refetch();
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
-  };
+  }, [refetch]);
 
-  const handleRetry = () => {
+  const handleRetry = useCallback(() => {
     setRetryCount(prev => prev + 1);
-  };
+  }, []);
 
   return {
     feedback,

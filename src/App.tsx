@@ -1,14 +1,14 @@
-
 import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import { RefreshProvider } from "@/contexts/RefreshContext";
 import { TermsOfUseDialog } from "@/components/terms/TermsOfUseDialog";
+import { createQueryClient } from "@/lib/react-query";
 
 // Layout
 import { AppLayout } from "./components/layout/AppLayout";
@@ -126,18 +126,10 @@ const AppRoutesWithAuth = () => {
   );
 };
 
-// Fix: Create QueryClient inside the App component to ensure it's in a React context
-function App() {
-  // Initialize QueryClient inside the component
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 60000,
-        refetchOnWindowFocus: false,
-      },
-    },
-  });
+// Create QueryClient instance at app initialization time but outside of render cycles
+const queryClient = createQueryClient();
 
+function App() {
   return (
     <React.StrictMode>
       <BrowserRouter>
