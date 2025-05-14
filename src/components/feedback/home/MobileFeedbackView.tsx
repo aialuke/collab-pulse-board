@@ -20,7 +20,7 @@ interface MobileFeedbackViewProps {
   openRepostDialog: (feedback: FeedbackType) => void;
   closeRepostDialog: () => void;
   handleRepost: (id: string, comment: string) => Promise<any>;
-  handleRetry: () => void;
+  handleRetry: () => Promise<void>; // Updated to match expected return type
   hasMore: boolean;
   sentinelRef?: React.RefCallback<HTMLDivElement>;
 }
@@ -45,7 +45,12 @@ export function MobileFeedbackView({
   
   // Register the refresh function with the RefreshContext
   useEffect(() => {
-    setRefreshFunction(handleRetry);
+    // Ensure handleRetry returns a Promise
+    const wrappedHandleRetry = async () => {
+      await handleRetry();
+    };
+    
+    setRefreshFunction(wrappedHandleRetry);
   }, [handleRetry, setRefreshFunction]);
 
   // Function to render the appropriate content based on loading/error state

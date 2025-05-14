@@ -5,6 +5,7 @@ interface UseAnimationOnScrollOptions {
   threshold?: number;
   rootMargin?: string;
   disabled?: boolean;
+  once?: boolean; // Added this property that was missing
 }
 
 /**
@@ -13,7 +14,8 @@ interface UseAnimationOnScrollOptions {
 export function useAnimationOnScroll({
   threshold = 0.1,
   rootMargin = '0px',
-  disabled = false
+  disabled = false,
+  once = true // Default to true
 }: UseAnimationOnScrollOptions = {}) {
   const [isVisible, setIsVisible] = useState(false);
   const elementRef = useRef<HTMLDivElement | null>(null);
@@ -41,8 +43,10 @@ export function useAnimationOnScroll({
         const [entry] = entries;
         if (entry.isIntersecting) {
           setIsVisible(true);
-          // Always disconnect after triggering once
-          observer.disconnect();
+          // Disconnect after triggering if once is true
+          if (once) {
+            observer.disconnect();
+          }
         }
       },
       { threshold, rootMargin }
@@ -53,7 +57,7 @@ export function useAnimationOnScroll({
 
     // Cleanup
     return () => observer.disconnect();
-  }, [threshold, rootMargin, disabled, isVisible]);
+  }, [threshold, rootMargin, disabled, isVisible, once]);
 
   return { ref: elementRef, isVisible };
 }

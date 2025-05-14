@@ -1,4 +1,3 @@
-
 export type FeedbackStatus = 'pending' | 'in-progress' | 'completed' | 'shout-out';
 
 export type FeedbackType = {
@@ -19,6 +18,8 @@ export type FeedbackType = {
   imageUrl?: string;
   linkUrl?: string;
   isUpvoted?: boolean;
+  // Keeping image property for backward compatibility until fully migrated
+  image?: string;
   // Repost fields
   isRepost?: boolean;
   originalPostId?: string;
