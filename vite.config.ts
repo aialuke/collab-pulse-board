@@ -10,10 +10,7 @@ import { configureServer } from "./src/config/vite/server";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => ({
-  server: {
-    port: 8080,
-    ...configureServer()
-  },
+  server: configureServer(),
   plugins: [
     react({
       // Add this for production optimization
