@@ -3,6 +3,6 @@
 export * from './feedback';
 
 // Export specific functions for direct use
-export { reportFeedback } from './feedback/feedbackApi';
+export { reportFeedback } from './feedback/statusService';
 export { toggleUpvote } from './feedback/upvoteService';
 export { fetchFeedback } from './feedback/readFeedbackService';
