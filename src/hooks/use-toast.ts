@@ -1,6 +1,6 @@
 
 // Import the toast from shadcn/ui toast
-import { Toast, ToasterToast, useToast as useShadcnToast } from "@/components/ui/toast";
+import { ToasterToast, useToast as useShadcnToast } from "@/components/ui/toast";
 
 // Re-export the useToast hook 
 export const useToast = useShadcnToast;
@@ -9,4 +9,4 @@ export const useToast = useShadcnToast;
 export const { toast } = useShadcnToast();
 
 // Export types
-export type { Toast, ToasterToast };
+export type { ToasterToast };
