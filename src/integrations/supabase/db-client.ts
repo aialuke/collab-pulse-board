@@ -12,7 +12,7 @@ export const supabaseDb = {
     console.log(`Creating query for table: ${table}`);
     return baseClient.from(table);
   },
-  rpc: function<T extends FunctionNames>(fn: T, params?: object) {
+  rpc: function<T extends FunctionNames>(fn: T, params?: Database['public']['Functions'][T]['Args']) {
     console.log(`Calling RPC function: ${fn}`, params || {});
     return baseClient.rpc(fn, params);
   }
