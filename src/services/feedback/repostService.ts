@@ -71,11 +71,16 @@ export async function repostFeedback(originalPostId: string, comment: string): P
     }
 
     // Add profile and category data to feedback item
-    // Make sure categories includes the id field
+    // Make sure both categories and profiles match their expected types
     const feedbackWithData = {
       ...repostData,
       categories: categoryData || { name: 'Uncategorized', id: repostData.category_id },
-      profiles: profileData || { name: 'Unknown User', id: user.id }
+      profiles: profileData || { 
+        id: user.id,
+        name: 'Unknown User',
+        avatar_url: null, 
+        role: null
+      }
     };
 
     return mapFeedbackItem(feedbackWithData);
