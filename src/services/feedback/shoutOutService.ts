@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { FeedbackType } from '@/types/feedback';
+import { FeedbackType, FeedbackStatus } from '@/types/feedback';
 import { mapFeedbackItem } from './mappers';
 import { FeedbackResponse } from '@/types/supabase';
 
@@ -90,7 +90,7 @@ export const getShoutOutsForUser = async (targetUserId: string): Promise<Feedbac
       return [];
     }
 
-    // Use simpler mapping approach to avoid recursive type issues
+    // Use a direct mapping approach that explicitly creates FeedbackType objects
     return data.map(item => {
       // Extract necessary data from the response and create a FeedbackType object
       const feedbackItem: FeedbackType = {
@@ -98,16 +98,16 @@ export const getShoutOutsForUser = async (targetUserId: string): Promise<Feedbac
         content: item.content,
         author: {
           id: item.user_id,
-          name: item.author?.name || 'Unknown User',
-          avatarUrl: item.author?.avatar_url || undefined,
-          role: item.author?.role || undefined
+          name: typeof item.author === 'object' && item.author ? item.author.name || 'Unknown User' : 'Unknown User',
+          avatarUrl: typeof item.author === 'object' && item.author ? item.author.avatar_url || undefined : undefined,
+          role: typeof item.author === 'object' && item.author ? item.author.role || undefined : undefined
         },
         createdAt: new Date(item.created_at),
-        category: item.category?.name || 'Uncategorized',
+        category: typeof item.category === 'object' && item.category ? item.category.name || 'Uncategorized' : 'Uncategorized',
         categoryId: item.category_id,
         upvotes: item.upvotes_count || 0,
         comments: item.comments_count || 0,
-        status: item.status,
+        status: item.status as FeedbackStatus, // Explicitly cast to FeedbackStatus
         imageUrl: item.image_url || undefined,
         linkUrl: item.link_url || undefined,
         isUpvoted: false,
