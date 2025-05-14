@@ -1,6 +1,9 @@
 
-// Server configuration that returns static headers rather than functions
-export const configureServer = () => {
+// Import HeadersConfig type from Vite to properly type our headers
+import type { ServerOptions } from 'vite';
+
+// Server configuration
+export const configureServer = (): ServerOptions => {
   return {
     host: "::", // Listen on all IPv6 interfaces
     hmr: {
