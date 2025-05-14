@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { usePaginatedFeedback } from '@/hooks/usePaginatedFeedback';
 import { useFeedbackFilters } from '@/hooks/useFeedbackFilters';
 import { useFeedbackActions } from '@/hooks/useFeedbackActions';
@@ -11,6 +11,8 @@ import { DesktopFeedbackView } from './DesktopFeedbackView';
 export function FeedbackContainer() {
   const isMobile = useIsMobile();
   const { filters } = useFeedbackFilters();
+  
+  console.log('[FeedbackContainer] Rendering with filters:', filters);
   
   // Use our optimized paginated feedback hook
   const {
@@ -25,6 +27,8 @@ export function FeedbackContainer() {
     pageSize: 10
   });
   
+  console.log('[FeedbackContainer] Feedback data received:', feedback?.length || 0, 'items');
+  
   // Use feedback actions
   const {
     handleUpvote,
@@ -32,7 +36,7 @@ export function FeedbackContainer() {
     handleDelete,
   } = useFeedbackActions((newFeedback) => {
     // This is a no-op since usePaginatedFeedback manages its own state
-    // We just need to pass a function to satisfy the API
+    console.log('[FeedbackContainer] Feedback action callback triggered');
   });
   
   // Use the repost context
@@ -43,6 +47,20 @@ export function FeedbackContainer() {
     openRepostDialog,
     closeRepostDialog
   } = useRepost();
+
+  // Log authentication status on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: auth } = await supabase.auth.getSession();
+        console.log('[FeedbackContainer] Auth status:', auth.session ? 'Authenticated' : 'Not authenticated');
+      } catch (err) {
+        console.error('[FeedbackContainer] Error checking auth:', err);
+      }
+    };
+    
+    checkAuth();
+  }, []);
 
   // We now use isMobile from useIsMobile() to determine which view to show
   if (isMobile) {
@@ -89,3 +107,6 @@ export function FeedbackContainer() {
     />
   );
 }
+
+// Add missing import for supabase
+import { supabase } from '@/integrations/supabase/client';

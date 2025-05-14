@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { FeedbackType } from '@/types/feedback';
 import { createBaseFeedbackQuery, fetchProfiles, fetchUserUpvotes, fetchOriginalPosts } from './feedbackApi';
@@ -9,35 +8,49 @@ import { FeedbackResponse } from '@/types/supabase';
  * Fetches all feedback items with optional status filter
  */
 export async function fetchFeedback(filterStatus?: string): Promise<FeedbackType[]> {
+  console.log('[fetchFeedback] Starting to fetch feedback, filter status:', filterStatus);
   try {
+    // Check authentication status
+    const { data: authData } = await supabase.auth.getUser();
+    console.log('[fetchFeedback] Current auth state:', authData?.user ? 'Authenticated' : 'Not authenticated');
+    
     // 1. Build and execute query
+    console.log('[fetchFeedback] Building base query');
     let query = createBaseFeedbackQuery();
 
     // Apply status filter if provided
     if (filterStatus && filterStatus !== 'all') {
+      console.log('[fetchFeedback] Applying status filter:', filterStatus);
       query = query.eq('status', filterStatus);
     }
 
     // Default sorting by newest
     query = query.order('created_at', { ascending: false });
+    console.log('[fetchFeedback] Query built, about to execute');
 
     // Execute query
     const { data: feedbackData, error: feedbackError } = await query;
 
     if (feedbackError) {
-      console.error('Error fetching feedback:', feedbackError);
+      console.error('[fetchFeedback] Error fetching feedback:', feedbackError);
       throw feedbackError;
     }
 
+    console.log('[fetchFeedback] Feedback data received:', feedbackData?.length || 0, 'items');
+    
     if (!feedbackData || feedbackData.length === 0) {
+      console.log('[fetchFeedback] No feedback data found, returning empty array');
       return [];
     }
 
     // 2. Collect all unique user IDs
     const userIds = [...new Set(feedbackData.map(item => item.user_id))];
+    console.log('[fetchFeedback] Collected user IDs for profiles:', userIds.length);
 
     // 3. Fetch profiles in a single query
+    console.log('[fetchFeedback] Fetching profiles');
     const profilesMap = await fetchProfiles(userIds);
+    console.log('[fetchFeedback] Profiles fetched:', Object.keys(profilesMap).length);
 
     // 4. Attach profiles to feedback items
     const feedbackWithProfiles: FeedbackResponse[] = feedbackData.map(item => ({
@@ -46,13 +59,17 @@ export async function fetchFeedback(filterStatus?: string): Promise<FeedbackType
     }));
 
     // 5. Get current user's upvotes
+    console.log('[fetchFeedback] Fetching current user upvotes');
     const userId = (await supabase.auth.getUser()).data.user?.id;
     const userUpvotes = await fetchUserUpvotes(userId);
+    console.log('[fetchFeedback] User upvotes fetched:', Object.keys(userUpvotes).length);
 
     // 6. Handle reposts - fetch original posts if needed
     const repostItems = feedbackWithProfiles.filter(item => 
       item.is_repost && item.original_post_id
     );
+    
+    console.log('[fetchFeedback] Found repost items:', repostItems.length);
     
     let originalPostsMap = {};
     
@@ -61,17 +78,23 @@ export async function fetchFeedback(filterStatus?: string): Promise<FeedbackType
         .map(item => item.original_post_id)
         .filter(Boolean) as string[];
       
+      console.log('[fetchFeedback] Fetching original posts:', originalPostIds.length);
       originalPostsMap = await fetchOriginalPosts(
         originalPostIds,
         profilesMap,
         userUpvotes
       );
+      console.log('[fetchFeedback] Original posts fetched:', Object.keys(originalPostsMap).length);
     }
 
     // 7. Map to frontend models
-    return mapFeedbackItems(feedbackWithProfiles, userUpvotes, originalPostsMap);
+    console.log('[fetchFeedback] Mapping feedback items to frontend models');
+    const mappedItems = mapFeedbackItems(feedbackWithProfiles, userUpvotes, originalPostsMap);
+    console.log('[fetchFeedback] Finished mapping, returning', mappedItems.length, 'items');
+    
+    return mappedItems;
   } catch (error) {
-    console.error('Error in fetchFeedback:', error);
+    console.error('[fetchFeedback] Error in fetchFeedback:', error);
     throw error;
   }
 }
@@ -87,7 +110,7 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
       .single();
 
     if (feedbackError) {
-      console.error('Error fetching feedback by id:', feedbackError);
+      console.error('[fetchFeedbackById] Error fetching feedback by id:', feedbackError);
       throw feedbackError;
     }
 
@@ -129,7 +152,7 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
 
     return feedbackItem;
   } catch (error) {
-    console.error('Error in fetchFeedbackById:', error);
+    console.error('[fetchFeedbackById] Error in fetchFeedbackById:', error);
     throw error;
   }
 }
