@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { getImageFormatInfo } from '@/utils/imageCompression';
+// Remove the non-existent import
+// import { getImageFormatInfo } from '@/utils/imageCompression';
 
 /**
  * Upload an image to Supabase Storage
