@@ -43,17 +43,6 @@
   }
 }
 
-/* Optimized font fallback strategy */
-@font-face {
-  font-family: 'Manrope Fallback';
-  size-adjust: 100%;
-  ascent-override: 95%;
-  descent-override: 25%;
-  line-gap-override: normal;
-  src: local('Arial');
-  font-display: swap;
-}
-
 @layer base {
   * {
     @apply border-border;
@@ -66,7 +55,7 @@
   
   body {
     @apply bg-background text-foreground;
-    font-family: 'Manrope', 'Manrope Fallback', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
