@@ -44,8 +44,8 @@ export async function fetchProfiles(userIds: string[]): Promise<Record<string, P
     if (profilesData && profilesData.length > 0) {
       console.log(`Successfully fetched ${profilesData.length} profiles`);
       profilesData.forEach(profile => {
-        if (profile && profile.id) {
-          profilesMap[profile.id] = profile;
+        if (profile && typeof profile === 'object' && 'id' in profile) {
+          profilesMap[profile.id] = profile as ProfileResponse;
         }
       });
     } else {
@@ -89,12 +89,12 @@ export async function fetchUserUpvotes(userId: string | undefined): Promise<Reco
     console.log(`Found ${upvotes.length} upvotes for user`);
     
     // Use reduce for better performance than object assignment in a loop
-    return upvotes.reduce((acc, upvote) => {
-      if (upvote && upvote.feedback_id) {
+    return upvotes.reduce<Record<string, boolean>>((acc, upvote) => {
+      if (upvote && typeof upvote === 'object' && 'feedback_id' in upvote) {
         acc[upvote.feedback_id] = true;
       }
       return acc;
-    }, {} as Record<string, boolean>);
+    }, {});
   } catch (error) {
     console.error('Error in fetchUserUpvotes:', error);
     return {};
@@ -142,8 +142,8 @@ export async function fetchOriginalPosts(
     
     // Get the profiles for original post authors - Fix #1: Use type guards and filter
     const originalPostUserIds: string[] = originalPostsData
-      .map(item => item.user_id)
-      .filter((id): id is string => typeof id === 'string' && id.length > 0);
+      .filter(item => item && typeof item === 'object' && 'user_id' in item && typeof item.user_id === 'string')
+      .map(item => item.user_id as string);
     
     // Create a Set from the array for uniqueness, then convert back to array
     const uniqueUserIds = [...new Set(originalPostUserIds)];
@@ -162,14 +162,17 @@ export async function fetchOriginalPosts(
     const originalPostsMap: Record<string, FeedbackResponse> = {};
     
     originalPostsData.forEach(post => {
-      if (post && typeof post.user_id === 'string') {
+      if (post && typeof post === 'object' && 'id' in post && 'user_id' in post) {
+        const userId = post.user_id as string;
         // Add profile to the post - Fix #3: Add safer access to profilesMap
-        originalPostsMap[post.id] = {
+        const postWithProfile = {
           ...post,
-          profiles: Object.prototype.hasOwnProperty.call(profilesMap, post.user_id) 
-            ? profilesMap[post.user_id] 
+          profiles: Object.prototype.hasOwnProperty.call(profilesMap, userId) 
+            ? profilesMap[userId] 
             : null
-        };
+        } as FeedbackResponse;
+        
+        originalPostsMap[post.id as string] = postWithProfile;
       }
     });
     

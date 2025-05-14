@@ -1,13 +1,18 @@
 
 import { baseClient } from './base-client';
+import type { Database } from './types';
 
-// Export the database-related methods with additional logging
+// Type for table names
+type TableNames = keyof Database['public']['Tables'];
+type FunctionNames = keyof Database['public']['Functions'];
+
+// Export the database-related methods with additional logging and proper typing
 export const supabaseDb = {
-  from: function(table: string) {
+  from: function<T extends TableNames>(table: T) {
     console.log(`Creating query for table: ${table}`);
     return baseClient.from(table);
   },
-  rpc: function(fn: string, params?: object) {
+  rpc: function<T extends FunctionNames>(fn: T, params?: object) {
     console.log(`Calling RPC function: ${fn}`, params || {});
     return baseClient.rpc(fn, params);
   }

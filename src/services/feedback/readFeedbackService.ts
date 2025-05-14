@@ -75,8 +75,8 @@ export async function fetchFeedback(
 
     // 2. Collect all unique user IDs with proper type safety
     const userIds: string[] = feedbackData
-      .map(item => item.user_id)
-      .filter((id): id is string => typeof id === 'string');
+      .filter(item => item && typeof item === 'object' && 'user_id' in item && typeof item.user_id === 'string')
+      .map(item => item.user_id as string);
 
     console.log(`Found ${userIds.length} unique user IDs`);
 
@@ -87,17 +87,18 @@ export async function fetchFeedback(
     const feedbackWithProfiles: FeedbackResponse[] = feedbackData
       .filter(item => item !== null && typeof item === 'object')
       .map(item => {
+        const typedItem = item as any;
         // We need to ensure all required properties are present, adding defaults for optional ones
         return {
-          ...item,
-          profiles: profilesMap[item.user_id] || null,
+          ...typedItem,
+          profiles: typedItem.user_id && profilesMap[typedItem.user_id] ? profilesMap[typedItem.user_id] : null,
           // Make sure all required properties are present, defaulting if necessary
-          updated_at: item.updated_at || item.created_at,
-          comments_count: item.comments_count || 0,
-          is_repost: Boolean(item.is_repost),
-          original_post_id: item.original_post_id || null,
-          repost_comment: item.repost_comment || null
-        };
+          updated_at: typedItem.updated_at || typedItem.created_at,
+          comments_count: typedItem.comments_count || 0,
+          is_repost: Boolean(typedItem.is_repost),
+          original_post_id: typedItem.original_post_id || null,
+          repost_comment: typedItem.repost_comment || null
+        } as FeedbackResponse;
       });
 
     // 5. Get current user's upvotes - using optimized query
@@ -190,8 +191,8 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
     
     // 3. Add profile to feedback
     const feedbackWithProfile: FeedbackResponse = {
-      ...feedbackData,
-      profiles: profilesMap[feedbackData.user_id] || null,
+      ...feedbackData as any,
+      profiles: profilesMap[feedbackData.user_id as string] || null,
       // Ensure required properties have default values if missing
       updated_at: feedbackData.updated_at || feedbackData.created_at,
       comments_count: feedbackData.comments_count || 0,
