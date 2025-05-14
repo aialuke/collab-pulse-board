@@ -9,9 +9,6 @@ export const getCacheSettings = () => {
     globDirectory: 'dist',
     globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,gif,woff2}'],
     globIgnores: ['**/node_modules/**/*', 'sw.js', 'workbox-*.js'],
-    // Add cacheable response options
-    cacheableResponse: {
-      statuses: [0, 200],
-    },
+    // Removed cacheableResponse from here as it's not valid at the top level
   };
 };
