@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -19,7 +20,21 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['"Segoe UI"', "system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+				sans: ['Manrope', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+				manrope: ['Manrope', 'sans-serif'],
+			},
+			fontSize: {
+				// Mobile-first typography scale
+				'heading-1': ['2rem', { lineHeight: '2.25rem', letterSpacing: '-0.02em', fontWeight: '600' }],      // 32px
+				'heading-2': ['1.75rem', { lineHeight: '2rem', letterSpacing: '-0.02em', fontWeight: '600' }],      // 28px
+				'heading-3': ['1.5rem', { lineHeight: '1.75rem', letterSpacing: '-0.01em', fontWeight: '600' }],    // 24px
+				'subheading': ['1rem', { lineHeight: '1.5rem', fontWeight: '500' }],                               // 16px
+				'body': ['0.875rem', { lineHeight: '1.25rem' }],                                                   // 14px
+				'body-small': ['0.75rem', { lineHeight: '1rem' }],                                                 // 12px
+			},
+			// Responsive font sizes for desktop
+			screens: {
+				'md': '768px',
 			},
 			colors: {
 				border: 'hsl(var(--border))',

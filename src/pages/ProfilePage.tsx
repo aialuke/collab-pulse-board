@@ -12,7 +12,7 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   
   if (!user) {
-    return <div>Loading profile...</div>;
+    return <div className="text-body">Loading profile...</div>;
   }
 
   const isManager = user.role === 'manager' || user.role === 'admin';
@@ -39,14 +39,14 @@ export default function ProfilePage() {
 
       <Card className="bg-white border-neutral-200">
         <CardHeader>
-          <CardTitle className="text-center">Profile Information</CardTitle>
+          <CardTitle className="heading-2 text-center">Profile Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col items-center text-center gap-4">
             <div className="space-y-1">
-              <h3 className="text-xl font-medium">{user.name}</h3>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-              <p className={`text-xs inline-block px-2 py-0.5 rounded-full mt-1 ${
+              <h3 className="heading-3">{user.name}</h3>
+              <p className="subheading text-muted-foreground">{user.email}</p>
+              <p className={`text-body-small inline-block px-2 py-0.5 rounded-full mt-1 ${
                 isManager ? 'bg-royal-blue-500/20 text-royal-blue-700' : 'bg-teal-500/20 text-teal-700'
               }`}>
                 {user.role === 'admin' ? 'Administrator' : user.role === 'manager' ? 'Manager' : 'Team Member'}
@@ -58,7 +58,7 @@ export default function ProfilePage() {
 
       <Card className="bg-white border-neutral-200">
         <CardHeader>
-          <CardTitle className="text-center">Terms of Use</CardTitle>
+          <CardTitle className="heading-2 text-center">Terms of Use</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 flex flex-col items-center">
           {user.hasAcceptedTerms ? (
@@ -66,9 +66,9 @@ export default function ProfilePage() {
               <div className="flex items-center gap-3 mb-2">
                 <CheckCircle className="text-green-500 h-5 w-5" />
                 <div>
-                  <p className="font-medium">You have accepted our Terms of Use</p>
+                  <p className="subheading font-medium">You have accepted our Terms of Use</p>
                   {user.termsAcceptedAt && (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-body-small text-muted-foreground">
                       Accepted on {format(new Date(user.termsAcceptedAt), 'MMMM dd, yyyy')}
                     </p>
                   )}
@@ -87,7 +87,7 @@ export default function ProfilePage() {
           ) : (
             <div className="flex items-center gap-3">
               <AlertCircle className="text-red-500 h-5 w-5" />
-              <p className="font-medium">You need to accept our Terms of Use</p>
+              <p className="subheading font-medium">You need to accept our Terms of Use</p>
             </div>
           )}
         </CardContent>

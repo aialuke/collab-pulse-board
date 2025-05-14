@@ -1,5 +1,31 @@
 
 @layer components {
+  /* Typography utility classes */
+  .heading-1 {
+    @apply text-heading-1 md:text-[2.5rem] md:leading-[2.75rem] font-semibold;
+  }
+  
+  .heading-2 {
+    @apply text-heading-2 md:text-[2rem] md:leading-[2.25rem] font-semibold;
+  }
+  
+  .heading-3 {
+    @apply text-heading-3 md:text-[1.75rem] md:leading-[2rem] font-semibold;
+  }
+  
+  .subheading {
+    @apply text-subheading md:text-[1.25rem] md:leading-[1.75rem] font-medium;
+  }
+  
+  .body-text {
+    @apply text-body;
+  }
+  
+  .body-text-small {
+    @apply text-body-small;
+  }
+  
+  /* Button components */
   .btn-primary {
     @apply flex items-center justify-center px-4 py-2 min-h-12 min-w-12 font-medium text-neutral-900 bg-gradient-yellow hover:shadow-glow rounded-full transition-all duration-200 ease-in-out;
   }

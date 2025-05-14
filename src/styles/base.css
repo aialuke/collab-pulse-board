@@ -87,6 +87,23 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Typography base styles */
+  h1 {
+    @apply text-heading-1 font-semibold md:text-[2.5rem] md:leading-[2.75rem];
+  }
+  
+  h2 {
+    @apply text-heading-2 font-semibold md:text-[2rem] md:leading-[2.25rem];
+  }
+  
+  h3 {
+    @apply text-heading-3 font-semibold md:text-[1.75rem] md:leading-[2rem];
+  }
+  
+  p {
+    @apply text-body md:text-[1rem] md:leading-[1.5rem];
+  }
+
   /* Optimized placeholder styles */
   input::placeholder,
   textarea::placeholder {
