@@ -15,7 +15,7 @@ export async function fetchFeedback(
 ): Promise<{ items: FeedbackType[], hasMore: boolean, total: number }> {
   try {
     // Select only the columns we need to improve query performance
-    const columns = 'id, title, content, user_id, category_id, created_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
+    const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
     
     // 1. Build query with pagination and filtering
     let query = supabase
@@ -68,12 +68,14 @@ export async function fetchFeedback(
     const feedbackWithProfiles: FeedbackResponse[] = feedbackData
       .filter(item => item !== null && typeof item === 'object')
       .map(item => {
+        // We need to ensure all required properties are present, adding defaults for optional ones
         return {
           ...item,
           profiles: profilesMap[item.user_id],
+          // Make sure all required properties are present, defaulting if necessary
           updated_at: item.updated_at || item.created_at,
           comments_count: item.comments_count || 0,
-          is_repost: item.is_repost || false,
+          is_repost: Boolean(item.is_repost),
           original_post_id: item.original_post_id || null,
           repost_comment: item.repost_comment || null
         };
@@ -125,7 +127,7 @@ export async function fetchFeedback(
 export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
   try {
     // 1. Fetch the specific feedback item with only necessary columns
-    const columns = 'id, title, content, user_id, category_id, created_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment, updated_at';
+    const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
     
     const { data: feedbackData, error: feedbackError } = await supabase
       .from('feedback')
@@ -152,9 +154,10 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
     const feedbackWithProfile: FeedbackResponse = {
       ...feedbackData,
       profiles: profilesMap[feedbackData.user_id],
+      // Ensure required properties have default values if missing
       updated_at: feedbackData.updated_at || feedbackData.created_at,
       comments_count: feedbackData.comments_count || 0,
-      is_repost: feedbackData.is_repost || false,
+      is_repost: Boolean(feedbackData.is_repost),
       original_post_id: feedbackData.original_post_id || null,
       repost_comment: feedbackData.repost_comment || null
     };
