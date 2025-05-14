@@ -1,5 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseDb } from '@/integrations/supabase/db-client';
+import { supabaseAuth } from '@/integrations/supabase/auth-client';
 import { User, UserRole } from '@/types/auth';
 
 /**
@@ -8,7 +9,7 @@ import { User, UserRole } from '@/types/auth';
 export async function fetchUserProfile(userId: string): Promise<User | null> {
   try {
     // Use maybeSingle instead of single to avoid errors when profile doesn't exist
-    const { data, error } = await supabase
+    const { data, error } = await supabaseDb
       .from('profiles')
       .select('*')
       .eq('id', userId)
@@ -34,7 +35,7 @@ export async function fetchUserProfile(userId: string): Promise<User | null> {
       console.warn('User profile not found for ID:', userId);
       
       // Get basic user info from Supabase user object
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await supabaseAuth.getUser();
       if (userData?.user) {
         return {
           id: userId,
@@ -58,7 +59,7 @@ export async function fetchUserProfile(userId: string): Promise<User | null> {
 export async function updateTermsAcceptance(userId: string, accepted: boolean): Promise<void> {
   const now = new Date().toISOString();
   
-  const { error } = await supabase
+  const { error } = await supabaseDb
     .from('profiles')
     .update({
       has_accepted_terms: accepted,

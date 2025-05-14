@@ -1,6 +1,6 @@
 
 import { AuthResponse } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseAuth } from '@/integrations/supabase/auth-client';
 import { cleanupAuthState } from '@/utils/authUtils';
 
 /**
@@ -10,7 +10,7 @@ export async function signInWithEmailAndPassword(
   email: string, 
   password: string
 ): Promise<AuthResponse> {
-  return await supabase.auth.signInWithPassword({ email, password });
+  return await supabaseAuth.auth.signInWithPassword({ email, password });
 }
 
 /**
@@ -21,7 +21,7 @@ export async function signUpWithEmailAndPassword(
   email: string, 
   password: string
 ): Promise<AuthResponse> {
-  return await supabase.auth.signUp({ 
+  return await supabaseAuth.auth.signUp({ 
     email, 
     password,
     options: {
@@ -40,5 +40,5 @@ export async function signOut(): Promise<void> {
   cleanupAuthState();
   
   // Sign out with scope: 'global' to sign out on all devices
-  await supabase.auth.signOut({ scope: 'global' });
+  await supabaseAuth.auth.signOut({ scope: 'global' });
 }

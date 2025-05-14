@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useEffect, ReactNode } from 'react';
 import { User, AuthContextType } from '@/types/auth';
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseAuth } from '@/integrations/supabase/auth-client';
 import { useAuthState } from '@/hooks/useAuthState';
 import { fetchUserProfile, updateTermsAcceptance } from '@/services/profileService';
 import { signInWithEmailAndPassword, signUpWithEmailAndPassword, signOut } from '@/services/authService';
@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     // Set up auth state listener first
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = supabaseAuth.auth.onAuthStateChange(
       async (event, currentSession) => {
         setSession(currentSession);
         setSupabaseUser(currentSession?.user ?? null);
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Then check for existing session
     const initializeAuth = async () => {
       try {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        const { data: { session: currentSession } } = await supabaseAuth.getSession();
         setSession(currentSession);
         setSupabaseUser(currentSession?.user ?? null);
 

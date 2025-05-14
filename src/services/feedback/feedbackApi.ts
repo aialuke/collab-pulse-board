@@ -1,5 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseDb } from '@/integrations/supabase/db-client';
+import { supabaseAuth } from '@/integrations/supabase/auth-client';
 import { FeedbackResponse, ProfileResponse, UpvoteResponse } from '@/types/supabase';
 
 /**
@@ -7,7 +8,7 @@ import { FeedbackResponse, ProfileResponse, UpvoteResponse } from '@/types/supab
  * Only selects the columns that are actually needed
  */
 export function createBaseFeedbackQuery(columns = '*') {
-  return supabase
+  return supabaseDb
     .from('feedback')
     .select(`
       ${columns},
@@ -24,7 +25,7 @@ export async function fetchProfiles(userIds: string[]): Promise<Record<string, P
     if (!userIds.length) return {};
 
     // Use a single batch query instead of multiple queries
-    const { data: profilesData, error: profilesError } = await supabase
+    const { data: profilesData, error: profilesError } = await supabaseDb
       .from('profiles')
       .select('id, name, avatar_url, role')
       .in('id', userIds)
@@ -58,7 +59,7 @@ export async function fetchUserUpvotes(userId: string | undefined): Promise<Reco
   try {
     if (!userId) return {};
     
-    const { data: upvotes } = await supabase
+    const { data: upvotes } = await supabaseDb
       .from('upvotes')
       .select('feedback_id')
       .eq('user_id', userId)
@@ -89,7 +90,7 @@ export async function fetchOriginalPosts(
     if (!originalPostIds.length) return {};
     
     // Optimize the columns we select to only what's needed
-    const { data: originalPostsData, error: originalPostsError } = await supabase
+    const { data: originalPostsData, error: originalPostsError } = await supabaseDb
       .from('feedback')
       .select(`
         id, title, content, user_id, category_id, 
