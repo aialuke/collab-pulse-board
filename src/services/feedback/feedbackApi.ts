@@ -140,16 +140,16 @@ export async function fetchOriginalPosts(
     
     console.log(`Successfully fetched ${originalPostsData.length} original posts`);
     
-    // Get the profiles for original post authors
-    const originalPostUserIds = originalPostsData
+    // Get the profiles for original post authors - Fix #1: Use type guards and filter
+    const originalPostUserIds: string[] = originalPostsData
       .map(item => item.user_id)
-      .filter((id): id is string => typeof id === 'string');
+      .filter((id): id is string => typeof id === 'string' && id.length > 0);
     
     // Create a Set from the array for uniqueness, then convert back to array
     const uniqueUserIds = [...new Set(originalPostUserIds)];
     
-    // Only fetch profiles we don't already have
-    const missingUserIds = uniqueUserIds.filter(id => !profilesMap[id]);
+    // Only fetch profiles we don't already have - Fix #2: Add type safety for profilesMap indexing
+    const missingUserIds = uniqueUserIds.filter(id => !Object.prototype.hasOwnProperty.call(profilesMap, id));
     
     if (missingUserIds.length > 0) {
       console.log(`Fetching ${missingUserIds.length} missing profiles for original posts`);
@@ -163,10 +163,12 @@ export async function fetchOriginalPosts(
     
     originalPostsData.forEach(post => {
       if (post && typeof post.user_id === 'string') {
-        // Add profile to the post
+        // Add profile to the post - Fix #3: Add safer access to profilesMap
         originalPostsMap[post.id] = {
           ...post,
-          profiles: profilesMap[post.user_id] || null
+          profiles: Object.prototype.hasOwnProperty.call(profilesMap, post.user_id) 
+            ? profilesMap[post.user_id] 
+            : null
         };
       }
     });
