@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { mapFeedbackItem } from './utils';
+import { mapFeedbackItem } from '@/services/feedback/mappers';
 import { FeedbackType } from '@/types/feedback';
 
 /**

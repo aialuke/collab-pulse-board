@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow, formatDuration, intervalToDuration } from 'date-fns';
@@ -8,7 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { FeedbackType } from '@/types/feedback';
 import { Badge } from '@/components/ui/badge';
-import { getFirstName } from '@/services/feedback/utils';
+import { getFirstName } from '@/services/feedback/mappers';
 
 // Custom function to format time without "about" prefix
 export const formatTimeAgo = (date: Date): string => {

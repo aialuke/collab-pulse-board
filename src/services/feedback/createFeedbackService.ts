@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { FeedbackType, CreateFeedbackInput, FeedbackStatus } from '@/types/feedback';
-import { extractCategoryInfo } from './utils';
+import { extractCategoryInfo } from '@/services/feedback/mappers';
 
 /**
  * Creates a new feedback item in the database

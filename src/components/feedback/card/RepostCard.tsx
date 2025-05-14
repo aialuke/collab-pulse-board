@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FeedbackType } from '@/types/feedback';
-import { getFirstName } from '@/services/feedback/utils';
+import { getFirstName } from '@/services/feedback/mappers';
 import { useNavigate } from 'react-router-dom';
 import { ImageWithOverlay } from '@/components/ui/image-with-overlay';
 
