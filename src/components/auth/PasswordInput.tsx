@@ -12,6 +12,7 @@ interface PasswordInputProps {
   label?: string;
   forgotPasswordLink?: boolean;
   disabled?: boolean;
+  isNewPassword?: boolean;
 }
 
 export function PasswordInput({
@@ -22,6 +23,7 @@ export function PasswordInput({
   label = "Password",
   forgotPasswordLink = false,
   disabled = false,
+  isNewPassword = false,
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -51,6 +53,7 @@ export function PasswordInput({
             disabled={disabled}
             className="pl-10 pr-10 border-neutral-200 text-neutral-900 focus:border-teal-500 focus:ring-teal-500 w-full"
             aria-label={label}
+            autoComplete={isNewPassword ? "new-password" : "current-password"}
           />
         </div>
         <button

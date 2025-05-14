@@ -69,6 +69,7 @@ export function SignUpForm({ onSignUp, onToggleForm, isLoading }: SignUpFormProp
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isLoading}
+          isNewPassword={true}
         />
         
         <PasswordInput
@@ -77,6 +78,7 @@ export function SignUpForm({ onSignUp, onToggleForm, isLoading }: SignUpFormProp
           onChange={(e) => setConfirmPassword(e.target.value)}
           label="Confirm Password"
           disabled={isLoading}
+          isNewPassword={true}
         />
         
         <Button

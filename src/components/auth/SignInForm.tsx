@@ -54,6 +54,7 @@ export function SignInForm({ onSignIn, onToggleForm, isLoading }: SignInFormProp
           onChange={(e) => setPassword(e.target.value)}
           forgotPasswordLink
           disabled={isLoading}
+          isNewPassword={false}
         />
         
         <Button
