@@ -2,7 +2,7 @@
 import { FeedbackType } from '@/types/feedback';
 import { toggleUpvote, reportFeedback } from '@/services/feedbackService';
 import { deleteFeedback } from '@/services/feedback/deleteFeedbackService';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function useFeedbackActions(

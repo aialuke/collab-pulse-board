@@ -1,5 +1,5 @@
 
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { compressImage, formatFileSize } from "@/utils/imageCompression";
 
 export interface CompressionStats {

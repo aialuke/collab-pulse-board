@@ -1,3 +1,3 @@
 
-// Re-export all feedback-related services from the new structure
+// Re-export all feedback-related services from the feedback directory
 export * from './feedback';
