@@ -1,24 +1,21 @@
-
 import { defineConfig, ConfigEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { configurePWA } from "./src/config/vite/pwa";
 import { configureCompression } from "./src/config/vite/compression";
 import { configureBuild } from "./src/config/vite/build";
-import { componentTagger } from "lovable-tagger";
+import { configureDevelopment } from "./src/config/vite/development";
+import { configureServer } from "./src/config/vite/server";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => ({
-  server: {
-    host: "::", // Listen on all IPv6 interfaces
-    port: 8080,
-  },
+  server: configureServer(),
   plugins: [
     react({
       // Add this for production optimization
       devTarget: mode === 'production' ? 'es2022' : 'es2020',
     }),
-    mode === 'development' && componentTagger(),
+    mode === 'development' && configureDevelopment(),
     configurePWA(),
     ...(mode === 'production' ? configureCompression() : []),
   ].filter(Boolean),
