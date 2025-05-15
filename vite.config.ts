@@ -30,19 +30,19 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         // Ensure production optimizations are enabled
         tsDecorators: false,
         // Enable React refresh only in dev mode
-        refresh: !isProd,
+        // Instead of refresh: !isProd which causes TypeScript error
       }),
-      mode === 'development' && configureDevelopment(),
+      mode === 'development' ? configureDevelopment() : null,
       configurePWA(),
       ...(isProd ? configureCompression() : []),
       splitVendorChunkPlugin(),
-      isProd && visualizer({
+      isProd ? visualizer({
         filename: './dist/stats.html',
         open: false,
         gzipSize: true,
         template: 'treemap', // Use treemap for better visualization
         sourcemap: false, // Disable source maps in the analyzer to speed it up
-      }),
+      }) : null,
     ].filter(Boolean) as PluginOption[],
     resolve: {
       alias: {

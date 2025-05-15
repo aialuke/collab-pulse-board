@@ -1,5 +1,5 @@
 
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -38,14 +38,14 @@ const PageLoading = () => (
 // Protected route component that also checks for terms acceptance
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
-  const [showTerms, setShowTerms] = React.useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   
   // Lazy load TermsOfUseDialog only when needed
   const TermsOfUseDialog = lazy(() => import("@/components/terms/TermsOfUseDialog").then(
     module => ({ default: module.TermsOfUseDialog })
   ));
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Only show terms dialog if user is authenticated and hasn't accepted terms
     if (isAuthenticated && user && !user.hasAcceptedTerms) {
       setShowTerms(true);
