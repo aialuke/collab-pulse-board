@@ -14,12 +14,15 @@ interface RequestIdleCallbackDeadline {
 
 type RequestIdleCallbackHandle = number;
 
-interface WindowWithIdleCallback extends Window {
-  requestIdleCallback: (
-    callback: (deadline: RequestIdleCallbackDeadline) => void,
-    opts?: RequestIdleCallbackOptions
-  ) => RequestIdleCallbackHandle;
-  cancelIdleCallback: (handle: RequestIdleCallbackHandle) => void;
+// Extend the Window interface instead of creating a new one
+declare global {
+  interface Window {
+    requestIdleCallback: (
+      callback: (deadline: RequestIdleCallbackDeadline) => void,
+      opts?: RequestIdleCallbackOptions
+    ) => RequestIdleCallbackHandle;
+    cancelIdleCallback: (handle: RequestIdleCallbackHandle) => void;
+  }
 }
 
 // Development-specific configuration
@@ -34,8 +37,7 @@ export const configureDevelopment = (): PluginOption => {
     
     // Load after the initial render
     if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      const win = window as WindowWithIdleCallback;
-      win.requestIdleCallback(loadDevTools, { timeout: 1000 });
+      window.requestIdleCallback(loadDevTools, { timeout: 1000 });
     } else {
       setTimeout(loadDevTools, 1000);
     }
