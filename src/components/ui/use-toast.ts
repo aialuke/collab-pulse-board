@@ -1,3 +1,3 @@
 
 // Re-export toast functionality from the hooks directory
-export * from "@/hooks/use-toast";
+export { toast, useToast, useToaster, type ToasterToast } from "@/hooks/use-toast";
