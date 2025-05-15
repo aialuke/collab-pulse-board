@@ -14,6 +14,14 @@ interface RequestIdleCallbackDeadline {
 
 type RequestIdleCallbackHandle = number;
 
+// Interface to type-check window access
+interface WindowWithIdleCallback {
+  requestIdleCallback: (
+    callback: (deadline: RequestIdleCallbackDeadline) => void,
+    options?: RequestIdleCallbackOptions
+  ) => RequestIdleCallbackHandle;
+}
+
 // Development-specific configuration
 export const configureDevelopment = (): PluginOption => {
   // Add React DevTools setup for development mode
@@ -26,9 +34,10 @@ export const configureDevelopment = (): PluginOption => {
     
     // Load after the initial render
     if (typeof globalThis !== 'undefined' && 
-        typeof globalThis.window !== 'undefined' && 
-        'requestIdleCallback' in globalThis.window) {
-      globalThis.window.requestIdleCallback(loadDevTools, { timeout: 1000 });
+        'window' in globalThis && 
+        globalThis.window && 
+        'requestIdleCallback' in (globalThis.window as Window & typeof globalThis)) {
+      (globalThis.window as unknown as WindowWithIdleCallback).requestIdleCallback(loadDevTools, { timeout: 1000 });
     } else {
       setTimeout(loadDevTools, 1000);
     }
@@ -37,3 +46,4 @@ export const configureDevelopment = (): PluginOption => {
   // Return the componentTagger plugin for development only
   return componentTagger();
 };
+

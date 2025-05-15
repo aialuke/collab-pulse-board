@@ -53,7 +53,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       // Improve tree-shaking with pure annotations
       pure: isProd ? ['console.log', 'console.debug', 'console.info'] : [],
       // Keep JSX in production for better tree-shaking
-      jsx: 'automatic',
+      jsx: 'automatic' as 'automatic' | 'transform' | 'preserve',
       // Target modern browsers for smaller output
       target: isProd ? 'es2020' : 'es2018',
     },
