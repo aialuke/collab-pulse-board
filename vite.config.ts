@@ -1,3 +1,4 @@
+
 import { defineConfig, ConfigEnv, PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -52,8 +53,8 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     esbuild: {
       // Improve tree-shaking with pure annotations
       pure: isProd ? ['console.log', 'console.debug', 'console.info'] : [],
-      // Keep JSX in production for better tree-shaking
-      jsx: 'automatic',
+      // Fix: Use a valid value for jsx property from the allowed options
+      jsx: 'automatic', // Valid values are "transform", "automatic", or "preserve"
       // Target modern browsers for smaller output
       target: isProd ? 'es2020' : 'es2018',
     },
