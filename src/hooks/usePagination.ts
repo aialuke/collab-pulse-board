@@ -1,12 +1,14 @@
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-interface UsePaginationOptions {
+interface UsePaginationOptions<T = any> {
   pageSize?: number;
+  initialData?: T[];  // Add initialData property to the interface
 }
 
-export function usePagination<T>({ pageSize = 10 }: UsePaginationOptions = {}) {
+export function usePagination<T>({ pageSize = 10, initialData = [] }: UsePaginationOptions<T> = {}) {
   const [page, setPage] = useState<number>(1);
-  const [items, setItems] = useState<T[]>([]);
+  const [items, setItems] = useState<T[]>(initialData); // Initialize with initialData if provided
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
