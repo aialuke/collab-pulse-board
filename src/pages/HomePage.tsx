@@ -1,12 +1,11 @@
 
-// Import only what we need from React - no default import
-import { memo } from 'react';
+import React from 'react';
 import { FeedbackContainer } from '@/components/feedback/home/FeedbackContainer';
 import { RepostProvider } from '@/contexts/RepostContext';
 import { toast } from '@/hooks/use-toast';
 
-// Memoize the component to avoid unnecessary re-renders
-const HomePage = memo(function HomePage() {
+// Main page component without analytics script
+export default function HomePage() {
   return (
     <div className="w-full flex-1 flex flex-col">
       <RepostProvider onRepostSuccess={() => {
@@ -20,6 +19,4 @@ const HomePage = memo(function HomePage() {
       </RepostProvider>
     </div>
   );
-});
-
-export default HomePage;
+}

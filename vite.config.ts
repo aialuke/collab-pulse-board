@@ -1,3 +1,4 @@
+
 import { defineConfig, ConfigEnv, PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -12,7 +13,6 @@ import { visualizer } from 'rollup-plugin-visualizer';
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => {
   const serverConfig = configureServer();
-  const isProd = mode === 'production';
   
   return {
     server: {
@@ -22,26 +22,20 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     plugins: [
       react({
         // Use faster builds in development with swc
-        devTarget: isProd ? 'es2022' : 'es2020',
+        devTarget: mode === 'production' ? 'es2022' : 'es2020',
         // Use JSX transform in production to reduce bundle size
-        jsxImportSource: isProd ? undefined : 'react',
-        // Properly configure development vs. production
-        plugins: !isProd ? [] : undefined,
-        // Ensure production optimizations are enabled
-        tsDecorators: false,
-        // Enable React refresh only in dev mode
-        refresh: !isProd,
+        jsxImportSource: mode === 'production' ? undefined : 'react',
+        // This is the correct way to specify development mode
+        plugins: mode !== 'production' ? [] : undefined,
       }),
       mode === 'development' && configureDevelopment(),
       configurePWA(),
-      ...(isProd ? configureCompression() : []),
+      ...(mode === 'production' ? configureCompression() : []),
       splitVendorChunkPlugin(),
-      isProd && visualizer({
+      mode === 'production' && visualizer({
         filename: './dist/stats.html',
         open: false,
         gzipSize: true,
-        template: 'treemap', // Use treemap for better visualization
-        sourcemap: false, // Disable source maps in the analyzer to speed it up
       }),
     ].filter(Boolean) as PluginOption[],
     resolve: {
@@ -49,18 +43,10 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         "@": path.resolve(__dirname, "./src"),
       },
     },
-    esbuild: {
-      // Improve tree-shaking with pure annotations
-      pure: isProd ? ['console.log', 'console.debug', 'console.info'] : [],
-      // Keep JSX in production for better tree-shaking
-      jsx: 'automatic',
-      // Target modern browsers for smaller output
-      target: isProd ? 'es2020' : 'es2018',
-    },
     build: {
       ...configureBuild(),
       cssCodeSplit: true,
-      cssMinify: isProd ? 'lightningcss' : false,
+      cssMinify: mode === 'production' ? 'lightningcss' : false,
       rollupOptions: {
         output: {
           entryFileNames: 'assets/[name]-[hash].js',
@@ -79,17 +65,11 @@ export default defineConfig(({ mode }: ConfigEnv) => {
             return 'assets/[name]-[hash].[ext]';
           },
           manualChunks: (id) => {
-            // Optimized React core chunking strategy
-            if (id.includes('node_modules/react/')) {
-              return 'react';
-            }
-            
-            if (id.includes('node_modules/react-dom/')) {
-              return 'react-dom';
-            }
-            
-            if (id.includes('node_modules/scheduler/')) {
-              return 'react-scheduler';
+            // Core React dependencies
+            if (id.includes('node_modules/react/') || 
+                id.includes('node_modules/react-dom/') || 
+                id.includes('node_modules/scheduler/')) {
+              return 'react-core';
             }
             
             // React Router
