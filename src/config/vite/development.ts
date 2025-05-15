@@ -7,6 +7,21 @@ interface RequestIdleCallbackOptions {
   timeout: number;
 }
 
+interface RequestIdleCallbackDeadline {
+  didTimeout: boolean;
+  timeRemaining: () => number;
+}
+
+type RequestIdleCallbackHandle = number;
+
+interface WindowWithIdleCallback extends Window {
+  requestIdleCallback: (
+    callback: (deadline: RequestIdleCallbackDeadline) => void,
+    opts?: RequestIdleCallbackOptions
+  ) => RequestIdleCallbackHandle;
+  cancelIdleCallback: (handle: RequestIdleCallbackHandle) => void;
+}
+
 // Development-specific configuration
 export const configureDevelopment = (): PluginOption => {
   // Add React DevTools setup for development mode
@@ -18,9 +33,9 @@ export const configureDevelopment = (): PluginOption => {
     };
     
     // Load after the initial render
-    if (typeof globalThis !== 'undefined' && 
-        'requestIdleCallback' in globalThis) {
-      (globalThis as any).requestIdleCallback(loadDevTools, { timeout: 1000 });
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const win = window as WindowWithIdleCallback;
+      win.requestIdleCallback(loadDevTools, { timeout: 1000 });
     } else {
       setTimeout(loadDevTools, 1000);
     }
