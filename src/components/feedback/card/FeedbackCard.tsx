@@ -35,7 +35,6 @@ export function FeedbackCard({
   onDelete,
   onRepost
 }: FeedbackCardProps) {
-  // Fixed: Use useRef with proper null initial value
   const dropdownTriggerRef = useRef<HTMLButtonElement>(null);
   const isManagerPost = feedback.author.role === 'manager' || feedback.author.role === 'admin';
   const isOwnFeedback = isAuthor;
