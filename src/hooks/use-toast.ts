@@ -130,15 +130,14 @@ function useToastReducer() {
   return React.useReducer(reducer, { toasts: [] })
 }
 
-// Export components and hooks
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useToastReducer()
   const contextValue = React.useMemo(() => ({ state, dispatch }), [state, dispatch])
 
-  return (
-    <ToastContext.Provider value={contextValue}>
-      {children}
-    </ToastContext.Provider>
+  return React.createElement(
+    ToastContext.Provider,
+    { value: contextValue },
+    children
   )
 }
 
