@@ -7,6 +7,3 @@ export const supabaseAuth = {
   getUser: async () => await baseClient.auth.getUser(),
   getSession: async () => await baseClient.auth.getSession(),
 };
-
-// Note: Modern Supabase client doesn't use setOptions directly
-// Auth options should be configured when creating the client in base-client.ts
