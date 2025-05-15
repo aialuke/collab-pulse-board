@@ -27,7 +27,7 @@ export const configureBuild = () => {
         drop_debugger: isProd,
         // Additional optimizations for production
         passes: 2, // Multiple passes for better optimization
-        ecma: 2020 as any, // Modern syntax optimizations
+        ecma: 2020 as 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020, // Properly typed ECMA version
         module: true, // Enable module-specific optimizations
         toplevel: true, // Enable top-level optimizations
         pure_getters: true, // Assume getters are pure
@@ -42,7 +42,7 @@ export const configureBuild = () => {
       },
       format: {
         comments: false, // Remove comments in production
-        ecma: 2020, // Use modern syntax
+        ecma: 2020 as 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020, // Properly typed ECMA version
       },
       mangle: {
         properties: {
