@@ -2,7 +2,7 @@
 import { componentTagger } from "lovable-tagger";
 import { PluginOption } from "vite";
 
-// Type declarations for requestIdleCallback
+// Type declarations for requestIdleCallback that are compatible with DOM types
 interface RequestIdleCallbackOptions {
   timeout: number;
 }
@@ -13,17 +13,6 @@ interface RequestIdleCallbackDeadline {
 }
 
 type RequestIdleCallbackHandle = number;
-
-// Extend the Window interface instead of creating a new one
-declare global {
-  interface Window {
-    requestIdleCallback: (
-      callback: (deadline: RequestIdleCallbackDeadline) => void,
-      opts?: RequestIdleCallbackOptions
-    ) => RequestIdleCallbackHandle;
-    cancelIdleCallback: (handle: RequestIdleCallbackHandle) => void;
-  }
-}
 
 // Development-specific configuration
 export const configureDevelopment = (): PluginOption => {
@@ -36,8 +25,10 @@ export const configureDevelopment = (): PluginOption => {
     };
     
     // Load after the initial render
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      window.requestIdleCallback(loadDevTools, { timeout: 1000 });
+    if (typeof globalThis !== 'undefined' && 
+        typeof globalThis.window !== 'undefined' && 
+        'requestIdleCallback' in globalThis.window) {
+      globalThis.window.requestIdleCallback(loadDevTools, { timeout: 1000 });
     } else {
       setTimeout(loadDevTools, 1000);
     }
