@@ -145,11 +145,8 @@ export const useToast = () => {
   const { dispatch } = React.useContext(ToastContext)
 
   // Memoize toast function to prevent unnecessary rerenders
-  const toast = React.useMemo(
+  return React.useMemo(
     () => ({
-      /**
-       * Display a toast message
-       */
       toast: (props: Omit<ToasterToast, "id">) => {
         const id = genId()
 
@@ -181,20 +178,19 @@ export const useToast = () => {
           update,
         }
       },
-      /**
-       * Dismiss a specific toast by ID or dismiss all toasts if no ID is provided
-       */
       dismiss: (toastId?: string) => {
         dispatch({ type: actionTypes.DISMISS_TOAST, toastId })
       },
     }),
     [dispatch]
   )
-
-  return toast
 }
 
-export type Toast = ReturnType<typeof useToast>
+// Export a simple toast function for direct usage
+export const toast = (props: Omit<ToasterToast, "id">) => {
+  const { toast } = useToast()
+  return toast(props)
+}
 
 export function useToaster() {
   const { state, dispatch } = React.useContext(ToastContext)
