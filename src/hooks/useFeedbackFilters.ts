@@ -1,12 +1,12 @@
 
 import { useState } from 'react';
 
-// This is now a minimal placeholder as we've removed filtering functionality
+// Enhanced version of the hook that provides direct access to selected values
 export function useFeedbackFilters() {
-  const [filters] = useState({
+  const [filters, setFilters] = useState({
     search: '',
-    category: 'all-categories',
-    status: 'all-statuses',
+    category: 'all',
+    status: 'all',
     sortBy: 'newest',
   });
 
@@ -15,8 +15,12 @@ export function useFeedbackFilters() {
     console.log('Filtering has been removed from the application');
   };
 
+  // Add these properties to match what's expected in FeedbackContainer
   return {
     filters,
-    updateFilters
+    updateFilters,
+    // Add direct access to individual filter values
+    selectedCategory: filters.category,
+    selectedStatus: filters.status
   };
 }

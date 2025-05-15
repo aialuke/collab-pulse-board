@@ -10,8 +10,8 @@ export { uploadFeedbackImage } from './feedback/imageService';
 
 // Export social interaction services
 export { toggleUpvote } from './feedback/upvoteService';
-export { reportFeedback } from './feedback/deleteFeedbackService';
-export { createRepost } from './feedback/repostService';
+export { reportFeedback } from './feedback/statusService'; // Fixed import source
+export { repostFeedback as createRepost } from './feedback/repostService'; // Aliased to match expected name
 
 // Export remaining services
 export * from './feedback';
