@@ -7,6 +7,7 @@ import { usePaginatedFeedback } from '@/hooks/usePaginatedFeedback';
 import { MobileFeedbackView } from './MobileFeedbackView';
 import { DesktopFeedbackView } from './DesktopFeedbackView';
 import { FeedbackSkeleton, FeedbackError } from './LoadingStates';
+import { RepostDialog } from '@/components/feedback/repost/RepostDialog';
 
 export function FeedbackContainer() {
   const isMobile = useIsMobile();
@@ -62,10 +63,24 @@ export function FeedbackContainer() {
     total
   };
   
-  // Render the appropriate view based on device type
-  if (isMobile) {
-    return <MobileFeedbackView {...viewProps} />;
-  }
-
-  return <DesktopFeedbackView {...viewProps} />;
+  return (
+    <>
+      {/* Render the appropriate view based on device type */}
+      {isMobile ? (
+        <MobileFeedbackView {...viewProps} />
+      ) : (
+        <DesktopFeedbackView {...viewProps} />
+      )}
+      
+      {/* Add the RepostDialog component */}
+      {feedbackToRepost && (
+        <RepostDialog
+          isOpen={repostDialogOpen}
+          onClose={closeRepostDialog}
+          feedback={feedbackToRepost}
+          onRepost={handleRepost}
+        />
+      )}
+    </>
+  );
 }
