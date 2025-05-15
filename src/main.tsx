@@ -1,5 +1,4 @@
 
-import React, { createContext } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import { registerSW } from 'virtual:pwa-register'
@@ -73,7 +72,7 @@ if (window.document) {
   document.documentElement.classList.add('fonts-loading');
 }
 
-// Use more efficient initialization approach
+// Use more efficient initialization approach with no React import
 const initApp = () => {
   // Create root only once
   const rootElement = document.getElementById("root");
@@ -84,13 +83,16 @@ const initApp = () => {
   
   const root = createRoot(rootElement);
   
-  // Disable StrictMode in production to avoid double-rendering
+  // Disable StrictMode in production to avoid double-rendering and extra bundle size
   if (process.env.NODE_ENV === 'development') {
-    root.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    );
+    // Dynamic import of React for StrictMode only in development
+    import('react').then(({ StrictMode }) => {
+      root.render(
+        <StrictMode>
+          <App />
+        </StrictMode>
+      );
+    });
   } else {
     root.render(<App />);
   }
@@ -98,7 +100,6 @@ const initApp = () => {
 
 // Defer non-critical initialization
 if ('requestIdleCallback' in window) {
-  // @ts-ignore - TypeScript doesn't recognize requestIdleCallback
   window.requestIdleCallback(initApp, { timeout: 1000 });
 } else {
   // Fallback for browsers that don't support requestIdleCallback
