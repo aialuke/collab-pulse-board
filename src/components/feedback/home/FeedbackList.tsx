@@ -4,6 +4,7 @@ import { FeedbackCardContainer } from '@/components/feedback/card/FeedbackCardCo
 import { FeedbackType } from '@/types/feedback';
 import { FixedSizeList as List } from 'react-window';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { ErrorBoundary } from '@/components/utils/ErrorBoundary';
 
 interface FeedbackListProps {
   feedback: FeedbackType[];
@@ -34,7 +35,7 @@ export function FeedbackList({
   
   // Reset list scroll position when feedback changes
   useEffect(() => {
-    if (listRef.current) {
+    if (listRef.current && feedback.length === 0) {
       listRef.current.scrollToItem(0);
     }
   }, [feedback.length === 0]);
@@ -44,16 +45,22 @@ export function FeedbackList({
     return (
       <div className="space-y-4">
         {feedback.map((item) => (
-          <FeedbackCardContainer
-            key={item.id}
-            feedback={item}
-            onUpvote={onUpvote}
-            onReport={onReport}
-            onDelete={onDelete}
-            onRepost={onRepost}
-          />
+          <ErrorBoundary key={item.id} fallback={
+            <div className="p-4 border border-red-300 bg-red-50 rounded-md">
+              Failed to render feedback item
+            </div>
+          }>
+            <FeedbackCardContainer
+              key={item.id}
+              feedback={item}
+              onUpvote={onUpvote}
+              onReport={onReport}
+              onDelete={onDelete}
+              onRepost={onRepost}
+            />
+          </ErrorBoundary>
         ))}
-        {hasMore && (
+        {hasMore && sentinelRef && (
           <div ref={sentinelRef} className="h-4" aria-hidden="true" />
         )}
       </div>
@@ -61,8 +68,9 @@ export function FeedbackList({
   }
   
   // Calculate item sizes based on content 
-  // This could be enhanced with dynamic sizing in a more complex implementation
   const getItemHeight = (index: number) => {
+    if (index >= feedback.length) return 50; // Sentinel height
+    
     const item = feedback[index];
     // Base height for a card
     let height = 180; 
@@ -94,20 +102,26 @@ export function FeedbackList({
   const Row = ({ index, style }: { index: number, style: React.CSSProperties }) => {
     // Special case for the last item which contains the sentinel for infinite loading
     if (hasMore && index === feedback.length) {
-      return <div ref={sentinelRef} style={style} className="h-16 flex items-center justify-center" />;
+      return <div ref={sentinelRef as any} style={style} className="h-16 flex items-center justify-center" />;
     }
     
     const item = feedback[index];
     return (
       <div style={{...style, paddingBottom: '16px'}}>
-        <FeedbackCardContainer
-          key={item.id}
-          feedback={item}
-          onUpvote={onUpvote}
-          onReport={onReport}
-          onDelete={onDelete}
-          onRepost={onRepost}
-        />
+        <ErrorBoundary fallback={
+          <div className="p-4 border border-red-300 bg-red-50 rounded-md">
+            Failed to render feedback item
+          </div>
+        }>
+          <FeedbackCardContainer
+            key={item.id}
+            feedback={item}
+            onUpvote={onUpvote}
+            onReport={onReport}
+            onDelete={onDelete}
+            onRepost={onRepost}
+          />
+        </ErrorBoundary>
       </div>
     );
   };

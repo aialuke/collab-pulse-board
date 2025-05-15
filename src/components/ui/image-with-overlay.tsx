@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { forwardRef, useState, useEffect } from 'react';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,7 +26,7 @@ interface ImageWithOverlayProps extends React.ImgHTMLAttributes<HTMLImageElement
  * - LQIP (Low Quality Image Placeholder) support
  * - Native lazy loading with fetchPriority
  */
-const ImageWithOverlay = React.memo<ImageWithOverlayProps>(({ 
+const ImageWithOverlay = forwardRef<HTMLDivElement, ImageWithOverlayProps>(({ 
   src, 
   alt, 
   overlay, 
@@ -42,15 +42,15 @@ const ImageWithOverlay = React.memo<ImageWithOverlayProps>(({
   fetchPriority = 'auto',
   ...props 
 }, ref) => {
-  const [isLoaded, setIsLoaded] = React.useState(false);
-  const [hasError, setHasError] = React.useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
   
   // Use eager loading for priority images (visible in viewport on initial load)
   const loadingStrategy = priority ? 'eager' : loading;
   const actualFetchPriority = priority ? 'high' : fetchPriority;
   
   // Preload high priority images
-  React.useEffect(() => {
+  useEffect(() => {
     if (priority && src && typeof window !== 'undefined') {
       const link = document.createElement('link');
       link.rel = 'preload';
@@ -59,7 +59,9 @@ const ImageWithOverlay = React.memo<ImageWithOverlayProps>(({
       document.head.appendChild(link);
       
       return () => {
-        document.head.removeChild(link);
+        if (document.head.contains(link)) {
+          document.head.removeChild(link);
+        }
       };
     }
   }, [priority, src]);

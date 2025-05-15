@@ -9,6 +9,7 @@ import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import { RefreshProvider } from "@/contexts/RefreshContext";
 import { createQueryClient } from "@/lib/react-query";
 import { Skeleton } from "./components/ui/skeleton";
+import { ErrorBoundary } from "./components/utils/ErrorBoundary";
 
 // Only load layout component when route is accessed
 const AppLayout = lazy(() => import("./components/layout/AppLayout"));
@@ -100,29 +101,50 @@ const AppRoutesWithAuth = () => {
         element={
           <ProtectedRoute>
             <Suspense fallback={<PageLoading />}>
-              <AppLayout />
+              <ErrorBoundary fallback={
+                <div className="p-8 m-4 border border-red-300 rounded-md bg-red-50 text-red-800">
+                  <h3 className="text-xl font-medium mb-2">Something went wrong with the layout</h3>
+                  <p>Please try refreshing the page or contact support if the issue persists.</p>
+                  <button 
+                    onClick={() => window.location.reload()} 
+                    className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  >
+                    Refresh Page
+                  </button>
+                </div>
+              }>
+                <AppLayout />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         }
       >
         <Route index element={
           <Suspense fallback={<PageLoading />}>
-            <HomePage />
+            <ErrorBoundary>
+              <HomePage />
+            </ErrorBoundary>
           </Suspense>
         } />
         <Route path="create" element={
           <Suspense fallback={<PageLoading />}>
-            <CreateFeedbackPage />
+            <ErrorBoundary>
+              <CreateFeedbackPage />
+            </ErrorBoundary>
           </Suspense>
         } />
         <Route path="feedback/:id" element={
           <Suspense fallback={<PageLoading />}>
-            <FeedbackDetailPage />
+            <ErrorBoundary>
+              <FeedbackDetailPage />
+            </ErrorBoundary>
           </Suspense>
         } />
         <Route path="profile" element={
           <Suspense fallback={<PageLoading />}>
-            <ProfilePage />
+            <ErrorBoundary>
+              <ProfilePage />
+            </ErrorBoundary>
           </Suspense>
         } />
       </Route>
@@ -141,28 +163,41 @@ const queryClient = createQueryClient();
 
 function App() {
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <NotificationsProvider>
-            <RefreshProvider>
-              <TooltipProvider>
-                <Toaster />
-                <AppRoutesWithAuth />
-                
-                {/* Load PWA components only when idle */}
-                <Suspense fallback={null}>
-                  <PWAInstallPrompt />
-                </Suspense>
-                <Suspense fallback={null}>
-                  <OfflineIndicator />
-                </Suspense>
-              </TooltipProvider>
-            </RefreshProvider>
-          </NotificationsProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
+    <ErrorBoundary fallback={
+      <div className="p-8 m-4 border border-red-300 rounded-md bg-red-50 text-red-800">
+        <h3 className="text-xl font-medium mb-2">Application Error</h3>
+        <p>The application encountered a critical error. Please try refreshing the page.</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          Reload Application
+        </button>
+      </div>
+    }>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <NotificationsProvider>
+              <RefreshProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <AppRoutesWithAuth />
+                  
+                  {/* Load PWA components only when idle */}
+                  <Suspense fallback={null}>
+                    <PWAInstallPrompt />
+                  </Suspense>
+                  <Suspense fallback={null}>
+                    <OfflineIndicator />
+                  </Suspense>
+                </TooltipProvider>
+              </RefreshProvider>
+            </NotificationsProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 
