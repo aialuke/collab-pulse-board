@@ -5,14 +5,25 @@ import { createBaseFeedbackQuery, fetchProfiles, fetchUserUpvotes, fetchOriginal
 import { mapFeedbackItem, mapFeedbackItems } from './mappers';
 import { FeedbackResponse } from '@/types/supabase';
 
+// Define the interface for the function parameters
+interface FetchFeedbackParams {
+  page?: number;
+  limit?: number;
+  filters?: {
+    category?: number;
+    status?: string;
+  };
+}
+
 /**
  * Optimized function to fetch all feedback items with pagination and sorting by newest first
  * Improved to reduce database load and network roundtrips
  */
-export async function fetchFeedback(
-  page: number = 1, 
-  limit: number = 10
-): Promise<{ items: FeedbackType[], hasMore: boolean, total: number }> {
+export async function fetchFeedback({
+  page = 1, 
+  limit = 10,
+  filters
+}: FetchFeedbackParams = {}): Promise<{ items: FeedbackType[], hasMore: boolean, total: number }> {
   try {
     // Select only essential columns to improve query performance
     const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
@@ -25,13 +36,26 @@ export async function fetchFeedback(
     const from = (page - 1) * limit;
     const to = from + limit - 1;
     
-    // 1. Execute main query with optimized select and range
-    const { data: feedbackData, error: feedbackError, count } = await supabase
+    // Initialize query
+    let query = supabase
       .from('feedback')
       .select(`
         ${columns},
         categories(name, id)
-      `, { count: 'estimated' }) // Use estimated count for better performance
+      `, { count: 'estimated' }); // Use estimated count for better performance
+    
+    // Apply filters if provided
+    if (filters) {
+      if (filters.category) {
+        query = query.eq('category_id', filters.category);
+      }
+      if (filters.status) {
+        query = query.eq('status', filters.status);
+      }
+    }
+    
+    // Apply ordering and range
+    const { data: feedbackData, error: feedbackError, count } = await query
       .order('created_at', { ascending: false })
       .range(from, to);
 

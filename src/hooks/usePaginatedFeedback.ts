@@ -66,7 +66,7 @@ export function usePaginatedFeedback({
           throw new Error('Cannot fetch additional pages without loading the first page');
         }
         
-        // Pass the parameters in the correct order and format the filterBy parameter
+        // Call fetchFeedback with the updated parameter structure
         return await fetchFeedback({
           page,
           limit: pageSize,
