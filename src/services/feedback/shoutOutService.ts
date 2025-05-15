@@ -1,8 +1,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { FeedbackType, FeedbackStatus } from '@/types/feedback';
+import { FeedbackType } from '@/types/feedback';
 import { mapFeedbackItem, isValidProfileResponse } from './mappers';
-import { FeedbackResponse, ProfileResponse } from '@/types/supabase';
+import { FeedbackResponse } from '@/types/supabase';
 
 // Define the category ID for shout outs
 const SHOUT_OUT_CATEGORY_ID = 5;
@@ -24,7 +24,6 @@ export const createShoutOut = async (
         user_id: userId,
         content,
         category_id: SHOUT_OUT_CATEGORY_ID, // Use the shout out category ID
-        status: 'completed' // Use a standard status
       })
       .select('*, categories(*), profiles(*)')
       .single();
@@ -35,7 +34,7 @@ export const createShoutOut = async (
     }
 
     // Get profile data separately if it's not available or malformed in the response
-    let feedbackWithProfile: FeedbackResponse = {...data};
+    let feedbackWithProfile = {...data} as FeedbackResponse;
     
     if (!data.profiles || !isValidProfileResponse(data.profiles)) {
       const { data: profileData } = await supabase
@@ -97,7 +96,7 @@ export const getAllShoutOuts = async (): Promise<FeedbackType[]> => {
             return {
               ...item,
               profiles: profileData
-            };
+            } as FeedbackResponse;
           }
         } catch (err) {
           console.error('Error fetching profile data:', err);
@@ -105,7 +104,7 @@ export const getAllShoutOuts = async (): Promise<FeedbackType[]> => {
       }
       
       // Return the item as is if we couldn't get profile data
-      return item;
+      return item as FeedbackResponse;
     }));
 
     return processedData.map(item => mapFeedbackItem(item, userUpvotes[item.id]));
@@ -157,7 +156,7 @@ export const getShoutOutsForUser = async (userId: string): Promise<FeedbackType[
             return {
               ...item,
               profiles: profileData
-            };
+            } as FeedbackResponse;
           }
         } catch (err) {
           console.error('Error fetching profile data:', err);
@@ -165,7 +164,7 @@ export const getShoutOutsForUser = async (userId: string): Promise<FeedbackType[
       }
       
       // Return the item as is if we couldn't get profile data
-      return item;
+      return item as FeedbackResponse;
     }));
 
     return processedData.map(item => mapFeedbackItem(item, userUpvotes[item.id]));

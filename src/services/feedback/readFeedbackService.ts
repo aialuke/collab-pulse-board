@@ -65,7 +65,7 @@ export async function fetchFeedback({
     ]);
 
     // 4. Attach profiles to feedback items
-    const feedbackWithProfiles: FeedbackResponse[] = feedbackData
+    const feedbackWithProfiles = feedbackData
       .filter(item => item !== null && typeof item === 'object')
       .map(item => ({
         ...item,
@@ -76,7 +76,7 @@ export async function fetchFeedback({
         is_repost: Boolean(item.is_repost),
         original_post_id: item.original_post_id || null,
         repost_comment: item.repost_comment || null
-      }));
+      })) as FeedbackResponse[];
 
     // 5. Identify and fetch original posts for reposts in a single batch
     const repostItems = feedbackWithProfiles.filter(item => 
@@ -154,7 +154,7 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
     const profilesMap = await fetchProfiles([feedbackData.user_id]);
     
     // 3. Add profile to feedback
-    const feedbackWithProfile: FeedbackResponse = {
+    const feedbackWithProfile = {
       ...feedbackData,
       profiles: profilesMap[feedbackData.user_id],
       // Ensure required properties have default values if missing
@@ -163,7 +163,7 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
       is_repost: Boolean(feedbackData.is_repost),
       original_post_id: feedbackData.original_post_id || null,
       repost_comment: feedbackData.repost_comment || null
-    };
+    } as FeedbackResponse;
     
     // 4. Map the feedback item
     const feedbackItem = mapFeedbackItem(feedbackWithProfile, !!userUpvotes[feedbackData.id]);

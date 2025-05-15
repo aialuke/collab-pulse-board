@@ -1,7 +1,7 @@
 
 import { supabaseDb } from '@/integrations/supabase/db-client';
 import { supabaseAuth } from '@/integrations/supabase/auth-client';
-import { FeedbackResponse, ProfileResponse, UpvoteResponse } from '@/types/supabase';
+import { FeedbackResponse, ProfileResponse } from '@/types/supabase';
 
 // Simple in-memory cache for profiles
 // This reduces redundant profile fetches during a session
@@ -135,7 +135,7 @@ export async function fetchOriginalPosts(
       .from('feedback')
       .select(`
         id, title, content, user_id, category_id, 
-        created_at, upvotes_count, status, image_url, link_url,
+        created_at, upvotes_count, image_url, link_url,
         updated_at, comments_count, is_repost, original_post_id, repost_comment,
         categories(name, id)
       `)
@@ -168,15 +168,17 @@ export async function fetchOriginalPosts(
     // Create a map of original post id to post data
     const originalPostsMap: Record<string, FeedbackResponse> = {};
     
-    originalPostsData.forEach(post => {
-      if (post && typeof post.user_id === 'string') {
-        // Add profile to the post
-        originalPostsMap[post.id] = {
-          ...post,
-          profiles: profilesMap[post.user_id]
-        };
-      }
-    });
+    if (originalPostsData && Array.isArray(originalPostsData)) {
+      originalPostsData.forEach(post => {
+        if (post && typeof post.user_id === 'string') {
+          // Add profile to the post and ensure it's a valid FeedbackResponse
+          originalPostsMap[post.id] = {
+            ...post,
+            profiles: profilesMap[post.user_id]
+          } as FeedbackResponse;
+        }
+      });
+    }
     
     return originalPostsMap;
   } catch (error) {

@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { mapFeedbackItem } from '@/services/feedback/mappers';
 import { FeedbackType } from '@/types/feedback';
+import { FeedbackResponse } from '@/types/supabase';
 
 /**
  * Creates a repost of an existing feedback item
@@ -36,7 +37,6 @@ export async function repostFeedback(originalPostId: string, comment: string): P
         is_repost: true,
         original_post_id: originalPostId,
         repost_comment: comment,
-        status: 'pending', // Default status
       })
       .select()
       .single();
@@ -81,7 +81,7 @@ export async function repostFeedback(originalPostId: string, comment: string): P
         avatar_url: null, 
         role: null
       }
-    };
+    } as FeedbackResponse;
 
     return mapFeedbackItem(feedbackWithData);
   } catch (error) {

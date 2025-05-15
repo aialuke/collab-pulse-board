@@ -1,6 +1,6 @@
 
 import { FeedbackResponse } from '@/types/supabase';
-import { FeedbackType, FeedbackStatus } from '@/types/feedback';
+import { FeedbackType } from '@/types/feedback';
 
 // Define the category ID for shout outs
 const SHOUT_OUT_CATEGORY_ID = 5;
@@ -114,7 +114,6 @@ export function mapFeedbackItem(
     category: extractCategoryName(item.categories),
     categoryId: item.category_id,
     upvotes: item.upvotes_count || 0,
-    status: item.status as FeedbackStatus,
     imageUrl: item.image_url || undefined,
     linkUrl: item.link_url || undefined,
     isUpvoted,

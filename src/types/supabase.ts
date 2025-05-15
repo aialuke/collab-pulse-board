@@ -6,7 +6,6 @@ export interface FeedbackResponse {
   title: string | null;
   user_id: string;
   category_id: number;
-  status: string;
   created_at: string;
   updated_at: string;
   upvotes_count: number;

@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { FeedbackType, CreateFeedbackInput, FeedbackStatus } from '@/types/feedback';
+import { FeedbackType, CreateFeedbackInput } from '@/types/feedback';
 import { extractCategoryName } from '@/services/feedback/mappers';
 
 /**
@@ -16,7 +16,6 @@ export async function createFeedback(input: CreateFeedbackInput): Promise<Feedba
       image_url: input.imageUrl,
       link_url: input.linkUrl,
       user_id: (await supabase.auth.getUser()).data.user?.id,
-      status: 'pending' as FeedbackStatus,
     })
     .select()
     .single();
@@ -68,7 +67,6 @@ export async function createFeedback(input: CreateFeedbackInput): Promise<Feedba
     categoryId: data.category_id,
     createdAt: new Date(data.created_at),
     upvotes: data.upvotes_count,
-    status: data.status as FeedbackStatus,
     imageUrl: data.image_url || undefined,
     linkUrl: data.link_url || undefined,
     isUpvoted: false,
