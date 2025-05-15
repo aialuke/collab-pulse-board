@@ -53,8 +53,8 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     esbuild: {
       // Improve tree-shaking with pure annotations
       pure: isProd ? ['console.log', 'console.debug', 'console.info'] : [],
-      // Fix: Use a valid value for jsx property from the allowed options
-      jsx: 'automatic', // Valid values are "transform", "automatic", or "preserve"
+      // Fix: Use a valid literal value for jsx property from the allowed options
+      jsx: 'automatic' as const, // Using 'as const' to ensure TypeScript sees this as a literal
       // Target modern browsers for smaller output
       target: isProd ? 'es2020' : 'es2018',
     },
