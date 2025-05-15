@@ -27,7 +27,7 @@ export const configureBuild = () => {
         drop_debugger: isProd,
         // Additional optimizations for production
         passes: 2, // Multiple passes for better optimization
-        ecma: 2020, // Modern syntax optimizations
+        ecma: 2020 as const, // Modern syntax optimizations as a proper type
         module: true, // Enable module-specific optimizations
         toplevel: true, // Enable top-level optimizations
         pure_getters: true, // Assume getters are pure
@@ -42,7 +42,7 @@ export const configureBuild = () => {
       },
       format: {
         comments: false, // Remove comments in production
-        ecma: 2020, // Use modern syntax
+        ecma: 2020 as const, // Use modern syntax
       },
       mangle: {
         properties: {

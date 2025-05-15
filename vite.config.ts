@@ -13,6 +13,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 export default defineConfig(({ mode }: ConfigEnv) => {
   const serverConfig = configureServer();
   const isProd = mode === 'production';
+  const buildConfig = configureBuild();
   
   return {
     server: {
@@ -30,7 +31,6 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         // Ensure production optimizations are enabled
         tsDecorators: false,
         // Enable React refresh only in dev mode
-        // Instead of refresh: !isProd which causes TypeScript error
       }),
       mode === 'development' ? configureDevelopment() : null,
       configurePWA(),
@@ -57,80 +57,6 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       // Target modern browsers for smaller output
       target: isProd ? 'es2020' : 'es2018',
     },
-    build: {
-      ...configureBuild(),
-      cssCodeSplit: true,
-      cssMinify: isProd ? 'lightningcss' : false,
-      rollupOptions: {
-        output: {
-          entryFileNames: 'assets/[name]-[hash].js',
-          chunkFileNames: 'assets/[name]-[hash].js',
-          assetFileNames: (assetInfo) => {
-            const cssExtensions = ['.css'];
-            const isCSS = assetInfo.name && cssExtensions.some(ext => assetInfo.name?.endsWith(ext));
-            
-            if (isCSS) {
-              if (assetInfo.name?.includes('critical')) {
-                return 'assets/critical-[hash].css';
-              }
-              return 'assets/styles-[name]-[hash].css';
-            }
-            
-            return 'assets/[name]-[hash].[ext]';
-          },
-          manualChunks: (id) => {
-            // Optimized React core chunking strategy
-            if (id.includes('node_modules/react/')) {
-              return 'react';
-            }
-            
-            if (id.includes('node_modules/react-dom/')) {
-              return 'react-dom';
-            }
-            
-            if (id.includes('node_modules/scheduler/')) {
-              return 'react-scheduler';
-            }
-            
-            // React Router
-            if (id.includes('node_modules/react-router') || 
-                id.includes('node_modules/@remix-run/router')) {
-              return 'router';
-            }
-            
-            // UI component library (Radix UI)
-            if (id.includes('node_modules/@radix-ui/')) {
-              const componentName = id.split('@radix-ui/')[1]?.split('/')[0];
-              // Group similar components together
-              if (componentName?.includes('react-dialog') || 
-                  componentName?.includes('react-popover') || 
-                  componentName?.includes('react-modal')) {
-                return 'ui-overlays';
-              }
-              if (componentName?.includes('react-form') || 
-                  componentName?.includes('react-label') || 
-                  componentName?.includes('react-select') ||
-                  componentName?.includes('react-checkbox') ||
-                  componentName?.includes('react-switch')) {
-                return 'ui-form';
-              }
-              return 'ui-components';
-            }
-            
-            // Tanstack/React-Query
-            if (id.includes('node_modules/@tanstack/react-query')) {
-              return 'tanstack-query';
-            }
-            
-            // Icons and visual libraries
-            if (id.includes('node_modules/lucide-react') || 
-                id.includes('node_modules/recharts')) {
-              return 'ui-visuals';
-            }
-          }
-        },
-        external: []
-      },
-    },
+    build: buildConfig
   };
 });

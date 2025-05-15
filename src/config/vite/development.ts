@@ -2,6 +2,11 @@
 import { componentTagger } from "lovable-tagger";
 import { PluginOption } from "vite";
 
+// Type declarations for requestIdleCallback
+interface RequestIdleCallbackOptions {
+  timeout: number;
+}
+
 // Development-specific configuration
 export const configureDevelopment = (): PluginOption => {
   // Add React DevTools setup for development mode
@@ -13,8 +18,9 @@ export const configureDevelopment = (): PluginOption => {
     };
     
     // Load after the initial render
-    if (globalThis.requestIdleCallback) {
-      globalThis.requestIdleCallback(loadDevTools, { timeout: 1000 });
+    if (typeof globalThis !== 'undefined' && 
+        'requestIdleCallback' in globalThis) {
+      (globalThis as any).requestIdleCallback(loadDevTools, { timeout: 1000 });
     } else {
       setTimeout(loadDevTools, 1000);
     }
