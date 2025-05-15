@@ -2,30 +2,10 @@
 import { componentTagger } from "lovable-tagger";
 import { PluginOption } from "vite";
 
-// Type declarations for requestIdleCallback that are compatible with DOM types
-interface RequestIdleCallbackOptions {
-  timeout: number;
-}
-
-interface RequestIdleCallbackDeadline {
-  didTimeout: boolean;
-  timeRemaining: () => number;
-}
-
-type RequestIdleCallbackHandle = number;
-
-// Interface to type-check window access
-interface WindowWithIdleCallback {
-  requestIdleCallback: (
-    callback: (deadline: RequestIdleCallbackDeadline) => void,
-    options?: RequestIdleCallbackOptions
-  ) => RequestIdleCallbackHandle;
-}
-
 // Development-specific configuration
 export const configureDevelopment = (): PluginOption => {
   // Add React DevTools setup for development mode
-  if (process.env.NODE_ENV !== 'production' && typeof globalThis !== 'undefined') {
+  if (process.env.NODE_ENV !== 'production' && typeof window !== 'undefined') {
     // Delay loading React DevTools to improve initial loading performance
     const loadDevTools = () => {
       // This will only be included in development builds
@@ -33,14 +13,8 @@ export const configureDevelopment = (): PluginOption => {
     };
     
     // Load after the initial render
-    if (typeof globalThis !== 'undefined' && 
-        'window' in globalThis && 
-        typeof (globalThis as any).window === 'object' && 
-        (globalThis as any).window !== null && 
-        'requestIdleCallback' in (globalThis as any).window) {
-      // Safely cast the window object to our interface with requestIdleCallback
-      const win = (globalThis as any).window as WindowWithIdleCallback;
-      win.requestIdleCallback(loadDevTools, { timeout: 1000 });
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(loadDevTools, { timeout: 1000 });
     } else {
       setTimeout(loadDevTools, 1000);
     }
