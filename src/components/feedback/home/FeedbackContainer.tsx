@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useFeedbackActions } from '@/hooks/useFeedbackActions';
 import { useRepost } from '@/contexts/RepostContext';
@@ -7,20 +7,28 @@ import { usePaginatedFeedback } from '@/hooks/usePaginatedFeedback';
 import { MobileFeedbackView } from './MobileFeedbackView';
 import { DesktopFeedbackView } from './DesktopFeedbackView';
 import { FeedbackSkeleton, FeedbackError } from './LoadingStates';
+import { useFeedbackFilters } from '@/hooks/useFeedbackFilters';
 
 export function FeedbackContainer() {
   const isMobile = useIsMobile();
+  const { selectedCategory, selectedStatus } = useFeedbackFilters();
   
-  // Use the paginated feedback hook for optimized data loading and infinite scroll
+  // Use the enhanced paginated feedback hook with filters
   const {
     feedback,
     isLoading,
     error: loadError,
     hasMore,
     sentinelRef,
-    refresh: handleRetry
+    refresh: handleRetry,
+    total
   } = usePaginatedFeedback({
-    pageSize: 10
+    pageSize: 10,
+    filterBy: {
+      category: selectedCategory !== 'all' ? Number(selectedCategory) : undefined,
+      status: selectedStatus !== 'all' ? selectedStatus : undefined
+    },
+    staleTime: 30 * 1000 // 30 seconds stale time
   });
   
   // Use the existing feedback actions hook
@@ -56,7 +64,8 @@ export function FeedbackContainer() {
     handleRepost,
     handleRetry,
     hasMore,
-    sentinelRef
+    sentinelRef,
+    total
   };
   
   // Render the appropriate view based on device type

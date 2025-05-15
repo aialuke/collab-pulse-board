@@ -11,12 +11,10 @@ import { deleteFeedback } from '@/services/feedback/deleteFeedbackService';
 import { useAuth } from '@/contexts/AuthContext';
 import { RepostDialog } from '@/components/feedback/repost/RepostDialog';
 import { RepostProvider, useRepost } from '@/contexts/RepostContext';
+import { useQuery } from '@tanstack/react-query';
 
 function FeedbackDetailContent() {
   const { id } = useParams<{ id: string }>();
-  const [feedback, setFeedback] = useState<FeedbackType | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -31,29 +29,32 @@ function FeedbackDetailContent() {
   
   const isManager = user?.role === 'manager' || user?.role === 'admin';
 
-  useEffect(() => {
-    const loadFeedback = async () => {
-      if (!id) return;
-      
-      setIsLoading(true);
-      try {
-        const data = await fetchFeedbackById(id);
-        setFeedback(data);
-      } catch (error) {
-        console.error('Error loading feedback:', error);
-        setError('Failed to load feedback. Please try again.');
+  // Use React Query for efficient data fetching with caching
+  const { 
+    data: feedback, 
+    isLoading, 
+    error,
+    refetch 
+  } = useQuery({
+    queryKey: ['feedback', 'detail', id],
+    queryFn: async () => {
+      if (!id) throw new Error('Feedback ID is required');
+      return await fetchFeedbackById(id);
+    },
+    enabled: !!id,
+    staleTime: 60 * 1000, // 1 minute
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    meta: {
+      onError: (error: Error) => {
         toast({
           title: 'Error',
           description: 'Failed to load feedback. Please try again.',
           variant: 'destructive',
         });
-      } finally {
-        setIsLoading(false);
       }
-    };
-
-    loadFeedback();
-  }, [id, toast]);
+    }
+  });
 
   const handleGoBack = () => {
     navigate(-1);
@@ -64,15 +65,8 @@ function FeedbackDetailContent() {
     
     try {
       await toggleUpvote(id);
-      setFeedback(prev => {
-        if (!prev) return prev;
-        // Only increment upvote if not already upvoted
-        return {
-          ...prev,
-          isUpvoted: true, // Always set to true, can't un-upvote
-          upvotes: !prev.isUpvoted ? prev.upvotes + 1 : prev.upvotes,
-        };
-      });
+      // Use refetch to get the updated data instead of manually updating state
+      refetch();
     } catch (error: any) {
       console.error('Error upvoting feedback:', error);
       toast({
@@ -139,7 +133,7 @@ function FeedbackDetailContent() {
           </Button>
         </div>
         <div className="bg-[#16181c] rounded-lg border border-red-600/30 p-8 text-center">
-          <p className="text-lg text-red-400 mb-4">{error || 'Feedback not found'}</p>
+          <p className="text-lg text-red-400 mb-4">{error instanceof Error ? error.message : 'Feedback not found'}</p>
           <Button onClick={handleGoBack} className="bg-gradient-yellow hover:shadow-glow text-black">
             <RefreshCw className="mr-2 h-4 w-4" />
             Go Back

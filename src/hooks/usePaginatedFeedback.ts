@@ -10,15 +10,20 @@ interface UsePaginatedFeedbackOptions {
   pageSize?: number;
   initialData?: FeedbackType[];
   staleTime?: number;
+  filterBy?: {
+    category?: number;
+    status?: string;
+  };
 }
 
 /**
- * Custom hook for paginated feedback with performance optimizations
+ * Enhanced hook for paginated feedback with performance optimizations
  */
 export function usePaginatedFeedback({
   pageSize = 10,
   initialData,
-  staleTime = 60 * 1000 // 1 minute default stale time
+  staleTime = 60 * 1000, // 1 minute default stale time
+  filterBy
 }: UsePaginatedFeedbackOptions = {}) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -39,8 +44,8 @@ export function usePaginatedFeedback({
     setTotal
   } = usePagination<FeedbackType>({ pageSize, initialData });
 
-  // Create a query key that includes the page for proper cache management
-  const queryKey = ['feedback', page, pageSize];
+  // Create a query key that includes all dependencies for proper cache management
+  const queryKey = ['feedback', page, pageSize, filterBy?.category, filterBy?.status];
 
   // Use React Query for efficient data fetching and caching
   const { 
@@ -61,7 +66,8 @@ export function usePaginatedFeedback({
           throw new Error('Cannot fetch additional pages without loading the first page');
         }
         
-        return await fetchFeedback(page, pageSize);
+        // Pass the filtering parameters to the fetchFeedback function
+        return await fetchFeedback(page, pageSize, filterBy);
       } catch (error) {
         console.error('Error loading feedback:', error);
         throw error;
@@ -153,6 +159,8 @@ export function usePaginatedFeedback({
     error,
     hasMore,
     sentinelRef,
-    refresh
+    refresh,
+    // Add total for displaying counts
+    total: data?.total || 0
   };
 }
