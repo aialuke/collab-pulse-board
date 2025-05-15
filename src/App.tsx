@@ -1,3 +1,4 @@
+
 import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,26 +18,38 @@ import { PWAInstallPrompt } from "./components/pwa/PWAInstallPrompt";
 import { OfflineIndicator } from "./components/pwa/OfflineIndicator";
 import { Skeleton } from "./components/ui/skeleton";
 
-// Lazy loaded pages
-const HomePage = lazy(() => import("./pages/HomePage"));
+// Lazy loaded pages with preloading hints
+const HomePage = lazy(() => {
+  // Add preloading hints for browser optimization
+  if (typeof window !== 'undefined') {
+    const pagePath = import.meta.url.replace(/\/src\/App\.tsx$/, '/src/pages/HomePage.tsx');
+    const link = document.createElement('link');
+    link.rel = 'modulepreload';
+    link.href = pagePath;
+    document.head.appendChild(link);
+  }
+  return import("./pages/HomePage");
+});
+
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const CreateFeedbackPage = lazy(() => import("./pages/CreateFeedbackPage"));
 const FeedbackDetailPage = lazy(() => import("./pages/FeedbackDetailPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-// Loading fallback component
-const PageLoading = () => (
+// Loading fallback component - optimized with memoization
+const PageLoading = React.memo(() => (
   <div className="w-full h-full min-h-[50vh] flex flex-col space-y-4 p-8">
     <Skeleton className="h-8 w-3/4 mx-auto" />
     <Skeleton className="h-64 w-full mx-auto" />
     <Skeleton className="h-8 w-2/4 mx-auto" />
     <Skeleton className="h-32 w-5/6 mx-auto" />
   </div>
-);
+));
+PageLoading.displayName = 'PageLoading';
 
 // Protected route component that also checks for terms acceptance
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+const ProtectedRoute = React.memo(({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [showTerms, setShowTerms] = React.useState(false);
 
@@ -63,10 +76,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       <TermsOfUseDialog open={showTerms} />
     </>
   );
-};
+});
+ProtectedRoute.displayName = 'ProtectedRoute';
 
 // This component needs to be inside the AuthProvider
-const AppRoutesWithAuth = () => {
+const AppRoutesWithAuth = React.memo(() => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -123,31 +137,30 @@ const AppRoutesWithAuth = () => {
       } />
     </Routes>
   );
-};
+});
+AppRoutesWithAuth.displayName = 'AppRoutesWithAuth';
 
 // Create QueryClient instance at app initialization time but outside of render cycles
 const queryClient = createQueryClient();
 
 function App() {
   return (
-    <React.StrictMode>
-      <BrowserRouter>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <NotificationsProvider>
-              <RefreshProvider>
-                <TooltipProvider>
-                  <Toaster />
-                  <AppRoutesWithAuth />
-                  <PWAInstallPrompt />
-                  <OfflineIndicator />
-                </TooltipProvider>
-              </RefreshProvider>
-            </NotificationsProvider>
-          </AuthProvider>
-        </QueryClientProvider>
-      </BrowserRouter>
-    </React.StrictMode>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <NotificationsProvider>
+            <RefreshProvider>
+              <TooltipProvider>
+                <Toaster />
+                <AppRoutesWithAuth />
+                <PWAInstallPrompt />
+                <OfflineIndicator />
+              </TooltipProvider>
+            </RefreshProvider>
+          </NotificationsProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
   );
 }
 

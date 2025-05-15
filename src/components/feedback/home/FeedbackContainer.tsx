@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useFeedbackActions } from '@/hooks/useFeedbackActions';
 import { useRepost } from '@/contexts/RepostContext';
@@ -44,8 +44,8 @@ export function FeedbackContainer() {
     closeRepostDialog
   } = useRepost();
   
-  // Common props for both mobile and desktop views
-  const viewProps = {
+  // Memoize props to prevent unnecessary re-renders
+  const viewProps = useMemo(() => ({
     feedback,
     isLoading,
     loadError,
@@ -61,16 +61,32 @@ export function FeedbackContainer() {
     hasMore,
     sentinelRef,
     total
-  };
+  }), [
+    feedback,
+    isLoading,
+    loadError,
+    feedbackToRepost,
+    repostDialogOpen,
+    handleUpvote,
+    handleReport,
+    handleDelete,
+    openRepostDialog,
+    closeRepostDialog,
+    handleRepost,
+    handleRetry,
+    hasMore,
+    sentinelRef,
+    total
+  ]);
+  
+  // Use React.memo to avoid unnecessary re-renders of child components
+  const MobileView = React.useMemo(() => <MobileFeedbackView {...viewProps} />, [viewProps, isMobile]);
+  const DesktopView = React.useMemo(() => <DesktopFeedbackView {...viewProps} />, [viewProps, isMobile]);
   
   return (
     <>
       {/* Render the appropriate view based on device type */}
-      {isMobile ? (
-        <MobileFeedbackView {...viewProps} />
-      ) : (
-        <DesktopFeedbackView {...viewProps} />
-      )}
+      {isMobile ? MobileView : DesktopView}
       
       {/* Add the RepostDialog component */}
       {feedbackToRepost && (

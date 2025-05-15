@@ -13,6 +13,8 @@ interface ImageWithOverlayProps extends React.ImgHTMLAttributes<HTMLImageElement
   height?: number;
   loading?: 'lazy' | 'eager';
   priority?: boolean;
+  blurDataUrl?: string;  // Base64 blur placeholder
+  fetchPriority?: 'high' | 'low' | 'auto';
 }
 
 /**
@@ -21,76 +23,106 @@ interface ImageWithOverlayProps extends React.ImgHTMLAttributes<HTMLImageElement
  * - Eager loading for priority images
  * - Progressive loading with skeleton placeholder
  * - Proper aspect ratio to prevent layout shifts
+ * - LQIP (Low Quality Image Placeholder) support
+ * - Native lazy loading with fetchPriority
  */
-const ImageWithOverlay = React.forwardRef<HTMLDivElement, ImageWithOverlayProps>(
-  ({ 
-    src, 
-    alt, 
-    overlay, 
-    aspectRatio = 16 / 9, 
-    overlayPosition = 'bottom', 
-    className, 
-    overlayClassName, 
-    width = 1200,
-    height = 800,
-    loading = 'lazy', // Default to lazy loading for better performance
-    priority = false,
-    ...props 
-  }, ref) => {
-    const [isLoaded, setIsLoaded] = React.useState(false);
-    const [hasError, setHasError] = React.useState(false);
-    
-    // Use eager loading for priority images (visible in viewport on initial load)
-    const loadingStrategy = priority ? 'eager' : loading;
+const ImageWithOverlay = React.memo<ImageWithOverlayProps>(({ 
+  src, 
+  alt, 
+  overlay, 
+  aspectRatio = 16 / 9, 
+  overlayPosition = 'bottom', 
+  className, 
+  overlayClassName, 
+  width = 1200,
+  height = 800,
+  loading = 'lazy', // Default to lazy loading for better performance
+  priority = false,
+  blurDataUrl,
+  fetchPriority = 'auto',
+  ...props 
+}, ref) => {
+  const [isLoaded, setIsLoaded] = React.useState(false);
+  const [hasError, setHasError] = React.useState(false);
+  
+  // Use eager loading for priority images (visible in viewport on initial load)
+  const loadingStrategy = priority ? 'eager' : loading;
+  const actualFetchPriority = priority ? 'high' : fetchPriority;
+  
+  // Preload high priority images
+  React.useEffect(() => {
+    if (priority && src && typeof window !== 'undefined') {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = src;
+      document.head.appendChild(link);
+      
+      return () => {
+        document.head.removeChild(link);
+      };
+    }
+  }, [priority, src]);
 
-    return (
-      <div ref={ref} className={cn("relative overflow-hidden rounded-md", className)}>
-        <AspectRatio ratio={aspectRatio} className="bg-muted">
-          {!isLoaded && !hasError && (
-            <Skeleton className="absolute inset-0 w-full h-full" />
-          )}
-          
-          {src && !hasError ? (
-            <img
-              src={src}
-              alt={alt || "Image"}
-              className={cn(
-                "object-cover w-full h-full transition-opacity duration-300",
-                !isLoaded && "opacity-0",
-                isLoaded && "opacity-100"
-              )}
-              width={width}
-              height={height}
-              loading={loadingStrategy}
-              onLoad={() => setIsLoaded(true)}
-              onError={() => setHasError(true)}
-              {...props}
-            />
-          ) : (
-            <div className="flex items-center justify-center w-full h-full bg-muted text-muted-foreground text-sm">
-              {hasError ? "Failed to load image" : "Image unavailable"}
-            </div>
-          )}
-        </AspectRatio>
+  return (
+    <div ref={ref} className={cn("relative overflow-hidden rounded-md", className)}>
+      <AspectRatio ratio={aspectRatio} className="bg-muted">
+        {!isLoaded && !hasError && (
+          <Skeleton className="absolute inset-0 w-full h-full" />
+        )}
         
-        {overlay && (
-          <div 
+        {/* Blur placeholder */}
+        {blurDataUrl && !isLoaded && !hasError && (
+          <img
+            src={blurDataUrl}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover blur-sm scale-110"
+            aria-hidden="true"
+          />
+        )}
+        
+        {src && !hasError ? (
+          <img
+            src={src}
+            alt={alt || "Image"}
             className={cn(
-              "absolute left-0 right-0 p-3 z-10",
-              overlayPosition === 'bottom' 
-                ? "bottom-0 bg-gradient-to-t from-black/80 to-transparent text-white" 
-                : "top-0 bg-gradient-to-b from-black/60 to-transparent text-white",
-              overlayClassName
+              "object-cover w-full h-full transition-opacity duration-300",
+              !isLoaded && "opacity-0",
+              isLoaded && "opacity-100"
             )}
-            aria-hidden="false"
-          >
-            {overlay}
+            width={width}
+            height={height}
+            loading={loadingStrategy}
+            fetchPriority={actualFetchPriority}
+            decoding="async"
+            onLoad={() => setIsLoaded(true)}
+            onError={() => setHasError(true)}
+            {...props}
+          />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full bg-muted text-muted-foreground text-sm">
+            {hasError ? "Failed to load image" : "Image unavailable"}
           </div>
         )}
-      </div>
-    );
-  }
-);
+      </AspectRatio>
+      
+      {overlay && (
+        <div 
+          className={cn(
+            "absolute left-0 right-0 p-3 z-10",
+            overlayPosition === 'bottom' 
+              ? "bottom-0 bg-gradient-to-t from-black/80 to-transparent text-white" 
+              : "top-0 bg-gradient-to-b from-black/60 to-transparent text-white",
+            overlayClassName
+          )}
+          aria-hidden="false"
+        >
+          {overlay}
+        </div>
+      )}
+    </div>
+  );
+});
 
 ImageWithOverlay.displayName = "ImageWithOverlay";
 

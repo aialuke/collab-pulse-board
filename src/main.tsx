@@ -75,13 +75,22 @@ if (window.document) {
 // Use requestIdleCallback for non-critical initialization
 const initApp = () => {
   const root = createRoot(document.getElementById("root")!);
-  root.render(<App />);
+  root.render(
+    // Remove StrictMode in production to prevent double-rendering
+    process.env.NODE_ENV === 'development' ? (
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    ) : (
+      <App />
+    )
+  );
 };
 
 // Use requestIdleCallback for non-critical initialization
 if ('requestIdleCallback' in window) {
   // @ts-ignore - TypeScript doesn't recognize requestIdleCallback
-  window.requestIdleCallback(initApp);
+  window.requestIdleCallback(initApp, { timeout: 1000 });
 } else {
   // Fallback for browsers that don't support requestIdleCallback
   setTimeout(initApp, 1);

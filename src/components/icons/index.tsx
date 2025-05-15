@@ -1,49 +1,13 @@
 
-// Central icon export file
+// Central icon export file - uses dynamic imports to reduce bundle size
 // Only export the icons that are actually used in the project
-import { 
+export {
   ArrowUp,
   AlertCircle, 
   Bell, 
   Calendar,
   Check,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-  Circle,
-  Clock,
-  Flag,
-  Lightbulb,
-  Loader2,
-  LogOut,
-  Mail as MailIcon,
-  MoreHorizontal,
-  MoreVertical,
-  PlusSquare,
-  RefreshCw,
-  Search,
-  Share2,
-  Trash2,
-  User,
-  UserIcon,
-  WifiOff,
-  X,
-  EyeIcon,
-  EyeOffIcon,
-  LockIcon,
-  Image,
-  Link
-} from 'lucide-react';
-
-// Re-export all icons that are used in the project
-export {
-  ArrowUp,
-  AlertCircle,
-  Bell,
-  Calendar,
-  Check,
-  ChevronDown, 
   ChevronLeft,
   ChevronRight,
   ChevronUp,
@@ -70,4 +34,7 @@ export {
   UserIcon,
   WifiOff,
   X
-};
+} from 'lucide-react';
+
+// Re-export LazyIcon for dynamically loading other icons
+export { LazyIcon } from './LazyIcon';
