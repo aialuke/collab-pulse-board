@@ -74,7 +74,6 @@ export type Database = {
           link_url: string | null
           original_post_id: string | null
           repost_comment: string | null
-          status: string
           title: string | null
           updated_at: string
           upvotes_count: number
@@ -91,7 +90,6 @@ export type Database = {
           link_url?: string | null
           original_post_id?: string | null
           repost_comment?: string | null
-          status?: string
           title?: string | null
           updated_at?: string
           upvotes_count?: number
@@ -108,7 +106,6 @@ export type Database = {
           link_url?: string | null
           original_post_id?: string | null
           repost_comment?: string | null
-          status?: string
           title?: string | null
           updated_at?: string
           upvotes_count?: number
@@ -214,7 +211,6 @@ export type Database = {
           link_url: string | null
           original_post_id: string | null
           repost_comment: string | null
-          status: string
           title: string | null
           updated_at: string
           upvotes_count: number

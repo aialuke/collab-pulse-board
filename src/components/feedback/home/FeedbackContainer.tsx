@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useFeedbackActions } from '@/hooks/useFeedbackActions';
 import { useRepost } from '@/contexts/RepostContext';
@@ -7,13 +7,11 @@ import { usePaginatedFeedback } from '@/hooks/usePaginatedFeedback';
 import { MobileFeedbackView } from './MobileFeedbackView';
 import { DesktopFeedbackView } from './DesktopFeedbackView';
 import { FeedbackSkeleton, FeedbackError } from './LoadingStates';
-import { useFeedbackFilters } from '@/hooks/useFeedbackFilters';
 
 export function FeedbackContainer() {
   const isMobile = useIsMobile();
-  const { selectedCategory, selectedStatus } = useFeedbackFilters();
   
-  // Use the enhanced paginated feedback hook with filters
+  // Use the enhanced paginated feedback hook without filters
   const {
     feedback,
     isLoading,
@@ -24,10 +22,6 @@ export function FeedbackContainer() {
     total
   } = usePaginatedFeedback({
     pageSize: 10,
-    filterBy: {
-      category: selectedCategory !== 'all' ? Number(selectedCategory) : undefined,
-      status: selectedStatus !== 'all' ? selectedStatus : undefined
-    },
     staleTime: 30 * 1000 // 30 seconds stale time
   });
   

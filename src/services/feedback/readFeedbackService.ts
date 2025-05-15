@@ -9,10 +9,6 @@ import { FeedbackResponse } from '@/types/supabase';
 interface FetchFeedbackParams {
   page?: number;
   limit?: number;
-  filters?: {
-    category?: number;
-    status?: string;
-  };
 }
 
 /**
@@ -21,12 +17,11 @@ interface FetchFeedbackParams {
  */
 export async function fetchFeedback({
   page = 1, 
-  limit = 10,
-  filters
+  limit = 10
 }: FetchFeedbackParams = {}): Promise<{ items: FeedbackType[], hasMore: boolean, total: number }> {
   try {
     // Select only essential columns to improve query performance
-    const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
+    const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
     
     // Get the current user ID once for efficient upvote checking
     const userId = (await supabase.auth.getUser()).data.user?.id;
@@ -36,26 +31,13 @@ export async function fetchFeedback({
     const from = (page - 1) * limit;
     const to = from + limit - 1;
     
-    // Initialize query
-    let query = supabase
+    // Initialize query and execute
+    const { data: feedbackData, error: feedbackError, count } = await supabase
       .from('feedback')
       .select(`
         ${columns},
         categories(name, id)
-      `, { count: 'estimated' }); // Use estimated count for better performance
-    
-    // Apply filters if provided
-    if (filters) {
-      if (filters.category) {
-        query = query.eq('category_id', filters.category);
-      }
-      if (filters.status) {
-        query = query.eq('status', filters.status);
-      }
-    }
-    
-    // Apply ordering and range
-    const { data: feedbackData, error: feedbackError, count } = await query
+      `, { count: 'estimated' }) // Use estimated count for better performance
       .order('created_at', { ascending: false })
       .range(from, to);
 
@@ -148,7 +130,7 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
         .from('feedback')
         .select(`
           id, title, content, user_id, category_id, created_at, updated_at, 
-          upvotes_count, status, image_url, link_url, is_repost, 
+          upvotes_count, image_url, link_url, is_repost, 
           original_post_id, comments_count, repost_comment,
           categories(name, id)
         `)

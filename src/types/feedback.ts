@@ -1,5 +1,3 @@
-export type FeedbackStatus = 'pending' | 'in-progress' | 'completed' | 'shout-out';
-
 export type FeedbackType = {
   id: string;
   title?: string;
@@ -14,7 +12,6 @@ export type FeedbackType = {
   category: string;
   categoryId: number;
   upvotes: number;
-  status: FeedbackStatus;
   imageUrl?: string;
   linkUrl?: string;
   isUpvoted?: boolean;

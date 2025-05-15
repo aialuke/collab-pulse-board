@@ -10,10 +10,6 @@ interface UsePaginatedFeedbackOptions {
   pageSize?: number;
   initialData?: FeedbackType[];
   staleTime?: number;
-  filterBy?: {
-    category?: number;
-    status?: string;
-  };
 }
 
 /**
@@ -22,8 +18,7 @@ interface UsePaginatedFeedbackOptions {
 export function usePaginatedFeedback({
   pageSize = 10,
   initialData,
-  staleTime = 60 * 1000, // 1 minute default stale time
-  filterBy
+  staleTime = 60 * 1000 // 1 minute default stale time
 }: UsePaginatedFeedbackOptions = {}) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -45,7 +40,7 @@ export function usePaginatedFeedback({
   } = usePagination<FeedbackType>({ pageSize, initialData });
 
   // Create a query key that includes all dependencies for proper cache management
-  const queryKey = ['feedback', page, pageSize, filterBy?.category, filterBy?.status];
+  const queryKey = ['feedback', page, pageSize];
 
   // Use React Query for efficient data fetching and caching
   const { 
@@ -69,8 +64,7 @@ export function usePaginatedFeedback({
         // Call fetchFeedback with the updated parameter structure
         return await fetchFeedback({
           page,
-          limit: pageSize,
-          filters: filterBy
+          limit: pageSize
         });
       } catch (error) {
         console.error('Error loading feedback:', error);

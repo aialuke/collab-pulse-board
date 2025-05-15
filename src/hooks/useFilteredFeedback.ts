@@ -13,23 +13,12 @@ export function useFilteredFeedback(
   setFilteredFeedback: React.Dispatch<React.SetStateAction<FeedbackType[]>>
 ) {
   useEffect(() => {
-    // Apply filters and sorting
+    // Apply sorting only, without filtering
     let result = [...feedback];
     
-    // Apply sorting
-    result.sort((a, b) => {
-      switch (filters.sortBy) {
-        case 'newest':
-          return b.createdAt.getTime() - a.createdAt.getTime();
-        case 'oldest':
-          return a.createdAt.getTime() - b.createdAt.getTime();
-        case 'upvotes':
-          return b.upvotes - a.upvotes;
-        default:
-          return 0;
-      }
-    });
+    // Sort by date (newest first)
+    result.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     
     setFilteredFeedback(result);
-  }, [feedback, filters, setFilteredFeedback]);
+  }, [feedback, setFilteredFeedback]);
 }
