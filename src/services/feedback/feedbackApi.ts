@@ -3,6 +3,12 @@ import { supabaseDb } from '@/integrations/supabase/db-client';
 import { supabaseAuth } from '@/integrations/supabase/auth-client';
 import { FeedbackResponse, ProfileResponse, UpvoteResponse } from '@/types/supabase';
 
+// Simple in-memory cache for profiles
+// This reduces redundant profile fetches during a session
+const profileCache: Record<string, ProfileResponse> = {};
+const CACHE_LIFETIME = 5 * 60 * 1000; // 5 minutes
+const profileCacheTimestamps: Record<string, number> = {};
+
 /**
  * Base query builder for feedback with column selection optimization
  * Only selects the columns that are actually needed
@@ -17,33 +23,59 @@ export function createBaseFeedbackQuery(columns = '*') {
 }
 
 /**
- * Fetch profiles for a list of user IDs with caching optimization
+ * Fetch profiles for a list of user IDs with optimized caching
+ * Uses an in-memory cache to avoid redundant database queries
  */
 export async function fetchProfiles(userIds: string[]): Promise<Record<string, ProfileResponse>> {
   try {
     // If no user IDs, return empty result
     if (!userIds.length) return {};
 
-    // Use a single batch query instead of multiple queries
+    const now = Date.now();
+    const result: Record<string, ProfileResponse> = {};
+    const idsToFetch: string[] = [];
+
+    // Check cache first for each user ID
+    userIds.forEach(id => {
+      if (profileCache[id] && profileCacheTimestamps[id] > now - CACHE_LIFETIME) {
+        // Use cached profile if it exists and isn't expired
+        result[id] = profileCache[id];
+      } else {
+        // Mark this ID for fetching
+        idsToFetch.push(id);
+      }
+    });
+
+    // If all profiles were in cache, return immediately
+    if (idsToFetch.length === 0) {
+      return result;
+    }
+
+    // Fetch only the profiles we don't have in cache
     const { data: profilesData, error: profilesError } = await supabaseDb
       .from('profiles')
       .select('id, name, avatar_url, role')
-      .in('id', userIds);
+      .in('id', idsToFetch);
 
     if (profilesError) {
       console.error('Error fetching profiles:', profilesError);
       throw profilesError;
     }
 
-    if (!profilesData) return {};
+    // Update cache and result with new profiles
+    if (profilesData) {
+      profilesData.forEach(profile => {
+        if (profile && profile.id) {
+          // Update cache
+          profileCache[profile.id] = profile;
+          profileCacheTimestamps[profile.id] = now;
+          // Add to result
+          result[profile.id] = profile;
+        }
+      });
+    }
 
-    // Create a map of user_id to profile data for quick lookups
-    return profilesData.reduce((acc, profile) => {
-      if (profile && profile.id) {
-        acc[profile.id] = profile;
-      }
-      return acc;
-    }, {} as Record<string, ProfileResponse>);
+    return result;
   } catch (error) {
     console.error('Error in fetchProfiles:', error);
     throw error;
@@ -52,6 +84,7 @@ export async function fetchProfiles(userIds: string[]): Promise<Record<string, P
 
 /**
  * Fetch upvotes for current user with optimized query
+ * Uses a single efficient query to get all upvotes
  */
 export async function fetchUserUpvotes(userId: string | undefined): Promise<Record<string, boolean>> {
   try {
@@ -84,6 +117,7 @@ export async function fetchUserUpvotes(userId: string | undefined): Promise<Reco
 
 /**
  * Fetch original posts for reposts with optimized batch query
+ * Reduces multiple network roundtrips to a single database query
  */
 export async function fetchOriginalPosts(
   originalPostIds: string[], 
@@ -92,6 +126,9 @@ export async function fetchOriginalPosts(
 ): Promise<Record<string, FeedbackResponse>> {
   try {
     if (!originalPostIds.length) return {};
+    
+    // Use a unique set of IDs to avoid duplicates
+    const uniqueIds = [...new Set(originalPostIds)];
     
     // Optimize the columns we select to only what's needed
     const { data: originalPostsData, error: originalPostsError } = await supabaseDb
@@ -102,7 +139,7 @@ export async function fetchOriginalPosts(
         updated_at, comments_count, is_repost, original_post_id, repost_comment,
         categories(name, id)
       `)
-      .in('id', originalPostIds);
+      .in('id', uniqueIds);
       
     if (originalPostsError) {
       console.error('Error fetching original posts:', originalPostsError);
@@ -111,7 +148,7 @@ export async function fetchOriginalPosts(
     
     if (!originalPostsData) return {};
     
-    // Get the profiles for original post authors
+    // Get the profiles for original post authors that we don't already have
     const originalPostUserIds = originalPostsData
       .filter(item => item && typeof item.user_id === 'string')
       .map(item => item.user_id);

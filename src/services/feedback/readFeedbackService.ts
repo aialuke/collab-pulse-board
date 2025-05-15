@@ -7,37 +7,33 @@ import { FeedbackResponse } from '@/types/supabase';
 
 /**
  * Optimized function to fetch all feedback items with pagination and sorting by newest first
+ * Improved to reduce database load and network roundtrips
  */
 export async function fetchFeedback(
   page: number = 1, 
   limit: number = 10
 ): Promise<{ items: FeedbackType[], hasMore: boolean, total: number }> {
   try {
-    // Select only the columns we need to improve query performance
+    // Select only essential columns to improve query performance
     const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
     
-    // 1. Build query with pagination
-    let query = supabase
+    // Get the current user ID once for efficient upvote checking
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    
+    // Use Range header instead of count query for better performance
+    // This avoids a separate COUNT(*) query which can be slow on large tables
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+    
+    // 1. Execute main query with optimized select and range
+    const { data: feedbackData, error: feedbackError, count } = await supabase
       .from('feedback')
       .select(`
         ${columns},
         categories(name, id)
-      `);
-
-    // Count total before applying pagination (for hasMore calculation)
-    const { count } = await supabase.from('feedback').select('*', { count: 'exact', head: true });
-    
-    // Apply pagination
-    const from = (page - 1) * limit;
-    const to = from + limit - 1;
-    
-    // Default sorting by newest
-    query = query
+      `, { count: 'estimated' }) // Use estimated count for better performance
       .order('created_at', { ascending: false })
       .range(from, to);
-
-    // Execute query
-    const { data: feedbackData, error: feedbackError } = await query;
 
     if (feedbackError) {
       console.error('Error fetching feedback:', feedbackError);
@@ -48,36 +44,35 @@ export async function fetchFeedback(
       return { items: [], hasMore: false, total: count || 0 };
     }
 
-    // 2. Collect all unique user IDs
+    // 2. Collect unique user IDs to batch fetch profiles
     const userIds = feedbackData
       .filter(item => item && typeof item.user_id === 'string')
       .map(item => item.user_id);
+    
+    // Create a unique set of user IDs to avoid duplicate queries
+    const uniqueUserIds = [...new Set(userIds)];
 
-    // 3. Fetch profiles in a single query
-    const profilesMap = await fetchProfiles(userIds);
+    // 3. Parallel fetch for profiles and user upvotes to reduce latency
+    const [profilesMap, userUpvotes] = await Promise.all([
+      fetchProfiles(uniqueUserIds), 
+      fetchUserUpvotes(userId)
+    ]);
 
     // 4. Attach profiles to feedback items
     const feedbackWithProfiles: FeedbackResponse[] = feedbackData
       .filter(item => item !== null && typeof item === 'object')
-      .map(item => {
-        // We need to ensure all required properties are present, adding defaults for optional ones
-        return {
-          ...item,
-          profiles: profilesMap[item.user_id],
-          // Make sure all required properties are present, defaulting if necessary
-          updated_at: item.updated_at || item.created_at,
-          comments_count: item.comments_count || 0,
-          is_repost: Boolean(item.is_repost),
-          original_post_id: item.original_post_id || null,
-          repost_comment: item.repost_comment || null
-        };
-      });
+      .map(item => ({
+        ...item,
+        profiles: profilesMap[item.user_id],
+        // Use default values for missing properties
+        updated_at: item.updated_at || item.created_at,
+        comments_count: item.comments_count || 0,
+        is_repost: Boolean(item.is_repost),
+        original_post_id: item.original_post_id || null,
+        repost_comment: item.repost_comment || null
+      }));
 
-    // 5. Get current user's upvotes - using optimized query
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    const userUpvotes = await fetchUserUpvotes(userId);
-
-    // 6. Handle reposts efficiently - fetch original posts if needed
+    // 5. Identify and fetch original posts for reposts in a single batch
     const repostItems = feedbackWithProfiles.filter(item => 
       item.is_repost && item.original_post_id
     );
@@ -85,9 +80,11 @@ export async function fetchFeedback(
     let originalPostsMap = {};
     
     if (repostItems.length > 0) {
-      const originalPostIds = repostItems
-        .map(item => item.original_post_id)
-        .filter(Boolean) as string[];
+      const originalPostIds = [...new Set(
+        repostItems
+          .map(item => item.original_post_id)
+          .filter(Boolean) as string[]
+      )];
       
       originalPostsMap = await fetchOriginalPosts(
         originalPostIds,
@@ -96,10 +93,10 @@ export async function fetchFeedback(
       );
     }
 
-    // 7. Map to frontend models
+    // 6. Map to frontend models with optimized processing
     const mappedItems = mapFeedbackItems(feedbackWithProfiles, userUpvotes, originalPostsMap);
     
-    // 8. Determine if there are more items
+    // 7. Determine if there are more items using the count
     const hasMore = count ? from + feedbackData.length < count : false;
     
     return {
@@ -118,17 +115,25 @@ export async function fetchFeedback(
  */
 export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
   try {
-    // 1. Fetch the specific feedback item with only necessary columns
-    const columns = 'id, title, content, user_id, category_id, created_at, updated_at, upvotes_count, status, image_url, link_url, is_repost, original_post_id, comments_count, repost_comment';
+    // Get the current user ID once for efficient upvote checking
+    const userId = (await supabase.auth.getUser()).data.user?.id;
     
-    const { data: feedbackData, error: feedbackError } = await supabase
-      .from('feedback')
-      .select(`
-        ${columns},
-        categories(name, id)
-      `)
-      .eq('id', id)
-      .maybeSingle();
+    // 1. Parallel fetch for the feedback item and user upvotes
+    const [feedbackResponse, userUpvotes] = await Promise.all([
+      supabase
+        .from('feedback')
+        .select(`
+          id, title, content, user_id, category_id, created_at, updated_at, 
+          upvotes_count, status, image_url, link_url, is_repost, 
+          original_post_id, comments_count, repost_comment,
+          categories(name, id)
+        `)
+        .eq('id', id)
+        .maybeSingle(),
+      fetchUserUpvotes(userId)
+    ]);
+    
+    const { data: feedbackData, error: feedbackError } = feedbackResponse;
 
     if (feedbackError) {
       console.error('Error fetching feedback by id:', feedbackError);
@@ -153,15 +158,11 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
       original_post_id: feedbackData.original_post_id || null,
       repost_comment: feedbackData.repost_comment || null
     };
-
-    // 4. Get current user's upvotes
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    const userUpvotes = await fetchUserUpvotes(userId);
     
-    // 5. Map the feedback item
+    // 4. Map the feedback item
     const feedbackItem = mapFeedbackItem(feedbackWithProfile, !!userUpvotes[feedbackData.id]);
 
-    // 6. If it's a repost, fetch the original post
+    // 5. If it's a repost, fetch the original post
     if (feedbackItem.isRepost && feedbackItem.originalPostId) {
       const originalPostsMap = await fetchOriginalPosts(
         [feedbackItem.originalPostId],

@@ -6,18 +6,18 @@ import { FeedbackType, FeedbackStatus } from '@/types/feedback';
 const SHOUT_OUT_CATEGORY_ID = 5;
 
 /**
- * Extract first name from full name
- * @param name - Full name
- * @returns First name
+ * Extract first name from full name - memoized for performance
  */
+const firstNameCache: Record<string, string> = {};
 export function getFirstName(name: string): string {
-  return name.split(' ')[0] || 'User';
+  if (firstNameCache[name]) return firstNameCache[name];
+  const firstName = name.split(' ')[0] || 'User';
+  firstNameCache[name] = firstName;
+  return firstName;
 }
 
 /**
  * Safely extract category name from category object
- * @param categories - Category object from database
- * @returns Category name or "Uncategorized" if not available
  */
 export function extractCategoryName(categories: { name: string } | null | undefined): string {
   return categories?.name || 'Uncategorized';
@@ -25,8 +25,7 @@ export function extractCategoryName(categories: { name: string } | null | undefi
 
 /**
  * Safely extract profile information
- * @param profiles - Profile data from the database
- * @returns Structured profile information
+ * Optimized to reduce object creation
  */
 export function extractProfileInfo(profiles: any): { 
   name: string; 
@@ -34,31 +33,27 @@ export function extractProfileInfo(profiles: any): {
   role?: string;
   id?: string;
 } {
-  let profileInfo = {
-    name: 'Unknown User',
-    avatarUrl: undefined as string | undefined,
-    role: 'user' as string,
-    id: undefined as string | undefined
-  };
-  
-  if (profiles && 
-      typeof profiles === 'object' && 
-      'name' in profiles) {
-    profileInfo = {
-      name: profiles.name || 'Unknown User',
-      avatarUrl: profiles.avatar_url || undefined,
-      role: profiles.role || 'user',
-      id: profiles.id
+  // Early return for invalid profile data
+  if (!profiles || typeof profiles !== 'object' || !('name' in profiles)) {
+    return {
+      name: 'Unknown User',
+      avatarUrl: undefined,
+      role: 'user',
+      id: undefined
     };
   }
-
-  return profileInfo;
+  
+  // Return profile info directly
+  return {
+    name: profiles.name || 'Unknown User',
+    avatarUrl: profiles.avatar_url || undefined,
+    role: profiles.role || 'user',
+    id: profiles.id
+  };
 }
 
 /**
  * Type guard to check if an object is a valid profile response
- * @param profiles - Potential profile response
- * @returns Boolean indicating if it's a valid profile
  */
 export function isValidProfileResponse(profiles: any): profiles is {
   id: string;
@@ -74,10 +69,7 @@ export function isValidProfileResponse(profiles: any): profiles is {
 
 /**
  * Map database feedback item to frontend model
- * @param item - Database feedback item
- * @param isUpvoted - Whether the current user upvoted this feedback
- * @param originalPostsMap - Map of original posts for reposts
- * @returns Frontend feedback model
+ * Optimized for performance with fewer intermediate objects
  */
 export function mapFeedbackItem(
   item: FeedbackResponse, 
@@ -107,7 +99,7 @@ export function mapFeedbackItem(
   // Check if this is a shout out post based on category ID
   const isShoutOut = item.category_id === SHOUT_OUT_CATEGORY_ID;
   
-  // Map to frontend model
+  // Create the feedback item directly
   const feedbackItem: FeedbackType = {
     id: item.id,
     title: item.title || undefined,
@@ -147,10 +139,7 @@ export function mapFeedbackItem(
 
 /**
  * Map a collection of feedback items
- * @param items - Database feedback items
- * @param userUpvotes - Map of user upvotes
- * @param originalPostsMap - Map of original posts for reposts
- * @returns Array of frontend feedback models
+ * Optimized to reduce redundant work
  */
 export function mapFeedbackItems(
   items: FeedbackResponse[], 
