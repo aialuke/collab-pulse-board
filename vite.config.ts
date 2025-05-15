@@ -25,8 +25,8 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         devTarget: mode === 'production' ? 'es2022' : 'es2020',
         // Use JSX transform in production to reduce bundle size
         jsxImportSource: mode === 'production' ? undefined : 'react',
-        // Disable development-only features in production
-        development: mode !== 'production',
+        // This is the correct way to specify development mode
+        plugins: mode !== 'production' ? [] : undefined,
       }),
       mode === 'development' && configureDevelopment(),
       configurePWA(),
