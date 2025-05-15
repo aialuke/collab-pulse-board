@@ -99,7 +99,7 @@ export const getAssetCacheStrategies = () => {
       urlPattern: /lucide-icons\.svg$/i,
       handler: 'CacheFirst' as const,
       options: {
-        cacheName: CACHE_NAMES.icons,
+        cacheName: CACHE_NAMES.static, // Changed from icons to static
         expiration: {
           maxEntries: 10,
           maxAgeSeconds: 60 * 60 * 24 * 90, // 90 days for icons

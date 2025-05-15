@@ -25,7 +25,7 @@ export const configureBuild = () => {
         drop_debugger: process.env.NODE_ENV === 'production',
         // Additional optimizations for production
         passes: 2, // Multiple passes for better optimization
-        ecma: 2020, // Modern syntax optimizations
+        ecma: 2020 as any, // Modern syntax optimizations - using any as a workaround
         module: true, // Enable module-specific optimizations
         toplevel: true, // Enable top-level optimizations
         pure_getters: true, // Assume getters are pure
