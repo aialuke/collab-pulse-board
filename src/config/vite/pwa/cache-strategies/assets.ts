@@ -4,6 +4,21 @@ import { CACHE_NAMES } from '../cache-names';
 // Cache strategies for static assets (JS, CSS, images)
 export const getAssetCacheStrategies = () => {
   return [
+    // Specific cache for React core bundle - CacheFirst with long TTL
+    {
+      urlPattern: /\/assets\/react-core-[A-Za-z0-9]+\.js$/i,
+      handler: 'CacheFirst' as const,
+      options: {
+        cacheName: CACHE_NAMES.main,
+        expiration: {
+          maxEntries: 5,
+          maxAgeSeconds: 60 * 60 * 24 * 365, // 365 days for immutable assets
+        },
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
+      },
+    },
     // Specific cache for main JS bundle files - CacheFirst for better performance with long TTL
     {
       urlPattern: /\/assets\/index-[A-Za-z0-9]+\.js$/i,
@@ -73,6 +88,21 @@ export const getAssetCacheStrategies = () => {
         expiration: {
           maxEntries: 100, // Increased from 60
           maxAgeSeconds: 60 * 60 * 24 * 90, // 90 days for images
+        },
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
+      },
+    },
+    // Cache icon SVGs separately - they're frequently used and small
+    {
+      urlPattern: /lucide-icons\.svg$/i,
+      handler: 'CacheFirst' as const,
+      options: {
+        cacheName: CACHE_NAMES.icons,
+        expiration: {
+          maxEntries: 10,
+          maxAgeSeconds: 60 * 60 * 24 * 90, // 90 days for icons
         },
         cacheableResponse: {
           statuses: [0, 200],

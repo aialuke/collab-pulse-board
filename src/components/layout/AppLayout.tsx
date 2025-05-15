@@ -1,19 +1,18 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AppHeader } from './AppHeader';
-import { FloatingFeedbackButton } from '@/components/feedback/FloatingFeedbackButton';
 
-export function AppLayout() {
+// Memoize the AppLayout component to prevent unnecessary re-renders
+const AppLayout = memo(function AppLayout() {
   return (
-    <div className="min-h-screen bg-[#E8F0FE] flex flex-col">
+    <div className="flex flex-col min-h-screen">
       <AppHeader />
-      <main className="flex-1 w-full px-3 py-4 sm:px-4 sm:py-6 overflow-auto">
-        <div className="w-full mx-auto max-w-[600px]">
-          <Outlet />
-        </div>
+      <main className="flex-1 container mx-auto px-4 py-6">
+        <Outlet />
       </main>
-      <FloatingFeedbackButton />
     </div>
   );
-}
+});
+
+export default AppLayout;

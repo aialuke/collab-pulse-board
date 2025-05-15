@@ -1,5 +1,5 @@
 
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useRef, useState, useEffect, memo } from 'react';
 import { LucideProps } from 'lucide-react';
 import { Loader2 } from '@/components/icons';
 
@@ -7,35 +7,59 @@ interface IconProps extends Omit<LucideProps, 'ref'> {
   name: string;
 }
 
-// Icon loading fallback
-const IconFallback = () => (
+// Use a cache to avoid re-importing icons
+const iconCache = new Map<string, React.ComponentType<LucideProps>>();
+
+// Icon loading fallback - memoized to avoid re-renders
+const IconFallback = memo(() => (
   <div className="w-4 h-4 flex items-center justify-center">
     <Loader2 className="h-3 w-3 animate-spin" />
   </div>
-);
+));
+IconFallback.displayName = 'IconFallback';
 
-export function LazyIcon({ name, ...props }: IconProps) {
-  // Dynamically import the icon
-  const ImportedIconRef = React.useRef<React.ComponentType<LucideProps>>();
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(false);
+// Create a memoized version of LazyIcon to prevent unnecessary re-renders
+export const LazyIcon = memo(({ name, ...props }: IconProps) => {
+  // Use refs to track state between renders without causing re-renders
+  const ImportedIconRef = useRef<React.ComponentType<LucideProps>>();
+  const [loading, setLoading] = useState(iconCache.has(name) ? false : true);
+  const [error, setError] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    // Skip loading if we already have this icon in cache
+    if (iconCache.has(name)) {
+      ImportedIconRef.current = iconCache.get(name);
+      setLoading(false);
+      return;
+    }
+    
     setLoading(true);
     setError(false);
     
-    // Import the icon dynamically
-    import('lucide-react')
-      .then((module) => {
+    // Import the icon dynamically with better error handling
+    const importIcon = async () => {
+      try {
+        const module = await import('lucide-react');
         const IconComponent = module[name as keyof typeof module] as React.ComponentType<LucideProps>;
-        ImportedIconRef.current = IconComponent;
-        setLoading(false);
-      })
-      .catch((err) => {
+        
+        if (IconComponent) {
+          // Store in cache for future use
+          iconCache.set(name, IconComponent);
+          ImportedIconRef.current = IconComponent;
+          setLoading(false);
+        } else {
+          console.error(`Icon not found: ${name}`);
+          setError(true);
+          setLoading(false);
+        }
+      } catch (err) {
         console.error(`Error loading icon: ${name}`, err);
         setError(true);
         setLoading(false);
-      });
+      }
+    };
+    
+    importIcon();
   }, [name]);
 
   if (error) return null;
@@ -43,4 +67,6 @@ export function LazyIcon({ name, ...props }: IconProps) {
   
   const IconComponent = ImportedIconRef.current;
   return <IconComponent {...props} />;
-}
+});
+
+LazyIcon.displayName = 'LazyIcon';

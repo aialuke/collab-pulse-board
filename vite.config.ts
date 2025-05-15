@@ -21,7 +21,12 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     },
     plugins: [
       react({
+        // Use faster builds in development with swc
         devTarget: mode === 'production' ? 'es2022' : 'es2020',
+        // Use JSX transform in production to reduce bundle size
+        jsxImportSource: mode === 'production' ? undefined : 'react',
+        // Disable development-only features in production
+        development: mode !== 'production',
       }),
       mode === 'development' && configureDevelopment(),
       configurePWA(),

@@ -73,22 +73,30 @@ if (window.document) {
   document.documentElement.classList.add('fonts-loading');
 }
 
-// Use requestIdleCallback for non-critical initialization
+// Use more efficient initialization approach
 const initApp = () => {
-  const root = createRoot(document.getElementById("root")!);
-  root.render(
-    // Remove StrictMode in production to prevent double-rendering
-    process.env.NODE_ENV === 'development' ? (
+  // Create root only once
+  const rootElement = document.getElementById("root");
+  if (!rootElement) {
+    console.error("Root element not found");
+    return;
+  }
+  
+  const root = createRoot(rootElement);
+  
+  // Disable StrictMode in production to avoid double-rendering
+  if (process.env.NODE_ENV === 'development') {
+    root.render(
       <React.StrictMode>
         <App />
       </React.StrictMode>
-    ) : (
-      <App />
-    )
-  );
+    );
+  } else {
+    root.render(<App />);
+  }
 };
 
-// Use requestIdleCallback for non-critical initialization
+// Defer non-critical initialization
 if ('requestIdleCallback' in window) {
   // @ts-ignore - TypeScript doesn't recognize requestIdleCallback
   window.requestIdleCallback(initApp, { timeout: 1000 });
