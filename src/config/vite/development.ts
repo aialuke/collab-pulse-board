@@ -15,7 +15,7 @@ interface RequestIdleCallbackDeadline {
 type RequestIdleCallbackHandle = number;
 
 // Interface to type-check window access
-interface WindowWithIdleCallback {
+interface WindowWithIdleCallback extends Window {
   requestIdleCallback: (
     callback: (deadline: RequestIdleCallbackDeadline) => void,
     options?: RequestIdleCallbackOptions
@@ -35,9 +35,12 @@ export const configureDevelopment = (): PluginOption => {
     // Load after the initial render
     if (typeof globalThis !== 'undefined' && 
         'window' in globalThis && 
-        globalThis.window && 
-        'requestIdleCallback' in (globalThis.window as Window & typeof globalThis)) {
-      (globalThis.window as unknown as WindowWithIdleCallback).requestIdleCallback(loadDevTools, { timeout: 1000 });
+        typeof globalThis.window === 'object' && 
+        globalThis.window !== null && 
+        'requestIdleCallback' in globalThis.window) {
+      // Safely cast the window object to our interface with requestIdleCallback
+      const win = globalThis.window as unknown as WindowWithIdleCallback;
+      win.requestIdleCallback(loadDevTools, { timeout: 1000 });
     } else {
       setTimeout(loadDevTools, 1000);
     }
@@ -46,4 +49,3 @@ export const configureDevelopment = (): PluginOption => {
   // Return the componentTagger plugin for development only
   return componentTagger();
 };
-
