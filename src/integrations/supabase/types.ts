@@ -27,41 +27,6 @@ export type Database = {
         }
         Relationships: []
       }
-      comments: {
-        Row: {
-          content: string
-          created_at: string
-          feedback_id: string
-          id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          content: string
-          created_at?: string
-          feedback_id: string
-          id?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          feedback_id?: string
-          id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comments_feedback_id_fkey"
-            columns: ["feedback_id"]
-            isOneToOne: false
-            referencedRelation: "feedback"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       feedback: {
         Row: {
           category_id: number
