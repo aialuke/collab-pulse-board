@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { FeedbackContainer } from '@/components/feedback/home/FeedbackContainer';
+import { FloatingFeedbackButton } from '@/components/feedback/FloatingFeedbackButton';
 import { RepostProvider } from '@/contexts/RepostContext';
 import { toast } from '@/hooks/use-toast';
 
@@ -16,6 +17,7 @@ export default function HomePage() {
         });
       }}>
         <FeedbackContainer />
+        <FloatingFeedbackButton />
       </RepostProvider>
     </div>
   );
