@@ -36,7 +36,6 @@ export function CategorySelect({ value, onChange, disabled = false }: CategorySe
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="category">Category</Label>
       <Select
         value={value}
         onValueChange={onChange}
