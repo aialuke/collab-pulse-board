@@ -12,7 +12,6 @@ interface ContentInputProps {
 export function ContentInput({ value, onChange, disabled = false }: ContentInputProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="content">Details</Label>
       <Textarea
         id="content"
         placeholder="Describe your feedback in detail..."
