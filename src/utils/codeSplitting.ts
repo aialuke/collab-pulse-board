@@ -35,8 +35,13 @@ export function lazyWithNamedExport<T extends ComponentType<any>>(
   chunkName: string,
   exportName: string
 ): React.LazyExoticComponent<T> {
+  // Cast the module export to the correct type explicitly
   const LazyComponent = lazy(() => 
-    importFunc().then(module => ({ default: module[exportName] as unknown as React.ComponentType<any> }))
+    importFunc().then(module => {
+      // Type assertion to ensure we're getting the right component type
+      const exportedComponent = module[exportName] as T;
+      return { default: exportedComponent };
+    })
   );
   
   Object.defineProperty(LazyComponent, 'displayName', {
