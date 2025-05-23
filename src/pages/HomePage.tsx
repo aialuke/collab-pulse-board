@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FeedbackContainer } from '@/components/feedback/home/FeedbackContainer';
+import { FeedbackContainer } from '@/features/feedback/components/home/FeedbackContainer';
 import { FloatingFeedbackButton } from '@/components/feedback/FloatingFeedbackButton';
 import { RepostProvider } from '@/contexts/RepostContext';
 import { toast } from '@/hooks/use-toast';
