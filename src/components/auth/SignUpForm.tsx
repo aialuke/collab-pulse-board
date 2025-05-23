@@ -1,10 +1,19 @@
 
-import React, { useState } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SignUpFormValues, signUpSchema } from "@/utils/validation";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { EmailInput } from "./EmailInput";
-import { PasswordInput } from "./PasswordInput";
-import { NameInput } from "./NameInput";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { UserIcon, MailIcon, LockIcon, EyeIcon, EyeOffIcon } from "@/components/icons";
 
 interface SignUpFormProps {
   onSignUp: (name: string, email: string, password: string) => Promise<void>;
@@ -13,72 +22,154 @@ interface SignUpFormProps {
 }
 
 export function SignUpForm({ onSignUp, onToggleForm, isLoading }: SignUpFormProps) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const { toast } = useToast();
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  
+  const form = useForm<SignUpFormValues>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!name || !email || !password || !confirmPassword) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all fields",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (password !== confirmPassword) {
-      toast({
-        title: "Validation Error",
-        description: "Passwords do not match",
-        variant: "destructive",
-      });
-      return;
-    }
-    
+  const handleSubmit = async (values: SignUpFormValues) => {
     try {
-      await onSignUp(name, email, password);
+      await onSignUp(values.name, values.email, values.password);
     } catch (error) {
-      // Error handling is already in the onSignUp function
+      // Error handling is done in the parent component
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="space-y-3">
-        <NameInput
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={isLoading}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-3">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="space-y-1 text-left">
+              <FormLabel className="text-neutral-900">Full Name</FormLabel>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">
+                  <UserIcon className="h-5 w-5" />
+                </div>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="John Doe"
+                    autoComplete="name"
+                    disabled={isLoading}
+                    className="pl-10 border-neutral-200 text-neutral-900 focus:border-teal-500 focus:ring-teal-500"
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
         />
         
-        <EmailInput
-          id="signup-email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={isLoading}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="space-y-1 text-left">
+              <FormLabel className="text-neutral-900">Email</FormLabel>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">
+                  <MailIcon className="h-5 w-5" />
+                </div>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="example@company.com"
+                    autoComplete="email"
+                    disabled={isLoading}
+                    className="pl-10 border-neutral-200 text-neutral-900 focus:border-teal-500 focus:ring-teal-500"
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
         />
         
-        <PasswordInput
-          id="signup-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={isLoading}
-          isNewPassword={true}
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="space-y-1 text-left">
+              <FormLabel className="text-neutral-900">Password</FormLabel>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">
+                  <LockIcon className="h-5 w-5" />
+                </div>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    disabled={isLoading}
+                    className="pl-10 pr-10 border-neutral-200 text-neutral-900 focus:border-teal-500 focus:ring-teal-500"
+                  />
+                </FormControl>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-500 hover:text-teal-600"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOffIcon className="h-5 w-5" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
         />
         
-        <PasswordInput
-          id="confirm-password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          label="Confirm Password"
-          disabled={isLoading}
-          isNewPassword={true}
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem className="space-y-1 text-left">
+              <FormLabel className="text-neutral-900">Confirm Password</FormLabel>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">
+                  <LockIcon className="h-5 w-5" />
+                </div>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    disabled={isLoading}
+                    className="pl-10 pr-10 border-neutral-200 text-neutral-900 focus:border-teal-500 focus:ring-teal-500"
+                  />
+                </FormControl>
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-500 hover:text-teal-600"
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOffIcon className="h-5 w-5" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
         />
         
         <Button
@@ -101,7 +192,7 @@ export function SignUpForm({ onSignUp, onToggleForm, isLoading }: SignUpFormProp
             </button>
           </p>
         </div>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 }

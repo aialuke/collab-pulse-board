@@ -15,9 +15,20 @@ export default function CreateFeedbackPage() {
   const { user } = useAuth();
   
   const { mutate: createFeedback, isPending: isSubmitting } = useCreateFeedbackMutation({
-    onSuccess: () => navigate('/'),
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        description: "Your feedback has been submitted.",
+      });
+      navigate('/');
+    },
     onError: (error) => {
       console.error('Error submitting feedback:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit feedback. Please try again.",
+        variant: "destructive",
+      });
     }
   });
 
