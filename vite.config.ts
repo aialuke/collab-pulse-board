@@ -37,25 +37,8 @@ export default defineConfig(({ mode }: ConfigEnv) => {
           './FeedbackModule': './src/modules/feedback/index.ts',
           './UIModule': './src/modules/ui/index.ts',
         },
-        // Shared dependencies across modules - fixed format according to @originjs/vite-plugin-federation
-        shared: {
-          react: { 
-            eager: true,
-            requiredVersion: '^18.0.0',
-          },
-          'react-dom': { 
-            eager: true,
-            requiredVersion: '^18.0.0',
-          },
-          '@tanstack/react-query': { 
-            eager: true,
-            requiredVersion: '^5.0.0',
-          },
-          'react-router-dom': { 
-            eager: true,
-            requiredVersion: '^6.0.0',
-          }
-        },
+        // Shared dependencies across modules
+        shared: ['react', 'react-dom', '@tanstack/react-query', 'react-router-dom'],
       }),
       mode === 'development' && configureDevelopment(),
       configurePWA(),
