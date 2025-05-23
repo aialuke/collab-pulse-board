@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useRepost } from '@/contexts/RepostContext';
 import { MobileFeedbackView } from './MobileFeedbackView';
@@ -7,8 +7,8 @@ import { DesktopFeedbackView } from './DesktopFeedbackView';
 import { RepostDialog } from '@/components/feedback/repost/RepostDialog';
 import { FeedbackProvider, useFeedback } from '@/hooks/feedback/useFeedbackContext';
 
-// Inner component that uses the feedback context
-function FeedbackContainerInner() {
+// Inner component that uses the feedback context with optimized memoization
+const FeedbackContainerInner = React.memo(function FeedbackContainerInner() {
   const isMobile = useIsMobile();
   
   // Get feedback data and operations from context
@@ -41,8 +41,8 @@ function FeedbackContainerInner() {
     return Promise.resolve(originalHandleRetry());
   };
   
-  // Props shared between mobile and desktop views
-  const viewProps = {
+  // Memoize the view props to prevent unnecessary re-renders
+  const viewProps = useMemo(() => ({
     feedback,
     isLoading,
     loadError: errorMessage,
@@ -57,16 +57,36 @@ function FeedbackContainerInner() {
     handleRetry,
     hasMore,
     total
-  };
+  }), [
+    feedback,
+    isLoading,
+    errorMessage,
+    feedbackToRepost,
+    repostDialogOpen,
+    handleUpvote,
+    handleReport,
+    handleDelete,
+    openRepostDialog,
+    closeRepostDialog,
+    handleRepost,
+    handleRetry,
+    hasMore,
+    total
+  ]);
   
+  // Memoize the appropriate view component based on device type
+  const CurrentView = useMemo(() => 
+    isMobile ? (
+      <MobileFeedbackView {...viewProps} />
+    ) : (
+      <DesktopFeedbackView {...viewProps} />
+    ), [viewProps, isMobile]
+  );
+
   return (
     <>
-      {/* Render the appropriate view based on device type */}
-      {isMobile ? (
-        <MobileFeedbackView {...viewProps} />
-      ) : (
-        <DesktopFeedbackView {...viewProps} />
-      )}
+      {/* Render the memoized view */}
+      {CurrentView}
       
       {/* Add the RepostDialog component */}
       {feedbackToRepost && (
@@ -79,7 +99,7 @@ function FeedbackContainerInner() {
       )}
     </>
   );
-}
+});
 
 // Outer component that provides the feedback context
 export function FeedbackContainer() {

@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useCallback, useMemo } from 'react';
 import { FeedbackType } from '@/types/feedback';
 import { 
   useFeedbackQuery,
@@ -65,30 +65,35 @@ export function FeedbackProvider({
   const prefetchItem = usePrefetchFeedbackItem();
   const { invalidateAll } = useInvalidateFeedbackQueries();
   
-  // Handle mutations
-  const handleUpvote = (id: string) => {
+  // Memoized handlers for better performance
+  const handleUpvote = useCallback((id: string) => {
     upvoteMutation.mutate(id);
-  };
+  }, [upvoteMutation]);
   
-  const handleReport = (id: string) => {
+  const handleReport = useCallback((id: string) => {
     reportMutation.mutate(id);
-  };
+  }, [reportMutation]);
   
-  const handleDelete = (id: string) => {
+  const handleDelete = useCallback((id: string) => {
     deleteMutation.mutate(id);
-  };
+  }, [deleteMutation]);
   
-  const handleRepost = async (id: string, comment: string) => {
+  const handleRepost = useCallback(async (id: string, comment: string) => {
     return repostMutation.mutateAsync({ feedbackId: id, comment });
-  };
+  }, [repostMutation]);
+  
+  const refresh = useCallback(() => {
+    invalidateAll();
+    refetch();
+  }, [invalidateAll, refetch]);
   
   // Extract feedback data or provide defaults
-  const feedback = data?.items || [];
-  const hasMore = data?.hasMore || false;
-  const total = data?.total || 0;
+  const feedback = useMemo(() => data?.items || [], [data?.items]);
+  const hasMore = useMemo(() => data?.hasMore || false, [data?.hasMore]);
+  const total = useMemo(() => data?.total || 0, [data?.total]);
   
-  // Provide the context value
-  const contextValue: FeedbackContextType = {
+  // Memoize the entire context value to prevent unnecessary re-renders
+  const contextValue = useMemo<FeedbackContextType>(() => ({
     feedback,
     isLoading,
     error: error as Error | null,
@@ -98,12 +103,21 @@ export function FeedbackProvider({
     handleReport,
     handleDelete,
     handleRepost,
-    refresh: () => {
-      invalidateAll();
-      refetch();
-    },
+    refresh,
     prefetchItem
-  };
+  }), [
+    feedback,
+    isLoading,
+    error,
+    hasMore,
+    total,
+    handleUpvote,
+    handleReport,
+    handleDelete,
+    handleRepost,
+    refresh,
+    prefetchItem
+  ]);
   
   return (
     <FeedbackContext.Provider value={contextValue}>

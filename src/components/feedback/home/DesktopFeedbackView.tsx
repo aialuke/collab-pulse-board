@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { FeedbackType } from '@/types/feedback';
 import { FeedbackList } from './FeedbackList';
 import { FeedbackEmptyState } from './FeedbackEmptyState';
@@ -19,12 +19,13 @@ interface DesktopFeedbackViewProps {
   openRepostDialog: (feedback: FeedbackType) => void;
   closeRepostDialog: () => void;
   handleRepost: (id: string, comment: string) => Promise<any>;
-  handleRetry: () => void;
+  handleRetry: () => Promise<void>;
   sentinelRef?: React.RefCallback<HTMLDivElement>;
   hasMore: boolean;
+  total?: number;
 }
 
-export function DesktopFeedbackView({
+export const DesktopFeedbackView = memo(function DesktopFeedbackView({
   feedback,
   isLoading,
   loadError,
@@ -38,8 +39,17 @@ export function DesktopFeedbackView({
   handleRepost,
   handleRetry,
   sentinelRef,
-  hasMore
+  hasMore,
+  total
 }: DesktopFeedbackViewProps) {
+  // Function to handle opening the repost dialog with the selected feedback
+  const handleOpenRepostDialog = React.useCallback((id: string) => {
+    const feedbackItem = feedback.find(item => item.id === id);
+    if (feedbackItem) {
+      openRepostDialog(feedbackItem);
+    }
+  }, [feedback, openRepostDialog]);
+
   // Function to render the appropriate content based on loading/error state
   const renderContent = () => {
     if (isLoading && feedback.length === 0) {
@@ -58,12 +68,9 @@ export function DesktopFeedbackView({
             onUpvote={handleUpvote}
             onReport={handleReport}
             onDelete={handleDelete}
-            onRepost={(id) => {
-              const feedbackItem = feedback.find(item => item.id === id);
-              if (feedbackItem) {
-                openRepostDialog(feedbackItem);
-              }
-            }}
+            onRepost={handleOpenRepostDialog}
+            hasMore={hasMore}
+            sentinelRef={sentinelRef}
           />
         ) : (
           <FeedbackEmptyState />
@@ -96,4 +103,4 @@ export function DesktopFeedbackView({
       )}
     </>
   );
-}
+});
