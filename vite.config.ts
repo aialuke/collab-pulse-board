@@ -40,25 +40,33 @@ export default defineConfig(({ mode }: ConfigEnv) => {
           './FeedbackModule': './src/modules/feedback/index.ts',
           './UIModule': './src/modules/ui/index.ts',
         },
-        // Enhanced shared configuration with singleton enforcement
+        // Fix shared configuration to match the expected type format
         shared: {
-          'react': {
-            singleton: true,
+          react: { 
             requiredVersion: '^18.0.0',
-            eager: true
+            shareConfig: { 
+              singleton: true,
+              eager: true
+            }
           },
-          'react-dom': {
-            singleton: true,
-            requiredVersion: '^18.0.0',
-            eager: true
+          'react-dom': { 
+            requiredVersion: '^18.0.0', 
+            shareConfig: { 
+              singleton: true,
+              eager: true
+            }
           },
-          '@tanstack/react-query': {
-            singleton: true,
-            requiredVersion: '^5.0.0'
+          '@tanstack/react-query': { 
+            requiredVersion: '^5.0.0',
+            shareConfig: { 
+              singleton: true 
+            }
           },
-          'react-router-dom': {
-            singleton: true,
-            requiredVersion: '^6.0.0'
+          'react-router-dom': { 
+            requiredVersion: '^6.0.0',
+            shareConfig: { 
+              singleton: true 
+            }
           }
         },
       }),
