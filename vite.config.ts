@@ -1,3 +1,4 @@
+
 import { defineConfig, ConfigEnv, PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -9,6 +10,7 @@ import { configureDevelopment } from "./src/config/vite/development";
 import { configureServer } from "./src/config/vite/server";
 import { splitVendorChunkPlugin } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
+import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => {
@@ -16,6 +18,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
   
   return {
     server: {
+      host: "::",
       port: 8080,
       ...serverConfig
     },
@@ -40,6 +43,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         // Shared dependencies across modules
         shared: ['react', 'react-dom', '@tanstack/react-query', 'react-router-dom'],
       }),
+      mode === 'development' && componentTagger(),
       mode === 'development' && configureDevelopment(),
       configurePWA(),
       ...(mode === 'production' ? configureCompression() : []),
