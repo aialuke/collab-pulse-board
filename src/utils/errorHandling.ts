@@ -1,5 +1,5 @@
 
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 export enum ErrorSeverity {
   INFO = 'info',
@@ -17,25 +17,28 @@ interface ErrorHandlerOptions {
 
 // Create a non-hook based notification function for class components
 export const showErrorNotification = (title: string, description: string, variant: "default" | "destructive" = "destructive") => {
-  // Use setTimeout to ensure this runs after React has finished its work
-  // This avoids invalid hook calls when used in class components
-  setTimeout(() => {
-    try {
-      // Only log to console to avoid React hook issues in class components
-      console.error(`${title}: ${description}`);
-      
-      // Instead of directly using toast which may cause issues in class components,
-      // we'll dispatch a custom event that can be listened to by components using hooks
-      if (typeof window !== 'undefined') {
-        const event = new CustomEvent('app-error', { 
-          detail: { title, description, variant } 
-        });
-        window.dispatchEvent(event);
-      }
-    } catch (err) {
-      console.error('Failed to show error notification:', err);
+  // Directly log to console - this is always safe
+  console.error(`${title}: ${description}`);
+  
+  // Use a safe version of toast that doesn't depend on hooks
+  // The toast function is designed to work outside of React components now
+  try {
+    toast({
+      title,
+      description,
+      variant
+    });
+  } catch (err) {
+    console.error('Failed to show error notification:', err);
+    
+    // Fallback: Create a custom event that the Toaster component can listen for
+    if (typeof window !== 'undefined') {
+      const event = new CustomEvent('app-error', { 
+        detail: { title, description, variant } 
+      });
+      window.dispatchEvent(event);
     }
-  }, 0);
+  }
 };
 
 /**
@@ -59,7 +62,7 @@ export function handleError(
   const formattedMessage = `[${context}] ${errorObject.message}`;
   
   // Add severity to the error object
-  const enhancedError = Object.assign({}, errorObject, { severity });
+  const enhancedError = Object.assign(Object.create(Object.getPrototypeOf(errorObject)), errorObject, { severity });
   
   // Log error with appropriate severity
   switch (severity) {
@@ -77,7 +80,7 @@ export function handleError(
       console.error(formattedMessage, error);
   }
   
-  // Show error notification instead of directly using toast
+  // Use safe notification function
   if (!silent) {
     showErrorNotification(
       severity === ErrorSeverity.CRITICAL ? "Critical Error" : "Error",

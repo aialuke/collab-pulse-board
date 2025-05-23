@@ -143,11 +143,50 @@ type ToastContextType = {
   dispatch: typeof dispatch
 }
 
+// Create a singleton React context
 const ToastContext = React.createContext<ToastContextType>({
   state: memoryState,
   dispatch,
 })
 
+// This creates a singleton toast manager that doesn't depend on hooks
+// outside of components - fixing the multiple React instances issue
+const createToast = (props: Omit<ToasterToast, "id">) => {
+  const id = genId()
+
+  const update = (props: ToasterToast) =>
+    dispatch({
+      type: actionTypes.UPDATE_TOAST,
+      toast: { ...props, id },
+    })
+  
+  const dismiss = () => dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id })
+
+  dispatch({
+    type: actionTypes.ADD_TOAST,
+    toast: {
+      ...props,
+      id,
+      open: true,
+      onOpenChange: (open) => {
+        if (!open) dismiss()
+      },
+    },
+  })
+
+  return {
+    id,
+    dismiss,
+    update,
+  }
+}
+
+// Export a safe toast function that doesn't use hooks
+export const toast = (props: Omit<ToasterToast, "id">) => {
+  return createToast(props);
+}
+
+// Component-based hook
 export function useToast() {
   const { dispatch } = React.useContext(ToastContext)
 
@@ -176,7 +215,7 @@ export function useToast() {
         })
 
         return {
-          id: id,
+          id,
           dismiss,
           update,
         }
@@ -189,12 +228,7 @@ export function useToast() {
   )
 }
 
-// Export a simple toast function for direct usage
-export const toast = (props: Omit<ToasterToast, "id">) => {
-  const { toast } = useToast()
-  return toast(props)
-}
-
+// Toaster component hook - only used within React component tree
 export function useToaster() {
   const [state, setState] = React.useState<State>(memoryState)
 

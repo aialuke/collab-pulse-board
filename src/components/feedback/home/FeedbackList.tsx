@@ -12,11 +12,10 @@ interface FeedbackListProps {
   onDelete?: (id: string) => void;
   onRepost?: (id: string) => void;
   hasMore?: boolean;
-  // Update the type to accept either a RefCallback or a RefObject
   sentinelRef?: React.RefCallback<HTMLDivElement> | React.RefObject<HTMLDivElement>;
 }
 
-// Memoized row component for virtualized list
+// Fixed Row component that properly handles refs
 const Row = memo(function Row({ 
   index, 
   style, 
@@ -38,13 +37,23 @@ const Row = memo(function Row({
   
   // Special case for the last item which contains the sentinel for infinite loading
   if (hasMore && index === feedback.length) {
-    // Create a div element for the sentinel
-    // Make sure we're handling both RefCallback and RefObject types
-    const sentinelProps = typeof sentinelRef === 'function' 
-      ? { ref: sentinelRef }  // It's a callback ref
-      : { ref: sentinelRef }; // It's a RefObject
-    
-    return <div {...sentinelProps} style={style} className="h-16 flex items-center justify-center" />;
+    // Create a div element that properly handles different ref types
+    return (
+      <div 
+        style={style} 
+        className="h-16 flex items-center justify-center"
+        ref={ref => {
+          // Handle both callback refs and RefObject refs
+          if (typeof sentinelRef === 'function') {
+            sentinelRef(ref);
+          } else if (sentinelRef && 'current' in sentinelRef) {
+            // RefObject case - manually set current property
+            // @ts-ignore - we know this is safe
+            sentinelRef.current = ref;
+          }
+        }}
+      />
+    );
   }
   
   const item = feedback[index];
@@ -84,7 +93,7 @@ export const FeedbackList = memo(function FeedbackList({
     if (listRef.current && feedback.length === 0) {
       listRef.current.scrollToItem(0);
     }
-  }, [feedback.length === 0]);
+  }, [feedback.length]);
   
   // Don't use virtualization for small lists (improves SEO and initial render)
   if (feedback.length <= 10) {
@@ -102,13 +111,18 @@ export const FeedbackList = memo(function FeedbackList({
         ))}
         {hasMore && (
           <div 
-            // Create sentinel element, safely handling different ref types 
-            {...(typeof sentinelRef === 'function' 
-              ? { ref: sentinelRef }  // It's a callback ref
-              : { ref: sentinelRef } // It's a RefObject
-            )}
             className="h-4" 
-            aria-hidden="true" 
+            aria-hidden="true"
+            ref={ref => {
+              // Handle both callback refs and RefObject refs
+              if (typeof sentinelRef === 'function') {
+                sentinelRef(ref);
+              } else if (sentinelRef && 'current' in sentinelRef) {
+                // RefObject case - manually set current property
+                // @ts-ignore - we know this is safe
+                sentinelRef.current = ref;
+              }
+            }}
           />
         )}
       </div>

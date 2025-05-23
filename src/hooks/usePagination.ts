@@ -16,7 +16,6 @@ export function usePagination<T>({ pageSize = 10, initialData = [] }: UsePaginat
   
   // Create a stable ref object for the sentinel
   const internalObserver = useRef<IntersectionObserver | null>(null);
-  const sentinelRefObject = useRef<HTMLElement | null>(null);
   
   // Create a stable callback ref function that will be used as sentinelRef
   const sentinelRef = useCallback((node: HTMLElement | null) => {
@@ -28,9 +27,6 @@ export function usePagination<T>({ pageSize = 10, initialData = [] }: UsePaginat
       internalObserver.current = null;
     }
     
-    // Store the node in our ref
-    sentinelRefObject.current = node;
-
     // Only create a new observer if we have a node and there's more content to load
     if (node && hasMore) {
       // Create new observer

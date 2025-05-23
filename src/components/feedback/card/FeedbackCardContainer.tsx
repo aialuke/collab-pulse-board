@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FeedbackCard } from './FeedbackCard';
 import { FeedbackType } from '@/types/feedback';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,9 +23,16 @@ export function FeedbackCardContainer({
   const [isUpvoted, setIsUpvoted] = useState(feedback.isUpvoted || false);
   const [upvotes, setUpvotes] = useState(feedback.upvotes);
 
-  const isManager = user?.role === 'manager' || user?.role === 'admin';
-  const isAuthor = user?.id === feedback.author?.id;
-  const isOwnFeedback = isAuthor;
+  // Memoize these values to prevent unnecessary re-renders
+  const userInfo = useMemo(() => {
+    const isManager = user?.role === 'manager' || user?.role === 'admin';
+    const isAuthor = user?.id === feedback.author?.id;
+    const isOwnFeedback = isAuthor;
+    
+    return { isManager, isAuthor, isOwnFeedback };
+  }, [user, feedback.author]);
+  
+  const { isManager, isAuthor, isOwnFeedback } = userInfo;
 
   const handleUpvote = () => {
     // Don't process upvotes for reposts

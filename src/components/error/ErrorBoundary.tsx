@@ -35,8 +35,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     // Log the error to an error reporting service
     console.error('Error caught by ErrorBoundary:', error, errorInfo);
     
-    // Use the utility function to show an error notification
-    // This avoids React hook usage issues in class components
+    // Use the helper function that doesn't rely on React hooks
     showErrorNotification(
       "An error occurred", 
       error.message || "Something went wrong"
