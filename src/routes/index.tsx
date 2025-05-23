@@ -1,6 +1,6 @@
 
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { TermsOfUseDialog } from '@/components/terms/TermsOfUseDialog';
 import { RouteErrorBoundary } from '@/components/error/RouteErrorBoundary';
@@ -8,8 +8,9 @@ import { RouteErrorBoundary } from '@/components/error/RouteErrorBoundary';
 // Loading state component
 const PageLoading = lazy(() => import(/* webpackChunkName: "page-loading" */ './PageLoading'));
 
-// Lazy-loaded layout components
+// Lazy-loaded layouts
 const AppLayout = lazy(() => import(/* webpackChunkName: "app-layout" */ '@/components/common/layout/AppLayout'));
+const AuthLayout = lazy(() => import(/* webpackChunkName: "auth-layout" */ '@/components/auth/AuthLayout'));
 
 // Lazy-loaded page components with named chunks for better debugging
 const HomePage = lazy(() => 
@@ -35,6 +36,7 @@ const NotFound = lazy(() =>
 export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [showTerms, setShowTerms] = React.useState(false);
+  const location = useLocation();
 
   React.useEffect(() => {
     // Only show terms dialog if user is authenticated and hasn't accepted terms
@@ -50,7 +52,8 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    // Save the location they were trying to access
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   return (
@@ -61,28 +64,45 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   );
 };
 
-export const AppRoutes: React.FC = () => {
+// Public route - redirects to home if authenticated
+export const PublicOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+  
+  // Get the location they were trying to access before being redirected to login
+  const from = location.state?.from?.pathname || '/';
 
   if (isLoading) {
     return <PageLoading />;
   }
 
+  if (isAuthenticated) {
+    return <Navigate to={from} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+export const AppRoutes: React.FC = () => {
   return (
     <Routes>
+      {/* Public routes */}
       <Route 
         path="/login" 
         element={
-          isAuthenticated ? 
-          <Navigate to="/" replace /> : 
-          <Suspense fallback={<PageLoading />}>
-            <RouteErrorBoundary>
-              <LoginPage />
-            </RouteErrorBoundary>
-          </Suspense>
+          <PublicOnlyRoute>
+            <Suspense fallback={<PageLoading />}>
+              <AuthLayout>
+                <RouteErrorBoundary>
+                  <LoginPage />
+                </RouteErrorBoundary>
+              </AuthLayout>
+            </Suspense>
+          </PublicOnlyRoute>
         } 
       />
       
+      {/* Protected routes */}
       <Route
         path="/"
         element={
@@ -115,6 +135,7 @@ export const AppRoutes: React.FC = () => {
         } />
       </Route>
       
+      {/* 404 route */}
       <Route path="*" element={
         <Suspense fallback={<PageLoading />}>
           <RouteErrorBoundary>

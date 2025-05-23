@@ -1,5 +1,5 @@
 
-import type { User as SupabaseUser, Session, AuthResponse, WeakPassword } from '@supabase/supabase-js';
+import type { User as SupabaseUser, Session, AuthResponse } from '@supabase/supabase-js';
 
 export type UserRole = 'user' | 'manager' | 'admin';
 
@@ -16,8 +16,10 @@ export type User = {
 export type AuthContextType = {
   user: User | null;
   supabaseUser: SupabaseUser | null;
+  session: Session | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  authError: Error | null;
   login: (email: string, password: string) => Promise<AuthResponse>;
   signup: (name: string, email: string, password: string) => Promise<AuthResponse>;
   logout: () => Promise<void>;

@@ -12,17 +12,32 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogOut, User } from '@/components/icons';
+import { LogOut, User as UserIcon } from '@/components/icons';
+import { useToast } from '@/hooks/use-toast';
 
 export function UserMenu() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const isManager = user?.role === 'manager' || user?.role === 'admin';
   
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out.",
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Sign out failed",
+        description: "There was a problem signing you out. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -48,7 +63,7 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-neutral-200" />
         <DropdownMenuItem className="hover:bg-royal-blue-500/10" onClick={() => navigate('/profile')}>
-          <User className="mr-2 h-4 w-4" />
+          <UserIcon className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-neutral-200" />
