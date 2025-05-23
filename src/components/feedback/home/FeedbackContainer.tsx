@@ -89,7 +89,7 @@ const FeedbackContainerInner = React.memo(function FeedbackContainerInner() {
   
   return (
     <>
-      <Suspense fallback={<FeedbackSkeleton count={3} />}>
+      <Suspense fallback={<FeedbackSkeleton />}>
         {isMobile ? (
           <MobileFeedbackView {...viewProps} />
         ) : (
