@@ -33,11 +33,14 @@ function FeedbackContainerInner() {
     closeRepostDialog
   } = useRepost();
   
+  // Convert the Error object to string for the view components
+  const errorMessage = loadError ? loadError.message || 'An error occurred' : null;
+  
   // Props shared between mobile and desktop views
   const viewProps = {
     feedback,
     isLoading,
-    loadError,
+    loadError: errorMessage,
     feedbackToRepost,
     repostDialogOpen,
     handleUpvote,
