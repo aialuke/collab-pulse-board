@@ -41,24 +41,10 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         },
         // Update shared configuration to match the expected type structure
         shared: {
-          react: {
-            requiredVersion: '^18.0.0',
-            singleton: true,
-            eager: true
-          },
-          'react-dom': {
-            requiredVersion: '^18.0.0',
-            singleton: true,
-            eager: true
-          },
-          '@tanstack/react-query': {
-            requiredVersion: '^5.0.0',
-            singleton: true
-          },
-          'react-router-dom': {
-            requiredVersion: '^6.0.0',
-            singleton: true
-          }
+          react: { requiredVersion: '^18.0.0' },
+          'react-dom': { requiredVersion: '^18.0.0' },
+          '@tanstack/react-query': { requiredVersion: '^5.0.0' },
+          'react-router-dom': { requiredVersion: '^6.0.0' }
         },
       }),
       mode === 'development' && componentTagger(),
