@@ -1,22 +1,40 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-interface UsePaginationOptions<T = any> {
+interface UsePaginationOptions<T = unknown> {
   pageSize?: number;
-  initialData?: T[];  // Add initialData property to the interface
+  initialData?: T[];
 }
 
-export function usePagination<T>({ pageSize = 10, initialData = [] }: UsePaginationOptions<T> = {}) {
+interface PaginationResult<T> {
+  page: number;
+  items: T[];
+  setItems: React.Dispatch<React.SetStateAction<T[]>>;
+  isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  hasMore: boolean;
+  setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
+  error: string | null;
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  sentinelRef: (node: HTMLElement | null) => void;
+  reset: () => void;
+  total: number;
+  setTotal: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export function usePagination<T>({ 
+  pageSize = 10, 
+  initialData = [] 
+}: UsePaginationOptions<T> = {}): PaginationResult<T> {
   const [page, setPage] = useState<number>(1);
-  const [items, setItems] = useState<T[]>(initialData); // Initialize with initialData if provided
+  const [items, setItems] = useState<T[]>(initialData);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // Add a state for total items count
   const [total, setTotal] = useState<number>(0);
 
   const observer = useRef<IntersectionObserver | null>(null);
+  
   const sentinelRef = useCallback(
     (node: HTMLElement | null) => {
       if (isLoading) return;

@@ -6,16 +6,18 @@ export interface CompressionStats {
   originalSize: number;
   compressedSize: number;
   compressionRatio: number;
-  outputFormat?: string; // Added output format field
+  outputFormat?: string;
+}
+
+interface ImageCompressionResult {
+  compressedImage: string;
+  compressionStats: CompressionStats | null;
 }
 
 export const useImageCompression = () => {
   const { toast } = useToast();
 
-  const compressImageFile = async (file: File): Promise<{
-    compressedImage: string;
-    compressionStats: CompressionStats | null;
-  }> => {
+  const compressImageFile = async (file: File): Promise<ImageCompressionResult> => {
     if (file.size > 10 * 1024 * 1024) {
       toast({
         title: "File too large",
@@ -33,7 +35,7 @@ export const useImageCompression = () => {
         originalSize: result.originalSize,
         compressedSize: result.compressedSize,
         compressionRatio: result.compressionRatio,
-        outputFormat: result.outputFormat // Include the output format
+        outputFormat: result.outputFormat
       };
       
       toast({
@@ -54,13 +56,17 @@ export const useImageCompression = () => {
       });
       
       // Fallback to original image loading
-      const reader = new FileReader();
-      return new Promise((resolve, reject) => {
+      return new Promise<ImageCompressionResult>((resolve, reject) => {
+        const reader = new FileReader();
         reader.onloadend = () => {
-          resolve({
-            compressedImage: reader.result as string,
-            compressionStats: null
-          });
+          if (typeof reader.result === 'string') {
+            resolve({
+              compressedImage: reader.result,
+              compressionStats: null
+            });
+          } else {
+            reject(new Error("Failed to read file as data URL"));
+          }
         };
         reader.onerror = reject;
         reader.readAsDataURL(file);

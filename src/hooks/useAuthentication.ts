@@ -7,7 +7,20 @@ import { fetchUserProfile, updateTermsAcceptance } from '@/services/profileServi
 import { signInWithEmailAndPassword, signUpWithEmailAndPassword, signOut } from '@/services/authService';
 import { cleanupAuthState } from '@/utils/authUtils';
 
-export function useAuthentication() {
+interface UseAuthenticationResult {
+  user: AppUser | null;
+  supabaseUser: User | null;
+  session: any | null; // Keeping as any since the session type is complex
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  authError: Error | null;
+  login: (email: string, password: string) => Promise<AuthResponse>;
+  signup: (name: string, email: string, password: string) => Promise<AuthResponse>;
+  logout: () => Promise<void>;
+  acceptTerms: (acceptedTerms: boolean) => Promise<void>;
+}
+
+export function useAuthentication(): UseAuthenticationResult {
   const [user, setUser] = useState<AppUser | null>(null);
   const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
   const [session, setSession] = useState<any>(null);
@@ -98,10 +111,11 @@ export function useAuthentication() {
       }
       
       return response;
-    } catch (error: any) {
-      console.error('Login failed:', error);
-      setAuthError(error instanceof Error ? error : new Error(error.message || 'Login failed'));
-      throw error;
+    } catch (error: unknown) {
+      const typedError = error instanceof Error ? error : new Error(String(error));
+      console.error('Login failed:', typedError);
+      setAuthError(typedError);
+      throw typedError;
     } finally {
       setIsLoading(false);
     }
@@ -122,10 +136,11 @@ export function useAuthentication() {
       }
       
       return response;
-    } catch (error: any) {
-      console.error('Signup failed:', error);
-      setAuthError(error instanceof Error ? error : new Error(error.message || 'Signup failed'));
-      throw error;
+    } catch (error: unknown) {
+      const typedError = error instanceof Error ? error : new Error(String(error));
+      console.error('Signup failed:', typedError);
+      setAuthError(typedError);
+      throw typedError;
     } finally {
       setIsLoading(false);
     }
@@ -137,9 +152,11 @@ export function useAuthentication() {
     
     try {
       await signOut();
-    } catch (error: any) {
-      console.error('Logout failed:', error);
-      setAuthError(error instanceof Error ? error : new Error(error.message || 'Logout failed'));
+    } catch (error: unknown) {
+      const typedError = error instanceof Error ? error : new Error(String(error));
+      console.error('Logout failed:', typedError);
+      setAuthError(typedError);
+      throw typedError;
     } finally {
       setIsLoading(false);
     }
@@ -161,10 +178,11 @@ export function useAuthentication() {
         hasAcceptedTerms: accepted,
         termsAcceptedAt: accepted ? new Date().toISOString() : undefined,
       });
-    } catch (error: any) {
-      console.error('Failed to update terms acceptance:', error);
-      setAuthError(error instanceof Error ? error : new Error(error.message || 'Failed to update terms'));
-      throw error;
+    } catch (error: unknown) {
+      const typedError = error instanceof Error ? error : new Error(String(error));
+      console.error('Failed to update terms acceptance:', typedError);
+      setAuthError(typedError);
+      throw typedError;
     }
   };
 

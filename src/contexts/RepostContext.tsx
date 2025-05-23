@@ -13,6 +13,11 @@ interface RepostContextType {
   handleRepost: (id: string, comment: string) => Promise<FeedbackType>;
 }
 
+interface RepostProviderProps {
+  children: ReactNode;
+  onRepostSuccess?: (feedback: FeedbackType) => void;
+}
+
 const RepostContext = createContext<RepostContextType | undefined>(undefined);
 
 export function useRepost(): RepostContextType {
@@ -23,19 +28,14 @@ export function useRepost(): RepostContextType {
   return context;
 }
 
-interface RepostProviderProps {
-  children: ReactNode;
-  onRepostSuccess?: (feedback: FeedbackType) => void;
-}
-
-export function RepostProvider({ children, onRepostSuccess }: RepostProviderProps) {
+export function RepostProvider({ children, onRepostSuccess }: RepostProviderProps): JSX.Element {
   const [repostDialogOpen, setRepostDialogOpen] = useState(false);
   const [feedbackToRepost, setFeedbackToRepost] = useState<FeedbackType | null>(null);
   const { toast } = useToast();
   const { isAuthenticated, user } = useAuth();
   const isManager = user?.role === 'manager' || user?.role === 'admin';
 
-  const openRepostDialog = (feedback: FeedbackType) => {
+  const openRepostDialog = (feedback: FeedbackType): void => {
     if (!isManager) {
       toast({
         title: "Permission denied",
@@ -49,19 +49,20 @@ export function RepostProvider({ children, onRepostSuccess }: RepostProviderProp
     setRepostDialogOpen(true);
   };
 
-  const closeRepostDialog = () => {
+  const closeRepostDialog = (): void => {
     setRepostDialogOpen(false);
     setFeedbackToRepost(null);
   };
 
   const handleRepost = async (id: string, comment: string): Promise<FeedbackType> => {
     if (!isAuthenticated || !isManager) {
+      const error = new Error("Permission denied");
       toast({
         title: "Permission denied",
         description: "Only managers can repost feedback.",
         variant: "destructive",
       });
-      throw new Error("Permission denied");
+      throw error;
     }
 
     try {
@@ -80,17 +81,18 @@ export function RepostProvider({ children, onRepostSuccess }: RepostProviderProp
       closeRepostDialog();
       return repostedFeedback;
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to repost feedback. Please try again.";
       console.error(`Error reposting feedback ${id}:`, error);
       toast({
         title: "Error",
-        description: "Failed to repost feedback. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
       throw error;
     }
   };
 
-  const value = {
+  const value: RepostContextType = {
     repostDialogOpen,
     feedbackToRepost,
     openRepostDialog,

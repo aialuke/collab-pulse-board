@@ -15,13 +15,17 @@ interface ErrorHandlerOptions {
   userMessage?: string;
 }
 
+interface EnhancedError extends Error {
+  severity: ErrorSeverity;
+}
+
 /**
  * Standard error handler function to handle errors consistently across the application
  */
 export function handleError(
   error: unknown,
   options: ErrorHandlerOptions = {}
-): Error {
+): EnhancedError {
   const {
     silent = false,
     severity = ErrorSeverity.ERROR,
@@ -30,13 +34,13 @@ export function handleError(
   } = options;
   
   // Convert to Error object if it's not already
-  const errorObject = error instanceof Error ? error : new Error(String(error));
+  const errorObject: Error = error instanceof Error ? error : new Error(String(error));
   
   // Format the error message with context
   const formattedMessage = `[${context}] ${errorObject.message}`;
   
   // Add severity to the error object
-  const enhancedError = Object.assign(errorObject, { severity });
+  const enhancedError = Object.assign(errorObject, { severity }) as EnhancedError;
   
   // Log error with appropriate severity
   switch (severity) {

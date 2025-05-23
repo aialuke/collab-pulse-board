@@ -4,13 +4,19 @@ import { toggleUpvote, reportFeedback, deleteFeedback } from '@/services/feedbac
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
+interface FeedbackActions {
+  handleUpvote: (id: string) => Promise<void>;
+  handleReport: (id: string) => Promise<void>;
+  handleDelete: (id: string) => Promise<void>;
+}
+
 export function useFeedbackActions(
   setFeedback: React.Dispatch<React.SetStateAction<FeedbackType[]>>
-) {
+): FeedbackActions {
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
 
-  const handleUpvote = async (id: string) => {
+  const handleUpvote = async (id: string): Promise<void> => {
     if (!isAuthenticated) {
       toast({
         title: "Authentication required",
@@ -35,17 +41,18 @@ export function useFeedbackActions(
             : item
         )
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update upvote. Please try again.";
       console.error(`Error upvoting feedback ${id}:`, error);
       toast({
         title: "Error",
-        description: error.message || "Failed to update upvote. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
   };
 
-  const handleReport = async (id: string) => {
+  const handleReport = async (id: string): Promise<void> => {
     try {
       await reportFeedback(id);
       toast({
@@ -62,7 +69,7 @@ export function useFeedbackActions(
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string): Promise<void> => {
     try {
       await deleteFeedback(id);
       

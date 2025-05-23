@@ -32,17 +32,19 @@ interface FeedbackContextType {
   prefetchItem: (id: string) => void;
 }
 
+interface FeedbackProviderProps {
+  children: ReactNode;
+  pageSize?: number;
+  staleTime?: number;
+}
+
 const FeedbackContext = createContext<FeedbackContextType | null>(null);
 
 export function FeedbackProvider({ 
   children,
   pageSize = 10,
   staleTime = 30 * 1000,
-}: { 
-  children: ReactNode;
-  pageSize?: number;
-  staleTime?: number;
-}) {
+}: FeedbackProviderProps) {
   // Use the dedicated query hook
   const { 
     data,
@@ -126,7 +128,7 @@ export function FeedbackProvider({
   );
 }
 
-export function useFeedback() {
+export function useFeedback(): FeedbackContextType {
   const context = useContext(FeedbackContext);
   
   if (!context) {

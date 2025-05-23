@@ -5,7 +5,18 @@ import { FeedbackType } from '@/types/feedback';
 import { fetchFeedback } from '@/services/feedbackService';
 import { useQuery } from '@tanstack/react-query';
 
-export function useFeedbackData() {
+interface UseFeedbackDataResult {
+  feedback: FeedbackType[];
+  setFeedback: React.Dispatch<React.SetStateAction<FeedbackType[]>>;
+  filteredFeedback: FeedbackType[];
+  setFilteredFeedback: React.Dispatch<React.SetStateAction<FeedbackType[]>>;
+  isLoading: boolean;
+  loadError: string | null;
+  handleRetry: () => void;
+  loadFeedback: () => Promise<void>;
+}
+
+export function useFeedbackData(): UseFeedbackDataResult {
   const [feedback, setFeedback] = useState<FeedbackType[]>([]);
   const [filteredFeedback, setFilteredFeedback] = useState<FeedbackType[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);

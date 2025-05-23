@@ -23,16 +23,18 @@ export function extractCategoryName(categories: { name: string } | null | undefi
   return categories?.name || 'Uncategorized';
 }
 
+interface ProfileInfo {
+  name: string;
+  avatarUrl?: string;
+  role?: string;
+  id?: string;
+}
+
 /**
  * Safely extract profile information
  * Optimized to reduce object creation
  */
-export function extractProfileInfo(profiles: any): { 
-  name: string; 
-  avatarUrl?: string; 
-  role?: string;
-  id?: string;
-} {
+export function extractProfileInfo(profiles: unknown): ProfileInfo {
   // Early return for invalid profile data
   if (!profiles || typeof profiles !== 'object' || !('name' in profiles)) {
     return {
@@ -43,28 +45,41 @@ export function extractProfileInfo(profiles: any): {
     };
   }
   
+  const typedProfiles = profiles as Record<string, unknown>;
+  
   // Return profile info directly
   return {
-    name: profiles.name || 'Unknown User',
-    avatarUrl: profiles.avatar_url || undefined,
-    role: profiles.role || 'user',
-    id: profiles.id
+    name: typeof typedProfiles.name === 'string' ? typedProfiles.name : 'Unknown User',
+    avatarUrl: typeof typedProfiles.avatar_url === 'string' ? typedProfiles.avatar_url : undefined,
+    role: typeof typedProfiles.role === 'string' ? typedProfiles.role : 'user',
+    id: typeof typedProfiles.id === 'string' ? typedProfiles.id : undefined
   };
+}
+
+interface ValidProfileResponse {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  role: string | null;
 }
 
 /**
  * Type guard to check if an object is a valid profile response
  */
-export function isValidProfileResponse(profiles: any): profiles is {
-  id: string;
-  name: string;
-  avatar_url: string | null;
-  role: string | null;
-} {
-  return profiles && 
-         typeof profiles === 'object' && 
-         !('error' in profiles) &&
-         'name' in profiles;
+export function isValidProfileResponse(profiles: unknown): profiles is ValidProfileResponse {
+  if (!profiles || typeof profiles !== 'object') return false;
+  
+  const p = profiles as Record<string, unknown>;
+  
+  return (
+    !('error' in p) &&
+    'name' in p &&
+    'id' in p &&
+    typeof p.id === 'string' &&
+    typeof p.name === 'string' &&
+    (p.avatar_url === null || typeof p.avatar_url === 'string') &&
+    (p.role === null || typeof p.role === 'string')
+  );
 }
 
 /**

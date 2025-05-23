@@ -15,17 +15,22 @@ export interface FormSubmitOptions<TData, TResponse> {
   errorMessage?: string;
 }
 
-export function useFormSubmit<TData, TResponse = any>({
+export interface FormSubmitResult<TData, TResponse> {
+  isSubmitting: boolean;
+  handleSubmit: (data: TData) => Promise<TResponse>;
+}
+
+export function useFormSubmit<TData, TResponse = unknown>({
   onSubmit,
   onSuccess,
   onError,
   successMessage = 'Form submitted successfully',
   errorMessage = 'An error occurred. Please try again.',
-}: FormSubmitOptions<TData, TResponse>) {
+}: FormSubmitOptions<TData, TResponse>): FormSubmitResult<TData, TResponse> {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = async (data: TData) => {
+  const handleSubmit = async (data: TData): Promise<TResponse> => {
     setIsSubmitting(true);
     
     try {
