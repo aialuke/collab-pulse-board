@@ -20,7 +20,7 @@ function FeedbackContainerInner() {
     handleUpvote, 
     handleReport, 
     handleDelete,
-    refresh: handleRetry,
+    refresh: originalHandleRetry,
     total
   } = useFeedback();
   
@@ -35,6 +35,11 @@ function FeedbackContainerInner() {
   
   // Convert the Error object to string for the view components
   const errorMessage = loadError ? loadError.message || 'An error occurred' : null;
+  
+  // Wrap handleRetry to ensure it returns a Promise
+  const handleRetry = async (): Promise<void> => {
+    return Promise.resolve(originalHandleRetry());
+  };
   
   // Props shared between mobile and desktop views
   const viewProps = {
