@@ -12,7 +12,8 @@ interface FeedbackListProps {
   onDelete?: (id: string) => void;
   onRepost?: (id: string) => void;
   hasMore?: boolean;
-  sentinelRef?: React.RefObject<HTMLDivElement>;
+  // Update the type to accept either a RefCallback or a RefObject
+  sentinelRef?: React.RefCallback<HTMLDivElement> | React.RefObject<HTMLDivElement>;
 }
 
 // Memoized row component for virtualized list
@@ -30,7 +31,7 @@ const Row = memo(function Row({
     onDelete?: (id: string) => void;
     onRepost?: (id: string) => void;
     hasMore?: boolean;
-    sentinelRef?: React.RefObject<HTMLDivElement>;
+    sentinelRef?: React.RefCallback<HTMLDivElement> | React.RefObject<HTMLDivElement>;
   }
 }) {
   const { feedback, onUpvote, onReport, onDelete, onRepost, hasMore, sentinelRef } = data;
