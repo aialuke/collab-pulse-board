@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { FeedbackType } from '@/types/feedback';
 import { handleApiError } from '../api/apiUtils';
@@ -266,25 +265,49 @@ export async function fetchFeedback({
     const processedFeedback = feedbackData.map(item => {
       const author = profilesMap[item.user_id];
       const isRepost = Boolean(item.is_repost);
-      const originalPost = isRepost && item.original_post_id && originalPostsMap[item.original_post_id] 
-        ? {
-            id: originalPostsMap[item.original_post_id].id,
-            title: originalPostsMap[item.original_post_id].title || undefined,
-            content: originalPostsMap[item.original_post_id].content,
-            author: {
-              id: originalPostsMap[item.original_post_id].user_id,
-              name: originalPostsMap[item.original_post_id].profiles?.name || 'Unknown User',
-              avatarUrl: originalPostsMap[item.original_post_id].profiles?.avatar_url || undefined,
-            },
-            category: originalPostsMap[item.original_post_id].categories?.name || 'Uncategorized',
-            categoryId: originalPostsMap[item.original_post_id].category_id,
-            createdAt: new Date(originalPostsMap[item.original_post_id].created_at),
-            upvotes: originalPostsMap[item.original_post_id].upvotes_count,
-            imageUrl: originalPostsMap[item.original_post_id].image_url || undefined,
-            linkUrl: originalPostsMap[item.original_post_id].link_url || undefined,
-            isUpvoted: Boolean(userUpvotes[originalPostsMap[item.original_post_id].id]),
-          }
-        : undefined;
+      
+      // Helper function to safely extract author information
+      const getAuthorInfo = (profile: ProfileResponse | null | undefined | { error: true } & String) => {
+        // If it's a valid profile with required fields
+        if (profile && typeof profile === 'object' && 'name' in profile) {
+          return {
+            name: profile.name || 'Unknown User',
+            avatarUrl: profile.avatar_url || undefined
+          };
+        }
+        // Default fallback
+        return {
+          name: 'Unknown User',
+          avatarUrl: undefined
+        };
+      };
+
+      let originalPost = undefined;
+      if (isRepost && item.original_post_id && originalPostsMap[item.original_post_id]) {
+        const originalData = originalPostsMap[item.original_post_id];
+        const originalAuthorInfo = getAuthorInfo(originalData.profiles);
+        
+        originalPost = {
+          id: originalData.id,
+          title: originalData.title || undefined,
+          content: originalData.content,
+          author: {
+            id: originalData.user_id,
+            name: originalAuthorInfo.name,
+            avatarUrl: originalAuthorInfo.avatarUrl,
+          },
+          category: originalData.categories?.name || 'Uncategorized',
+          categoryId: originalData.category_id,
+          createdAt: new Date(originalData.created_at),
+          upvotes: originalData.upvotes_count,
+          imageUrl: originalData.image_url || undefined,
+          linkUrl: originalData.link_url || undefined,
+          isUpvoted: Boolean(userUpvotes[originalData.id]),
+        };
+      }
+
+      // Get author info safely
+      const authorInfo = getAuthorInfo(author);
 
       return {
         id: item.id,
@@ -292,8 +315,8 @@ export async function fetchFeedback({
         content: item.content,
         author: {
           id: item.user_id,
-          name: author?.name || 'Unknown User',
-          avatarUrl: author?.avatar_url || undefined,
+          name: authorInfo.name,
+          avatarUrl: authorInfo.avatarUrl,
         },
         category: item.categories?.name || 'Uncategorized',
         categoryId: item.category_id,
@@ -355,8 +378,26 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
       fetchProfiles([feedbackData.user_id])
     ]);
 
+    // Helper function to safely extract author information
+    const getAuthorInfo = (profile: ProfileResponse | null | undefined | { error: true } & String) => {
+      // If it's a valid profile with required fields
+      if (profile && typeof profile === 'object' && 'name' in profile) {
+        return {
+          name: profile.name || 'Unknown User',
+          avatarUrl: profile.avatar_url || undefined
+        };
+      }
+      // Default fallback
+      return {
+        name: 'Unknown User',
+        avatarUrl: undefined
+      };
+    };
+
     // Get author info
     const author = profilesMap[feedbackData.user_id];
+    const authorInfo = getAuthorInfo(author);
+    
     const isRepost = Boolean(feedbackData.is_repost);
     
     // Fetch original post if this is a repost
@@ -367,14 +408,16 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
       
       if (originalPostData) {
         const originalAuthor = await fetchProfiles([originalPostData.user_id]);
+        const originalAuthorInfo = getAuthorInfo(originalAuthor[originalPostData.user_id]);
+        
         originalPost = {
           id: originalPostData.id,
           title: originalPostData.title || undefined,
           content: originalPostData.content,
           author: {
             id: originalPostData.user_id,
-            name: originalAuthor[originalPostData.user_id]?.name || 'Unknown User',
-            avatarUrl: originalAuthor[originalPostData.user_id]?.avatar_url || undefined,
+            name: originalAuthorInfo.name,
+            avatarUrl: originalAuthorInfo.avatarUrl,
           },
           category: originalPostData.categories?.name || 'Uncategorized',
           categoryId: originalPostData.category_id,
@@ -394,8 +437,8 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
       content: feedbackData.content,
       author: {
         id: feedbackData.user_id,
-        name: author?.name || 'Unknown User',
-        avatarUrl: author?.avatar_url || undefined,
+        name: authorInfo.name,
+        avatarUrl: authorInfo.avatarUrl,
       },
       category: feedbackData.categories?.name || 'Uncategorized',
       categoryId: feedbackData.category_id,
