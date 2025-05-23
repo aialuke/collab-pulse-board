@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Logo } from './Logo';
-import { RefreshButton } from './RefreshButton';
-import { NotificationsMenu } from './NotificationsMenu';
-import { UserMenu } from './UserMenu';
+import { Logo } from '@/components/common/layout/Logo';
+import { RefreshButton } from '@/components/common/layout/RefreshButton';
+import { NotificationsMenu } from '@/components/common/layout/NotificationsMenu';
+import { UserMenu } from '@/components/common/layout/UserMenu';
 
 export function AppHeader() {
   const isMobile = useIsMobile();

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -12,16 +13,32 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { LogOut, User } from '@/components/icons';
+import { useToast } from '@/hooks/use-toast';
 
 export function UserMenu() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const isManager = user?.role === 'manager' || user?.role === 'admin';
   
   const handleLogout = () => {
-    logout();
-    navigate('/login');
+    logout()
+      .then(() => {
+        navigate('/login');
+        toast({
+          title: "Signed out",
+          description: "You have been successfully signed out.",
+        });
+      })
+      .catch((error) => {
+        console.error('Logout error:', error);
+        toast({
+          title: "Sign out failed",
+          description: "There was a problem signing you out. Please try again.",
+          variant: "destructive",
+        });
+      });
   };
 
   return (
@@ -36,7 +53,11 @@ export function UserMenu() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-white border-neutral-200 text-neutral-900" align="end" forceMount>
+      <DropdownMenuContent 
+        className="z-50 w-56 bg-white border border-neutral-200 text-neutral-900 shadow-md rounded-md" 
+        align="end" 
+        forceMount
+      >
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user?.name}</p>
@@ -46,12 +67,12 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-neutral-200" />
-        <DropdownMenuItem className="hover:bg-royal-blue-500/10" onClick={() => navigate('/profile')}>
+        <DropdownMenuItem className="hover:bg-royal-blue-500/10 cursor-pointer" onClick={() => navigate('/profile')}>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-neutral-200" />
-        <DropdownMenuItem className="hover:bg-royal-blue-500/10" onClick={handleLogout}>
+        <DropdownMenuItem className="hover:bg-royal-blue-500/10 cursor-pointer" onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>

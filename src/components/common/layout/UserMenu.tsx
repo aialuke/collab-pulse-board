@@ -52,7 +52,11 @@ export function UserMenu() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-white border-neutral-200 text-neutral-900" align="end" forceMount>
+      <DropdownMenuContent 
+        className="z-50 w-56 bg-white border border-neutral-200 text-neutral-900 shadow-md rounded-md" 
+        align="end" 
+        forceMount
+      >
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user?.name}</p>
@@ -62,12 +66,12 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-neutral-200" />
-        <DropdownMenuItem className="hover:bg-royal-blue-500/10" onClick={() => navigate('/profile')}>
+        <DropdownMenuItem className="hover:bg-royal-blue-500/10 cursor-pointer" onClick={() => navigate('/profile')}>
           <UserIcon className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-neutral-200" />
-        <DropdownMenuItem className="hover:bg-royal-blue-500/10" onClick={handleLogout}>
+        <DropdownMenuItem className="hover:bg-royal-blue-500/10 cursor-pointer" onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>

@@ -1,7 +1,7 @@
 
 import React, { memo } from 'react';
 import { Outlet } from 'react-router-dom';
-import { AppHeader } from './AppHeader';
+import { AppHeader } from '@/components/common/layout/AppHeader';
 
 // Memoize the AppLayout component to prevent unnecessary re-renders
 const AppLayout = memo(function AppLayout() {
