@@ -107,6 +107,25 @@ export default defineConfig(({ mode }: ConfigEnv) => {
                 id.includes('node_modules/recharts')) {
               return 'ui-visuals';
             }
+            
+            // Feature-based chunks for our own code
+            if (id.includes('/src/components/feedback/')) {
+              return 'feature-feedback';
+            }
+            if (id.includes('/src/components/auth/')) {
+              return 'feature-auth';
+            }
+            if (id.includes('/src/components/common/')) {
+              return 'feature-common';
+            }
+            if (id.includes('/src/components/ui/')) {
+              return 'ui-shadcn';
+            }
+            
+            // Core app files
+            if (id.includes('/src/contexts/') || id.includes('/src/hooks/')) {
+              return 'app-core';
+            }
           }
         },
         external: []

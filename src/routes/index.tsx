@@ -1,35 +1,50 @@
-
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { TermsOfUseDialog } from '@/components/terms/TermsOfUseDialog';
 import { RouteErrorBoundary } from '@/components/error/RouteErrorBoundary';
+import { lazyWithChunkName } from '@/utils/codeSplitting';
 
-// Loading state component
-const PageLoading = lazy(() => import(/* webpackChunkName: "page-loading" */ './PageLoading'));
+// Loading state component - smaller bundle so can be imported directly
+const PageLoading = lazyWithChunkName(
+  () => import(/* webpackChunkName: "page-loading" */ './PageLoading'), 
+  'PageLoading'
+);
 
-// Lazy-loaded layouts
-const AppLayout = lazy(() => import(/* webpackChunkName: "app-layout" */ '@/components/common/layout/AppLayout'));
-const AuthLayout = lazy(() => import(/* webpackChunkName: "auth-layout" */ '@/components/auth/AuthLayout'));
+// Lazy-loaded layouts with descriptive chunk names
+const AppLayout = lazyWithChunkName(
+  () => import(/* webpackChunkName: "app-layout" */ '@/components/common/layout/AppLayout'), 
+  'AppLayout'
+);
+const AuthLayout = lazyWithChunkName(
+  () => import(/* webpackChunkName: "auth-layout" */ '@/components/auth/AuthLayout'),
+  'AuthLayout'
+);
 
 // Lazy-loaded page components with named chunks for better debugging
-const HomePage = lazy(() => 
-  import(/* webpackChunkName: "home-page" */ '@/pages/HomePage')
+const HomePage = lazyWithChunkName(
+  () => import(/* webpackChunkName: "home-page" */ '@/pages/HomePage'),
+  'HomePage'
 );
-const LoginPage = lazy(() => 
-  import(/* webpackChunkName: "login-page" */ '@/pages/LoginPage')
+const LoginPage = lazyWithChunkName(
+  () => import(/* webpackChunkName: "login-page" */ '@/pages/LoginPage'),
+  'LoginPage'
 );
-const CreateFeedbackPage = lazy(() => 
-  import(/* webpackChunkName: "create-feedback-page" */ '@/pages/CreateFeedbackPage')
+const CreateFeedbackPage = lazyWithChunkName(
+  () => import(/* webpackChunkName: "create-feedback-page" */ '@/pages/CreateFeedbackPage'),
+  'CreateFeedbackPage'
 );
-const FeedbackDetailPage = lazy(() => 
-  import(/* webpackChunkName: "feedback-detail-page" */ '@/pages/FeedbackDetailPage')
+const FeedbackDetailPage = lazyWithChunkName(
+  () => import(/* webpackChunkName: "feedback-detail-page" */ '@/pages/FeedbackDetailPage'),
+  'FeedbackDetailPage'
 );
-const ProfilePage = lazy(() => 
-  import(/* webpackChunkName: "profile-page" */ '@/pages/ProfilePage')
+const ProfilePage = lazyWithChunkName(
+  () => import(/* webpackChunkName: "profile-page" */ '@/pages/ProfilePage'),
+  'ProfilePage'
 );
-const NotFound = lazy(() => 
-  import(/* webpackChunkName: "not-found-page" */ '@/pages/NotFound')
+const NotFound = lazyWithChunkName(
+  () => import(/* webpackChunkName: "not-found-page" */ '@/pages/NotFound'),
+  'NotFound'
 );
 
 // Protected route component that also checks for terms acceptance
@@ -82,6 +97,23 @@ export const PublicOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ child
 
   return <>{children}</>;
 };
+
+// Preload components for routes likely to be visited
+// This runs only once when the routes file loads
+const preloadHomeRoute = () => {
+  import(/* webpackChunkName: "home-page" */ '@/pages/HomePage');
+};
+
+// Add an event listener to preload components when hovering over links
+document.addEventListener('mouseover', (event) => {
+  const target = event.target as HTMLElement;
+  if (target.tagName === 'A') {
+    const href = target.getAttribute('href');
+    if (href === '/') {
+      preloadHomeRoute();
+    }
+  }
+});
 
 export const AppRoutes: React.FC = () => {
   return (

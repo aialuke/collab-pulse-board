@@ -1,23 +1,27 @@
 
-import React, { useMemo, Suspense, lazy } from 'react';
+import React, { useMemo, Suspense } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useRepost } from '@/contexts/RepostContext';
 import { FeedbackProvider, useFeedback } from '@/hooks/feedback/useFeedbackContext';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { FeedbackSkeleton } from './LoadingStates';
+import { lazyWithNamedExport, lazyWithChunkName } from '@/utils/codeSplitting';
 
-// Lazy load view components
-const MobileFeedbackView = lazy(() => 
-  import(/* webpackChunkName: "mobile-feedback-view" */ './MobileFeedbackView')
-  .then(module => ({ default: module.MobileFeedbackView }))
+// Lazy load view components with better naming
+const MobileFeedbackView = lazyWithNamedExport(
+  () => import(/* webpackChunkName: "mobile-feedback-view" */ './MobileFeedbackView'),
+  'MobileFeedbackView',
+  'MobileFeedbackView'
 );
-const DesktopFeedbackView = lazy(() => 
-  import(/* webpackChunkName: "desktop-feedback-view" */ './DesktopFeedbackView')
-  .then(module => ({ default: module.DesktopFeedbackView }))
+const DesktopFeedbackView = lazyWithNamedExport(
+  () => import(/* webpackChunkName: "desktop-feedback-view" */ './DesktopFeedbackView'),
+  'DesktopFeedbackView',
+  'DesktopFeedbackView'
 );
-const RepostDialog = lazy(() => 
-  import(/* webpackChunkName: "repost-dialog" */ '@/components/feedback/repost/RepostDialog')
-  .then(module => ({ default: module.RepostDialog }))
+const RepostDialog = lazyWithNamedExport(
+  () => import(/* webpackChunkName: "repost-dialog" */ '@/components/feedback/repost/RepostDialog'),
+  'RepostDialog',
+  'RepostDialog'
 );
 
 // Inner component that uses the feedback context with optimized memoization

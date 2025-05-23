@@ -1,5 +1,5 @@
 
-import React, { Suspense, lazy } from "react";
+import React, { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -10,15 +10,18 @@ import { RefreshProvider } from "@/contexts/RefreshContext";
 import { createQueryClient } from "@/lib/react-query";
 import { AppRoutes } from "./routes";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { lazyWithNamedExport } from "@/utils/codeSplitting";
 
 // PWA Components - loaded conditionally based on need with named chunks
-const PWAInstallPrompt = lazy(() => 
-  import(/* webpackChunkName: "pwa-install-prompt" */ "./components/pwa/PWAInstallPrompt")
-  .then(module => ({default: module.PWAInstallPrompt}))
+const PWAInstallPrompt = lazyWithNamedExport(
+  () => import(/* webpackChunkName: "pwa-install-prompt" */ "./components/pwa/PWAInstallPrompt"),
+  'PWAInstallPrompt',
+  'PWAInstallPrompt'
 );
-const OfflineIndicator = lazy(() => 
-  import(/* webpackChunkName: "offline-indicator" */ "./components/pwa/OfflineIndicator")
-  .then(module => ({default: module.OfflineIndicator}))
+const OfflineIndicator = lazyWithNamedExport(
+  () => import(/* webpackChunkName: "offline-indicator" */ "./components/pwa/OfflineIndicator"),
+  'OfflineIndicator',
+  'OfflineIndicator'
 );
 
 // Create QueryClient instance outside component to avoid recreation
