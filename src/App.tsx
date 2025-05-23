@@ -9,6 +9,7 @@ import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import { RefreshProvider } from "@/contexts/RefreshContext";
 import { createQueryClient } from "@/lib/react-query";
 import { AppRoutes } from "./routes";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 
 // PWA Components - loaded conditionally based on need
 const PWAInstallPrompt = lazy(() => import("./components/pwa/PWAInstallPrompt").then(module => ({default: module.PWAInstallPrompt})));
@@ -19,28 +20,30 @@ const queryClient = createQueryClient();
 
 function App() {
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <NotificationsProvider>
-            <RefreshProvider>
-              <TooltipProvider>
-                <Toaster />
-                <AppRoutes />
-                
-                {/* Load PWA components only when idle */}
-                <React.Suspense fallback={null}>
-                  <PWAInstallPrompt />
-                </React.Suspense>
-                <React.Suspense fallback={null}>
-                  <OfflineIndicator />
-                </React.Suspense>
-              </TooltipProvider>
-            </RefreshProvider>
-          </NotificationsProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <NotificationsProvider>
+              <RefreshProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <AppRoutes />
+                  
+                  {/* Load PWA components only when idle */}
+                  <React.Suspense fallback={null}>
+                    <PWAInstallPrompt />
+                  </React.Suspense>
+                  <React.Suspense fallback={null}>
+                    <OfflineIndicator />
+                  </React.Suspense>
+                </TooltipProvider>
+              </RefreshProvider>
+            </NotificationsProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

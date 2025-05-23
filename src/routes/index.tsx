@@ -3,6 +3,7 @@ import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { TermsOfUseDialog } from '@/components/terms/TermsOfUseDialog';
+import { RouteErrorBoundary } from '@/components/error/RouteErrorBoundary';
 
 // Loading state component
 const PageLoading = React.lazy(() => import('./PageLoading'));
@@ -40,7 +41,7 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
 
   return (
     <>
-      {children}
+      <RouteErrorBoundary>{children}</RouteErrorBoundary>
       <TermsOfUseDialog open={showTerms} />
     </>
   );
@@ -61,7 +62,9 @@ export const AppRoutes: React.FC = () => {
           isAuthenticated ? 
           <Navigate to="/" replace /> : 
           <Suspense fallback={<PageLoading />}>
-            <LoginPage />
+            <RouteErrorBoundary>
+              <LoginPage />
+            </RouteErrorBoundary>
           </Suspense>
         } 
       />
@@ -100,9 +103,11 @@ export const AppRoutes: React.FC = () => {
       
       <Route path="*" element={
         <Suspense fallback={<PageLoading />}>
-          <NotFound />
+          <RouteErrorBoundary>
+            <NotFound />
+          </RouteErrorBoundary>
         </Suspense>
       } />
     </Routes>
   );
-};
+}

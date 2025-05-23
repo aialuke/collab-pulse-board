@@ -6,6 +6,7 @@ import { MobileFeedbackView } from './MobileFeedbackView';
 import { DesktopFeedbackView } from './DesktopFeedbackView';
 import { RepostDialog } from '@/components/feedback/repost/RepostDialog';
 import { FeedbackProvider, useFeedback } from '@/hooks/feedback/useFeedbackContext';
+import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 
 // Inner component that uses the feedback context with optimized memoization
 const FeedbackContainerInner = React.memo(function FeedbackContainerInner() {
@@ -104,8 +105,10 @@ const FeedbackContainerInner = React.memo(function FeedbackContainerInner() {
 // Outer component that provides the feedback context
 export function FeedbackContainer() {
   return (
-    <FeedbackProvider pageSize={10} staleTime={30 * 1000}>
-      <FeedbackContainerInner />
-    </FeedbackProvider>
+    <ErrorBoundary>
+      <FeedbackProvider pageSize={10} staleTime={30 * 1000}>
+        <FeedbackContainerInner />
+      </FeedbackProvider>
+    </ErrorBoundary>
   );
 }

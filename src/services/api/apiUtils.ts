@@ -1,5 +1,6 @@
 
 import { toast } from '@/hooks/use-toast';
+import { handleError, ErrorSeverity, withErrorHandling } from '@/utils/errorHandling';
 
 /**
  * Standard error handling for API calls
@@ -14,15 +15,12 @@ export async function handleApiError<T>(
     const actualPromise = typeof promise === 'function' ? promise() : promise;
     return await actualPromise;
   } catch (error) {
-    console.error(`API Error: ${errorMessage}`, error);
-    
-    toast({
-      title: "Error",
-      description: errorMessage,
-      variant: "destructive",
+    // Use the standardized error handling utility
+    throw handleError(error, {
+      context: 'API',
+      userMessage: errorMessage,
+      severity: ErrorSeverity.ERROR
     });
-    
-    throw error;
   }
 }
 
