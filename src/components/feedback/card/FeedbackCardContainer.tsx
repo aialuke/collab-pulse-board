@@ -24,7 +24,7 @@ export function FeedbackCardContainer({
   const [upvotes, setUpvotes] = useState(feedback.upvotes);
 
   const isManager = user?.role === 'manager' || user?.role === 'admin';
-  const isAuthor = user?.id === feedback.author.id;
+  const isAuthor = user?.id === feedback.author?.id;
   const isOwnFeedback = isAuthor;
 
   const handleUpvote = () => {

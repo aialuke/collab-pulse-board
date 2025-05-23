@@ -21,12 +21,19 @@ export const showErrorNotification = (title: string, description: string, varian
   // This avoids invalid hook calls when used in class components
   setTimeout(() => {
     try {
-      // Only attempt to use toast in a safe context
+      // Only log to console to avoid React hook issues in class components
+      console.error(`${title}: ${description}`);
+      
+      // Instead of directly using toast which may cause issues in class components,
+      // we'll dispatch a custom event that can be listened to by components using hooks
       if (typeof window !== 'undefined') {
-        console.error(`${title}: ${description}`);
+        const event = new CustomEvent('app-error', { 
+          detail: { title, description, variant } 
+        });
+        window.dispatchEvent(event);
       }
     } catch (err) {
-      console.error('Failed to show error toast:', err);
+      console.error('Failed to show error notification:', err);
     }
   }, 0);
 };
@@ -52,7 +59,7 @@ export function handleError(
   const formattedMessage = `[${context}] ${errorObject.message}`;
   
   // Add severity to the error object
-  const enhancedError = Object.assign(errorObject, { severity });
+  const enhancedError = Object.assign({}, errorObject, { severity });
   
   // Log error with appropriate severity
   switch (severity) {

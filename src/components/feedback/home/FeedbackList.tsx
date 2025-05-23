@@ -38,7 +38,13 @@ const Row = memo(function Row({
   
   // Special case for the last item which contains the sentinel for infinite loading
   if (hasMore && index === feedback.length) {
-    return <div ref={sentinelRef} style={style} className="h-16 flex items-center justify-center" />;
+    // Create a div element for the sentinel
+    // Make sure we're handling both RefCallback and RefObject types
+    const sentinelProps = typeof sentinelRef === 'function' 
+      ? { ref: sentinelRef }  // It's a callback ref
+      : { ref: sentinelRef }; // It's a RefObject
+    
+    return <div {...sentinelProps} style={style} className="h-16 flex items-center justify-center" />;
   }
   
   const item = feedback[index];
@@ -80,17 +86,6 @@ export const FeedbackList = memo(function FeedbackList({
     }
   }, [feedback.length === 0]);
   
-  // Memoize props passed to Row component
-  const itemData = React.useMemo(() => ({
-    feedback,
-    onUpvote,
-    onReport,
-    onDelete,
-    onRepost,
-    hasMore,
-    sentinelRef
-  }), [feedback, onUpvote, onReport, onDelete, onRepost, hasMore, sentinelRef]);
-  
   // Don't use virtualization for small lists (improves SEO and initial render)
   if (feedback.length <= 10) {
     return (
@@ -106,7 +101,15 @@ export const FeedbackList = memo(function FeedbackList({
           />
         ))}
         {hasMore && (
-          <div ref={sentinelRef} className="h-4" aria-hidden="true" />
+          <div 
+            // Create sentinel element, safely handling different ref types 
+            {...(typeof sentinelRef === 'function' 
+              ? { ref: sentinelRef }  // It's a callback ref
+              : { ref: sentinelRef } // It's a RefObject
+            )}
+            className="h-4" 
+            aria-hidden="true" 
+          />
         )}
       </div>
     );
@@ -143,6 +146,17 @@ export const FeedbackList = memo(function FeedbackList({
   
   // Determine list height based on viewport
   const listHeight = isMobile ? 500 : 600;
+  
+  // Memoize props passed to Row component
+  const itemData = React.useMemo(() => ({
+    feedback,
+    onUpvote,
+    onReport,
+    onDelete,
+    onRepost,
+    hasMore,
+    sentinelRef
+  }), [feedback, onUpvote, onReport, onDelete, onRepost, hasMore, sentinelRef]);
   
   return (
     <div ref={parentRef} className="w-full" style={{ height: `${listHeight}px` }}>
