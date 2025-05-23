@@ -46,10 +46,14 @@ export default function CreateFeedbackPage() {
     createFeedback(feedback);
   };
 
+  const handleGoBack = () => {
+    navigate('/');
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
       <div className="flex items-center space-x-2">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="bg-transparent">
+        <Button variant="ghost" size="sm" onClick={handleGoBack} className="bg-transparent">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>

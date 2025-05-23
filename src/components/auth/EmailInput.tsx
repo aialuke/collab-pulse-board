@@ -1,16 +1,9 @@
+
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MailIcon } from "@/components/icons";
-
-interface EmailInputProps {
-  id: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-  label?: string;
-  disabled?: boolean;
-}
+import { InputProps } from "./NameInput";
 
 export function EmailInput({
   id,
@@ -19,7 +12,7 @@ export function EmailInput({
   placeholder = "example@company.com",
   label = "Email",
   disabled = false,
-}: EmailInputProps) {
+}: InputProps) {
   return (
     <div className="space-y-1 text-left">
       <Label htmlFor={id} className="text-neutral-900">{label}</Label>

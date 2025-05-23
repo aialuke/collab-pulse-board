@@ -10,13 +10,19 @@ import {
 } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-interface FeedbackActionsProps {
+export interface FeedbackActionProps {
+  /** Number of upvotes for the feedback */
   upvotes: number;
+  /** Whether the current user has upvoted this feedback */
   isUpvoted: boolean;
+  /** Handler function for upvote action */
   onUpvote: () => void;
+  /** Whether the feedback belongs to the current user */
   isOwnFeedback?: boolean;
+  /** Whether the feedback was posted by a manager */
   isManagerPost?: boolean;
-  hideRepost?: boolean;  // Used to determine if this is a repost
+  /** Whether to hide repost actions */
+  hideRepost?: boolean;
 }
 
 export function FeedbackActions({ 
@@ -26,7 +32,7 @@ export function FeedbackActions({
   isOwnFeedback = false,
   isManagerPost = false,
   hideRepost = false
-}: FeedbackActionsProps) {
+}: FeedbackActionProps) {
   const isMobile = useIsMobile();
   
   const getUpvoteButtonClasses = () => {

@@ -5,7 +5,8 @@ import { FeedbackType } from '@/types/feedback';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ImageWithOverlay } from '@/components/ui/image-with-overlay';
 
-interface FeedbackContentProps {
+export interface FeedbackContentProps {
+  /** The feedback data to display */
   feedback: FeedbackType;
 }
 
@@ -15,6 +16,14 @@ export function FeedbackContent({
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
   const imageSource = feedback.imageUrl || feedback.image;
 
+  const handleImageClick = () => {
+    setIsImagePreviewOpen(true);
+  };
+
+  const handleDialogChange = (open: boolean) => {
+    setIsImagePreviewOpen(open);
+  };
+
   return (
     <div className="text-left pl-8 sm:pl-10">
       <p className="text-sm sm:text-base text-neutral-900 mb-2">{feedback.content}</p>
@@ -22,7 +31,7 @@ export function FeedbackContent({
         <>
           <div 
             className="mt-2 overflow-hidden cursor-pointer"
-            onClick={() => setIsImagePreviewOpen(true)}
+            onClick={handleImageClick}
           >
             <ImageWithOverlay
               src={imageSource} 
@@ -35,7 +44,7 @@ export function FeedbackContent({
             />
           </div>
           
-          <Dialog open={isImagePreviewOpen} onOpenChange={setIsImagePreviewOpen}>
+          <Dialog open={isImagePreviewOpen} onOpenChange={handleDialogChange}>
             <DialogContent className="sm:max-w-3xl md:max-w-4xl p-1 bg-white border-yellow-500/30 w-[95vw] max-h-[90vh]">
               <div className="flex items-center justify-center w-full h-full overflow-auto">
                 <img 

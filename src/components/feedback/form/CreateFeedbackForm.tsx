@@ -18,7 +18,9 @@ import { CreateFeedbackInput } from '@/types/feedback';
 import { FeedbackFormValues, feedbackSchema } from '@/utils/validation';
 
 interface CreateFeedbackFormProps {
+  /** Function to handle form submission */
   onSubmit: (feedback: CreateFeedbackInput) => void;
+  /** Whether the form is currently submitting */
   isLoading?: boolean;
 }
 

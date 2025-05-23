@@ -9,12 +9,18 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Flag, Trash2, Share2 } from '@/components/icons';
 
-interface FeedbackDropdownMenuProps {
+export interface FeedbackDropdownMenuProps {
+  /** Unique identifier for the feedback */
   feedbackId: string;
+  /** Whether the current user is a manager */
   isManager: boolean;
+  /** Whether the current user is the author of the feedback */
   isAuthor?: boolean;
+  /** Handler function for reporting feedback */
   onReport: (id: string) => void;
+  /** Handler function for deleting feedback */
   onDelete?: (id: string) => void;
+  /** Handler function for reposting feedback */
   onRepost?: () => void;
 }
 
@@ -26,12 +32,28 @@ export function FeedbackDropdownMenu({
   onDelete,
   onRepost
 }: FeedbackDropdownMenuProps) {
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(feedbackId);
+    }
+  };
+
+  const handleReport = () => {
+    onReport(feedbackId);
+  };
+
+  const handleRepost = () => {
+    if (onRepost) {
+      onRepost();
+    }
+  };
+
   return (
     <>
       {isManager && onRepost && (
         <>
           <DropdownMenuItem
-            onClick={onRepost}
+            onClick={handleRepost}
             className="hover:bg-royal-blue-500/10 text-royal-blue-600"
           >
             <Share2 className="mr-2 h-4 w-4" />
@@ -44,7 +66,7 @@ export function FeedbackDropdownMenu({
       {(isAuthor || isManager) && onDelete && (
         <>
           <DropdownMenuItem 
-            onClick={() => onDelete(feedbackId)}
+            onClick={handleDelete}
             className="hover:bg-red-700/10 text-red-600"
           >
             <Trash2 className="mr-2 h-4 w-4" />
@@ -55,7 +77,7 @@ export function FeedbackDropdownMenu({
       )}
       
       <DropdownMenuItem 
-        onClick={() => onReport(feedbackId)}
+        onClick={handleReport}
         className="hover:bg-blue-700/10"
       >
         <Flag className="mr-2 h-4 w-4" />

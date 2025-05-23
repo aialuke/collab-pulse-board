@@ -1,14 +1,21 @@
+
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserIcon } from "@/components/icons";
 
-interface NameInputProps {
+export interface InputProps {
+  /** The ID of the input element */
   id: string;
+  /** Current value of the input */
   value: string;
+  /** Handler function for change events */
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** Placeholder text to display when input is empty */
   placeholder?: string;
+  /** Label text displayed above the input */
   label?: string;
+  /** Whether the input is disabled */
   disabled?: boolean;
 }
 
@@ -19,7 +26,7 @@ export function NameInput({
   placeholder = "John Doe",
   label = "Full Name",
   disabled = false,
-}: NameInputProps) {
+}: InputProps) {
   return (
     <div className="space-y-1 text-left">
       <Label htmlFor={id} className="text-neutral-900">{label}</Label>

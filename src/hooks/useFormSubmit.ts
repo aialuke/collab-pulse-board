@@ -2,11 +2,16 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-interface FormSubmitOptions<TData, TResponse> {
+export interface FormSubmitOptions<TData, TResponse> {
+  /** Function that performs the form submission */
   onSubmit: (data: TData) => Promise<TResponse>;
+  /** Function called when submission is successful */
   onSuccess?: (response: TResponse) => void;
+  /** Function called when submission fails */
   onError?: (error: Error) => void;
+  /** Message to display on successful submission */
   successMessage?: string;
+  /** Message to display on failed submission */
   errorMessage?: string;
 }
 

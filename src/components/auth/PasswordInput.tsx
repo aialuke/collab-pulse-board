@@ -1,16 +1,14 @@
+
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EyeIcon, EyeOffIcon, LockIcon } from "@/components/icons";
+import { InputProps } from "./NameInput";
 
-interface PasswordInputProps {
-  id: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-  label?: string;
+export interface PasswordInputProps extends InputProps {
+  /** Whether to show the forgot password link */
   forgotPasswordLink?: boolean;
-  disabled?: boolean;
+  /** Whether this is for creating a new password */
   isNewPassword?: boolean;
 }
 
