@@ -2,6 +2,7 @@
 import { defineConfig, ConfigEnv, PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { federation } from '@originjs/vite-plugin-federation';
 import { configurePWA } from "./src/config/vite/pwa";
 import { configureCompression } from "./src/config/vite/compression";
 import { configureBuild } from "./src/config/vite/build";
@@ -27,6 +28,35 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         jsxImportSource: mode === 'production' ? undefined : 'react',
         // This is the correct way to specify development mode
         plugins: mode !== 'production' ? [] : undefined,
+      }),
+      federation({
+        name: 'host-app',
+        filename: 'remoteEntry.js',
+        // Expose modules that can be consumed by other applications
+        exposes: {
+          './AuthModule': './src/modules/auth/index.ts',
+          './FeedbackModule': './src/modules/feedback/index.ts',
+          './UIModule': './src/modules/ui/index.ts',
+        },
+        // Shared dependencies across modules
+        shared: {
+          'react': {
+            singleton: true,
+            requiredVersion: '^18.0.0',
+          },
+          'react-dom': {
+            singleton: true,
+            requiredVersion: '^18.0.0',
+          },
+          '@tanstack/react-query': {
+            singleton: true,
+            requiredVersion: '^5.0.0',
+          },
+          'react-router-dom': {
+            singleton: true,
+            requiredVersion: '^6.0.0',
+          }
+        },
       }),
       mode === 'development' && configureDevelopment(),
       configurePWA(),
@@ -109,17 +139,14 @@ export default defineConfig(({ mode }: ConfigEnv) => {
             }
             
             // Feature-based chunks for our own code
-            if (id.includes('/src/components/feedback/')) {
-              return 'feature-feedback';
-            }
-            if (id.includes('/src/components/auth/')) {
+            if (id.includes('/src/modules/auth/')) {
               return 'feature-auth';
             }
-            if (id.includes('/src/components/common/')) {
-              return 'feature-common';
+            if (id.includes('/src/modules/feedback/')) {
+              return 'feature-feedback';
             }
-            if (id.includes('/src/components/ui/')) {
-              return 'ui-shadcn';
+            if (id.includes('/src/modules/ui/')) {
+              return 'feature-ui';
             }
             
             // Core app files

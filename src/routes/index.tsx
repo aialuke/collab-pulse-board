@@ -1,9 +1,10 @@
+
 import React, { Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/modules/auth';
 import { TermsOfUseDialog } from '@/components/terms/TermsOfUseDialog';
 import { RouteErrorBoundary } from '@/components/error/RouteErrorBoundary';
-import { lazyWithChunkName } from '@/utils/codeSplitting';
+import { lazyWithChunkName } from '@/modules/ui';
 
 // Loading state component - smaller bundle so can be imported directly
 const PageLoading = lazyWithChunkName(
@@ -17,7 +18,9 @@ const AppLayout = lazyWithChunkName(
   'AppLayout'
 );
 const AuthLayout = lazyWithChunkName(
-  () => import(/* webpackChunkName: "auth-layout" */ '@/components/auth/AuthLayout'),
+  () => import(/* webpackChunkName: "auth-layout" */ '@/modules/auth').then(module => ({ 
+    default: module.AuthLayout 
+  })),
   'AuthLayout'
 );
 

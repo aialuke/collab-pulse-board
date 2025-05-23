@@ -10,7 +10,7 @@ import { RefreshProvider } from "@/contexts/RefreshContext";
 import { createQueryClient } from "@/lib/react-query";
 import { AppRoutes } from "./routes";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
-import { lazyWithNamedExport } from "@/utils/codeSplitting";
+import { lazyWithNamedExport } from "@/modules/ui";
 
 // PWA Components - loaded conditionally based on need with named chunks
 const PWAInstallPrompt = lazyWithNamedExport(
