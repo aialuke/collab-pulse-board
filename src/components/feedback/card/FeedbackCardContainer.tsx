@@ -51,7 +51,11 @@ export function FeedbackCardContainer({
   return (
     <div className={`w-full mb-4 ${minHeightClass}`}>
       <FeedbackCard
-        feedback={feedback}
+        feedback={{
+          ...feedback,
+          isUpvoted,
+          upvotes
+        }}
         isManager={isManager}
         isAuthor={isAuthor}
         isUpvoted={isUpvoted}

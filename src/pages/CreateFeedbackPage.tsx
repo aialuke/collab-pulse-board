@@ -1,21 +1,27 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreateFeedbackForm } from '@/components/feedback/form/CreateFeedbackForm';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { CreateFeedbackInput } from '@/types/feedback';
-import { createFeedback, uploadFeedbackImage } from '@/services/feedbackService';
+import { useCreateFeedbackMutation } from '@/hooks/feedback/useFeedbackMutations';
+import { useToast } from '@/hooks/use-toast';
 
 export default function CreateFeedbackPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
+  
+  const { mutate: createFeedback, isPending: isSubmitting } = useCreateFeedbackMutation({
+    onSuccess: () => navigate('/'),
+    onError: (error) => {
+      console.error('Error submitting feedback:', error);
+    }
+  });
 
-  const handleSubmit = async (feedback: CreateFeedbackInput) => {
+  const handleSubmit = (feedback: CreateFeedbackInput) => {
     if (!user) {
       toast({
         title: 'Authentication required',
@@ -26,43 +32,7 @@ export default function CreateFeedbackPage() {
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      // Handle image upload first if there is an image
-      let imageUrl: string | undefined = undefined;
-      if (feedback.imageUrl && feedback.imageUrl.startsWith('data:')) {
-        // Get the format from the data URL
-        const formatInfo = feedback.imageUrl.split(';')[0].split(':')[1];
-        const outputFormat = formatInfo === 'image/webp' ? 'webp' : 'jpeg';
-        
-        // Upload the image using our service - fixed argument count
-        imageUrl = await uploadFeedbackImage(feedback.imageUrl, outputFormat);
-      } else if (feedback.imageUrl) {
-        // If it's already a URL (not base64), use it directly
-        imageUrl = feedback.imageUrl;
-      }
-
-      // Create feedback with the image URL if present
-      await createFeedback({
-        ...feedback,
-        imageUrl
-      });
-
-      toast({
-        title: 'Feedback submitted',
-        description: 'Your feedback has been successfully submitted.',
-      });
-      navigate('/');
-    } catch (error: any) {
-      console.error('Error submitting feedback:', error);
-      toast({
-        title: 'Error',
-        description: error.message || 'There was a problem submitting your feedback. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    createFeedback(feedback);
   };
 
   return (

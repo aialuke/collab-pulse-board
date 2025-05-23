@@ -5,7 +5,7 @@ import { FloatingFeedbackButton } from '@/components/feedback/FloatingFeedbackBu
 import { RepostProvider } from '@/contexts/RepostContext';
 import { toast } from '@/hooks/use-toast';
 
-// Main page component without analytics script
+// Main page component with enhanced state management
 export default function HomePage() {
   return (
     <div className="w-full flex-1 flex flex-col">
