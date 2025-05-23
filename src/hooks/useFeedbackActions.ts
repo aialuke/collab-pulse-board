@@ -1,7 +1,6 @@
 
 import { FeedbackType } from '@/types/feedback';
-import { toggleUpvote, reportFeedback } from '@/services/feedbackService';
-import { deleteFeedback } from '@/services/feedback/deleteFeedbackService';
+import { toggleUpvote, reportFeedback, deleteFeedback } from '@/services/feedbackService';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
