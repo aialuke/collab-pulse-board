@@ -1,5 +1,5 @@
 
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 
 export enum ErrorSeverity {
   INFO = 'info',
@@ -54,7 +54,7 @@ export function handleError(
       console.error(formattedMessage, error);
   }
   
-  // Show toast notification if not silent
+  // Show toast notification if not silent - use imported toast function
   if (!silent) {
     toast({
       title: severity === ErrorSeverity.CRITICAL ? "Critical Error" : "Error",

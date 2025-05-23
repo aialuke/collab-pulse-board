@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 import { ErrorDisplay } from './ErrorDisplay';
 
 interface ErrorBoundaryProps {
@@ -35,7 +35,8 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     // Log the error to an error reporting service
     console.error('Error caught by ErrorBoundary:', error, errorInfo);
     
-    // Notify user about the error
+    // Notify user about the error using the imported toast function
+    // This avoids using hooks directly in a class component
     toast({
       title: "An error occurred",
       description: "The application encountered an unexpected error",

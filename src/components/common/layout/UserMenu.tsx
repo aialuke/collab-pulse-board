@@ -53,7 +53,7 @@ export function UserMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
-        className="z-50 w-56 bg-white border border-neutral-200 text-neutral-900 shadow-md rounded-md" 
+        className="z-[100] w-56 bg-white border border-neutral-200 text-neutral-900 shadow-md rounded-md" 
         align="end" 
         forceMount
       >
