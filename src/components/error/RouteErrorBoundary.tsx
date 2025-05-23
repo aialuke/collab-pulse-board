@@ -10,6 +10,7 @@ interface RouteErrorBoundaryProps {
   children: React.ReactNode;
 }
 
+// Create a separate component for the fallback UI
 function FallbackComponent({ error }: { error: Error | null }) {
   const navigate = useNavigate();
   
@@ -61,7 +62,7 @@ function FallbackComponent({ error }: { error: Error | null }) {
 export function RouteErrorBoundary({ children }: RouteErrorBoundaryProps) {
   return (
     <ErrorBoundary
-      fallback={({ error }) => <FallbackComponent error={error} />}
+      fallback={<FallbackComponent error={null} />}
       onError={(error) => {
         console.error("Route error:", error);
       }}
