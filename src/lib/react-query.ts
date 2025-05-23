@@ -1,14 +1,22 @@
+
 import { QueryClient } from "@tanstack/react-query";
 
 /**
- * Optimized React Query client configuration
+ * Advanced React Query client configuration
  * Uses staggered cache settings and efficient strategies to reduce database load
  */
 export const createQueryClient = () => new QueryClient({
   defaultOptions: {
     queries: {
+      // Stale time defines how long data is considered fresh
+      // Higher stale time means less refetches and better performance
       staleTime: 60 * 1000, // 1 minute (data considered fresh)
-      gcTime: 5 * 60 * 1000, // 5 minutes (unused data kept in memory)
+      
+      // GC time is how long inactive data stays in memory
+      // Higher gc time improves UX for back navigation
+      gcTime: 10 * 60 * 1000, // 10 minutes (unused data kept in memory)
+      
+      // Intelligent retry logic
       retry: (failureCount, error) => {
         // Only retry once for most errors
         if (failureCount > 1) return false;
@@ -20,19 +28,29 @@ export const createQueryClient = () => new QueryClient({
             error.message.includes('404') || 
             error.message.includes('401') ||
             error.message.includes('validation') ||
-            error.message.includes('not found')
+            error.message.includes('not found') ||
+            error.message.includes('permission denied')
           ) {
             return false;
           }
         }
+        
+        // For network errors or server errors, retry
         return true;
       },
-      retryDelay: attemptIndex => Math.min(1000 * (2 ** attemptIndex), 30000), // Exponential backoff capped at 30s
-      refetchOnWindowFocus: false, // Don't refetch when window regains focus
+      
+      // Exponential backoff capped at 30s
+      retryDelay: attemptIndex => Math.min(1000 * (2 ** attemptIndex), 30000),
+      
+      // Don't refetch when window regains focus
+      // This prevents unnecessary refetches when user switches tabs
+      refetchOnWindowFocus: false,
+      
+      // Don't refetch on reconnect as data is usually still fresh
+      refetchOnReconnect: false,
       
       /**
-       * Select function to transform data before caching
-       * This allows us to normalize data structure across different endpoints
+       * Data normalization for consistent structure
        */
       select: (data) => {
         // If data already has the right shape, return it
@@ -47,15 +65,26 @@ export const createQueryClient = () => new QueryClient({
         return data;
       }
     },
+    
     mutations: {
-      retry: 1, // Only retry mutations once
+      // Only retry mutations once to prevent duplicate actions
+      retry: 1,
       retryDelay: 1000, // 1 second delay between retries
-      // Use optimistic updates where possible
-      // This makes the UI feel more responsive
+      
+      // Use optimistic updates where possible for better UX
       onMutate: (variables) => {
         // Return context that will be passed to onError/onSettled
         return { timestamp: Date.now() };
       },
+      
+      // Better error logging for mutations
+      onError: (error, variables, context) => {
+        console.error(`Mutation error:`, {
+          error,
+          variables,
+          context
+        });
+      }
     },
   },
 });

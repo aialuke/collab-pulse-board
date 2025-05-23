@@ -1,12 +1,20 @@
 
 /**
  * Centralized export file for all feedback-related services
- * This improves tree-shaking and helps eliminate duplicate imports
+ * Now using the optimized implementations for better performance
  */
 
+// Export optimized core feedback functions
 export {
   fetchFeedback,
   fetchFeedbackById,
+  fetchProfiles,
+  fetchUserUpvotes,
+  fetchOriginalPosts
+} from './feedback/optimizedFeedbackService';
+
+// Export other specialized services that aren't part of the main feedback service
+export { 
   createFeedback,
   deleteFeedback,
   toggleFeedbackUpvote as toggleUpvote,
@@ -15,6 +23,6 @@ export {
   uploadFeedbackImage
 } from './feedback/feedbackService';
 
-// Export other specialized services that aren't part of the main feedback service
+// Export other services
 export { fetchCategories } from './feedback/categoryService';
 export { createShoutOut, getAllShoutOuts, getShoutOutsForUser } from './feedback/shoutOutService';

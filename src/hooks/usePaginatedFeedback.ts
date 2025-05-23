@@ -3,13 +3,17 @@ import { useCallback, useEffect, useRef, useMemo } from 'react';
 import { usePagination } from './usePagination';
 import { FeedbackType } from '@/types/feedback';
 import { useToast } from './use-toast';
-import { fetchFeedback } from '@/services/feedbackService';
+import { fetchFeedback } from '@/services/feedback/optimizedFeedbackService'; 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface UsePaginatedFeedbackOptions {
   pageSize?: number;
   initialData?: FeedbackType[];
   staleTime?: number;
+  gcTime?: number;
+  category?: string;
+  status?: string;
+  search?: string;
 }
 
 interface UsePaginatedFeedbackResult {
@@ -24,11 +28,16 @@ interface UsePaginatedFeedbackResult {
 
 /**
  * Enhanced hook for paginated feedback with performance optimizations
+ * Uses the consolidated fetchFeedback implementation
  */
 export function usePaginatedFeedback({
   pageSize = 10,
   initialData,
-  staleTime = 60 * 1000 // 1 minute default stale time
+  staleTime = 60 * 1000, // 1 minute default stale time
+  gcTime = 5 * 60 * 1000,  // 5 minutes default cache time
+  category = '',
+  status = '',
+  search = ''
 }: UsePaginatedFeedbackOptions = {}): UsePaginatedFeedbackResult {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -50,7 +59,10 @@ export function usePaginatedFeedback({
   } = usePagination<FeedbackType>({ pageSize, initialData });
 
   // Create a memoized query key that includes all dependencies for proper cache management
-  const queryKey = useMemo(() => ['feedback', page, pageSize], [page, pageSize]);
+  const queryKey = useMemo(() => 
+    ['feedback', { page, pageSize, category, status, search }], 
+    [page, pageSize, category, status, search]
+  );
 
   // Use React Query for efficient data fetching and caching
   const { 
@@ -71,10 +83,13 @@ export function usePaginatedFeedback({
           throw new Error('Cannot fetch additional pages without loading the first page');
         }
         
-        // Call fetchFeedback with the updated parameter structure
+        // Call consolidated fetchFeedback with all parameters
         return await fetchFeedback({
           page,
-          limit: pageSize
+          limit: pageSize,
+          category,
+          status,
+          search
         });
       } catch (error) {
         console.error('Error loading feedback:', error);
@@ -85,7 +100,7 @@ export function usePaginatedFeedback({
     },
     // Optimized configuration for better performance
     staleTime, // Use configurable stale time
-    gcTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime,    // Use configurable cache time
     refetchOnWindowFocus: false,
     // Only fetch if we have a valid page
     enabled: page > 0,
@@ -139,26 +154,6 @@ export function usePaginatedFeedback({
       setError((queryError as Error).message || 'Failed to load feedback');
     }
   }, [queryError, setError]);
-
-  // Listen for cache updates from the service worker
-  useEffect(() => {
-    let channel: BroadcastChannel | null = null;
-    
-    // Only create BroadcastChannel if it's supported by the browser
-    if ('BroadcastChannel' in window) {
-      channel = new BroadcastChannel('api-updates');
-      channel.addEventListener('message', (event) => {
-        if (event.data.type === 'CACHE_UPDATED' && event.data.url === 'feed') {
-          // Use queryClient to invalidate queries on cache update
-          queryClient.invalidateQueries({ queryKey: ['feedback'] });
-        }
-      });
-    }
-    
-    return () => {
-      if (channel) channel.close();
-    };
-  }, [queryClient]);
   
   // Optimized reload function that uses queryClient
   const refresh = useCallback(async () => {

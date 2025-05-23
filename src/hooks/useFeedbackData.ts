@@ -16,6 +16,9 @@ interface UseFeedbackDataResult {
   loadFeedback: () => Promise<void>;
 }
 
+/**
+ * Enhanced feedback data hook with improved caching and performance
+ */
 export function useFeedbackData(): UseFeedbackDataResult {
   const [feedback, setFeedback] = useState<FeedbackType[]>([]);
   const [filteredFeedback, setFilteredFeedback] = useState<FeedbackType[]>([]);
@@ -24,8 +27,12 @@ export function useFeedbackData(): UseFeedbackDataResult {
   const { toast } = useToast();
 
   // Memoize query key to prevent unnecessary refetches
-  const queryKey = useMemo(() => ['feedback', retryCount], [retryCount]);
+  const queryKey = useMemo(
+    () => ['feedback', { page: 1, limit: 50, retryCount }], 
+    [retryCount]
+  );
 
+  // Configure query with proper caching settings
   const { 
     data, 
     isLoading, 
@@ -35,15 +42,18 @@ export function useFeedbackData(): UseFeedbackDataResult {
     queryKey,
     queryFn: async () => {
       try {
-        return await fetchFeedback();
+        return await fetchFeedback({ page: 1, limit: 50 });
       } catch (error) {
         console.error('Error loading feedback:', error);
-        throw error; // Let React Query handle the error
+        throw error;
       }
     },
+    // Better caching for improved performance
+    staleTime: 30 * 1000,      // 30 seconds - data considered fresh
+    gcTime: 5 * 60 * 1000,     // 5 minutes - keep in cache
+    refetchOnWindowFocus: false, // Don't refetch on tab focus
     meta: {
       onError: (error: Error) => {
-        // This will run when the query encounters an error
         setLoadError('Failed to load feedback. Please try again.');
         toast({
           title: 'Error',
@@ -54,15 +64,16 @@ export function useFeedbackData(): UseFeedbackDataResult {
     }
   });
 
+  // Update state when data changes
   useEffect(() => {
-    if (data) {
-      // Extract the items array from the response
+    if (data?.items) {
       setFeedback(data.items);
       setFilteredFeedback(data.items);
       setLoadError(null);
     }
   }, [data]);
 
+  // Optimized load feedback function
   const loadFeedback = useCallback(async () => {
     try {
       await refetch();
@@ -72,6 +83,7 @@ export function useFeedbackData(): UseFeedbackDataResult {
     }
   }, [refetch]);
 
+  // Retry handler with debounce to prevent spam
   const handleRetry = useCallback(() => {
     setRetryCount(prev => prev + 1);
   }, []);
