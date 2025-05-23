@@ -1,5 +1,5 @@
 
-import { toastService } from '@/services/toastService';
+import { toast } from '@/hooks/use-toast';
 import { handleError, ErrorSeverity, withErrorHandling } from '@/utils/errorHandling';
 
 /**
@@ -37,8 +37,10 @@ export async function withSuccessToast<T>(
     const actualPromise = typeof promise === 'function' ? promise() : promise;
     const result = await actualPromise;
     
-    // Use the safe toast service
-    toastService.success(successMessage);
+    toast({
+      title: "Success",
+      description: successMessage,
+    });
     
     return result;
   } catch (error) {

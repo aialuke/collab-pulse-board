@@ -11,7 +11,6 @@ import { createQueryClient } from "@/lib/react-query";
 import { AppRoutes } from "./routes";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { lazyWithNamedExport } from "@/utils/codeSplitting";
-import { ToastErrorHandler } from "@/components/error/ToastErrorHandler";
 
 // PWA Components - loaded conditionally based on need with named chunks
 const PWAInstallPrompt = lazyWithNamedExport(
@@ -38,7 +37,6 @@ function App() {
               <RefreshProvider>
                 <TooltipProvider>
                   <Toaster />
-                  <ToastErrorHandler />
                   <AppRoutes />
                   
                   {/* Load PWA components only when idle */}

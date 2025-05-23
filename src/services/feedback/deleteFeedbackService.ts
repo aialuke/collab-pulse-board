@@ -1,6 +1,6 @@
 
 import { supabaseDb } from '@/integrations/supabase/db-client';
-import { toastService } from '@/services/toastService';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * Delete a feedback item by ID
@@ -47,11 +47,18 @@ export async function deleteFeedback(id: string): Promise<void> {
       throw error;
     }
     
-    // Show success toast using the safe toast service
-    toastService.success("Feedback deleted successfully");
+    // Show success toast
+    toast({
+      title: "Success",
+      description: "Feedback deleted successfully",
+    });
   } catch (error) {
     console.error('Error in deleteFeedback:', error);
-    toastService.error("Failed to delete feedback. Please try again.");
+    toast({
+      title: "Error",
+      description: "Failed to delete feedback. Please try again.",
+      variant: "destructive",
+    });
     throw error;
   }
 }
