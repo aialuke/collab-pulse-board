@@ -1,12 +1,24 @@
 
-import React, { useMemo } from 'react';
+import React, { useMemo, Suspense, lazy } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useRepost } from '@/contexts/RepostContext';
-import { MobileFeedbackView } from './MobileFeedbackView';
-import { DesktopFeedbackView } from './DesktopFeedbackView';
-import { RepostDialog } from '@/components/feedback/repost/RepostDialog';
 import { FeedbackProvider, useFeedback } from '@/hooks/feedback/useFeedbackContext';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
+import { FeedbackSkeleton } from './LoadingStates';
+
+// Lazy load view components
+const MobileFeedbackView = lazy(() => 
+  import(/* webpackChunkName: "mobile-feedback-view" */ './MobileFeedbackView')
+  .then(module => ({ default: module.MobileFeedbackView }))
+);
+const DesktopFeedbackView = lazy(() => 
+  import(/* webpackChunkName: "desktop-feedback-view" */ './DesktopFeedbackView')
+  .then(module => ({ default: module.DesktopFeedbackView }))
+);
+const RepostDialog = lazy(() => 
+  import(/* webpackChunkName: "repost-dialog" */ '@/components/feedback/repost/RepostDialog')
+  .then(module => ({ default: module.RepostDialog }))
+);
 
 // Inner component that uses the feedback context with optimized memoization
 const FeedbackContainerInner = React.memo(function FeedbackContainerInner() {
@@ -75,28 +87,26 @@ const FeedbackContainerInner = React.memo(function FeedbackContainerInner() {
     total
   ]);
   
-  // Memoize the appropriate view component based on device type
-  const CurrentView = useMemo(() => 
-    isMobile ? (
-      <MobileFeedbackView {...viewProps} />
-    ) : (
-      <DesktopFeedbackView {...viewProps} />
-    ), [viewProps, isMobile]
-  );
-
   return (
     <>
-      {/* Render the memoized view */}
-      {CurrentView}
+      <Suspense fallback={<FeedbackSkeleton count={3} />}>
+        {isMobile ? (
+          <MobileFeedbackView {...viewProps} />
+        ) : (
+          <DesktopFeedbackView {...viewProps} />
+        )}
+      </Suspense>
       
-      {/* Add the RepostDialog component */}
+      {/* Add the RepostDialog component with Suspense */}
       {feedbackToRepost && (
-        <RepostDialog
-          isOpen={repostDialogOpen}
-          onClose={closeRepostDialog}
-          feedback={feedbackToRepost}
-          onRepost={handleRepost}
-        />
+        <Suspense fallback={null}>
+          <RepostDialog
+            isOpen={repostDialogOpen}
+            onClose={closeRepostDialog}
+            feedback={feedbackToRepost}
+            onRepost={handleRepost}
+          />
+        </Suspense>
       )}
     </>
   );

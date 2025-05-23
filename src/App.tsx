@@ -11,9 +11,15 @@ import { createQueryClient } from "@/lib/react-query";
 import { AppRoutes } from "./routes";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 
-// PWA Components - loaded conditionally based on need
-const PWAInstallPrompt = lazy(() => import("./components/pwa/PWAInstallPrompt").then(module => ({default: module.PWAInstallPrompt})));
-const OfflineIndicator = lazy(() => import("./components/pwa/OfflineIndicator").then(module => ({default: module.OfflineIndicator})));
+// PWA Components - loaded conditionally based on need with named chunks
+const PWAInstallPrompt = lazy(() => 
+  import(/* webpackChunkName: "pwa-install-prompt" */ "./components/pwa/PWAInstallPrompt")
+  .then(module => ({default: module.PWAInstallPrompt}))
+);
+const OfflineIndicator = lazy(() => 
+  import(/* webpackChunkName: "offline-indicator" */ "./components/pwa/OfflineIndicator")
+  .then(module => ({default: module.OfflineIndicator}))
+);
 
 // Create QueryClient instance outside component to avoid recreation
 const queryClient = createQueryClient();
@@ -31,12 +37,12 @@ function App() {
                   <AppRoutes />
                   
                   {/* Load PWA components only when idle */}
-                  <React.Suspense fallback={null}>
+                  <Suspense fallback={null}>
                     <PWAInstallPrompt />
-                  </React.Suspense>
-                  <React.Suspense fallback={null}>
+                  </Suspense>
+                  <Suspense fallback={null}>
                     <OfflineIndicator />
-                  </React.Suspense>
+                  </Suspense>
                 </TooltipProvider>
               </RefreshProvider>
             </NotificationsProvider>

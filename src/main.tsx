@@ -1,13 +1,12 @@
 
 import React, { createContext } from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
 import { registerSW } from 'virtual:pwa-register'
 
 // Use VitePWA's registration function with more robust options
 if ('serviceWorker' in navigator) {
   registerSW({
-    immediate: true, // Register immediately to ensure assets are cached faster
+    immediate: false, // Don't register immediately to prioritize main app loading
     onNeedRefresh() {
       console.log('New content available, refresh needed')
       // Show the refresh UI to the user
@@ -27,43 +26,6 @@ if ('serviceWorker' in navigator) {
     },
     onOfflineReady() {
       console.log('App ready to work offline')
-      // Removed toast notification
-    },
-    onRegisteredSW(swUrl, registration) {
-      console.log('Service worker has been registered successfully')
-      
-      // Setup background sync event listener
-      if (registration && 'sync' in registration) {
-        navigator.serviceWorker.addEventListener('message', (event) => {
-          if (event.data && event.data.type === 'BACKGROUND_SYNC_COMPLETE') {
-            // Handle completed background sync
-            console.log('Background sync completed');
-          }
-        });
-      }
-      
-      // Font loading optimization with local fonts
-      if (registration && 'fonts' in document) {
-        // Trigger font loading and caching
-        document.fonts.ready.then(() => {
-          console.log('Local fonts loaded and ready');
-          document.documentElement.classList.remove('fonts-loading');
-        }).catch(err => {
-          console.error('Font loading error:', err);
-          // Remove class anyway to ensure content is visible
-          document.documentElement.classList.remove('fonts-loading');
-        });
-      }
-      
-      // Periodically check for updates (every hour)
-      if (registration) {
-        setInterval(() => {
-          registration.update().catch(console.error)
-        }, 60 * 60 * 1000)
-      }
-    },
-    onRegisterError(error) {
-      console.error('Service worker registration failed:', error)
     }
   })
 }
@@ -72,6 +34,9 @@ if ('serviceWorker' in navigator) {
 if (window.document) {
   document.documentElement.classList.add('fonts-loading');
 }
+
+// Dynamic import for App.tsx - this allows for better chunk loading
+const loadApp = () => import(/* webpackChunkName: "app" */ './App').then(module => module.default);
 
 // Use more efficient initialization approach
 const initApp = () => {
@@ -84,19 +49,22 @@ const initApp = () => {
   
   const root = createRoot(rootElement);
   
-  // Disable StrictMode in production to avoid double-rendering
-  if (process.env.NODE_ENV === 'development') {
-    root.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    );
-  } else {
-    root.render(<App />);
-  }
+  // Load App component dynamically
+  loadApp().then(App => {
+    // Disable StrictMode in production to avoid double-rendering
+    if (process.env.NODE_ENV === 'development') {
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      );
+    } else {
+      root.render(<App />);
+    }
+  });
 };
 
-// Defer non-critical initialization
+// Defer initialization to prioritize critical rendering
 if ('requestIdleCallback' in window) {
   // @ts-ignore - TypeScript doesn't recognize requestIdleCallback
   window.requestIdleCallback(initApp, { timeout: 1000 });

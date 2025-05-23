@@ -6,16 +6,30 @@ import { TermsOfUseDialog } from '@/components/terms/TermsOfUseDialog';
 import { RouteErrorBoundary } from '@/components/error/RouteErrorBoundary';
 
 // Loading state component
-const PageLoading = React.lazy(() => import('./PageLoading'));
+const PageLoading = lazy(() => import(/* webpackChunkName: "page-loading" */ './PageLoading'));
 
-// Lazy-loaded components
-const AppLayout = lazy(() => import('@/components/common/layout/AppLayout'));
-const HomePage = lazy(() => import('@/pages/HomePage'));
-const LoginPage = lazy(() => import('@/pages/LoginPage'));
-const CreateFeedbackPage = lazy(() => import('@/pages/CreateFeedbackPage'));
-const FeedbackDetailPage = lazy(() => import('@/pages/FeedbackDetailPage'));
-const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
-const NotFound = lazy(() => import('@/pages/NotFound'));
+// Lazy-loaded layout components
+const AppLayout = lazy(() => import(/* webpackChunkName: "app-layout" */ '@/components/common/layout/AppLayout'));
+
+// Lazy-loaded page components with named chunks for better debugging
+const HomePage = lazy(() => 
+  import(/* webpackChunkName: "home-page" */ '@/pages/HomePage')
+);
+const LoginPage = lazy(() => 
+  import(/* webpackChunkName: "login-page" */ '@/pages/LoginPage')
+);
+const CreateFeedbackPage = lazy(() => 
+  import(/* webpackChunkName: "create-feedback-page" */ '@/pages/CreateFeedbackPage')
+);
+const FeedbackDetailPage = lazy(() => 
+  import(/* webpackChunkName: "feedback-detail-page" */ '@/pages/FeedbackDetailPage')
+);
+const ProfilePage = lazy(() => 
+  import(/* webpackChunkName: "profile-page" */ '@/pages/ProfilePage')
+);
+const NotFound = lazy(() => 
+  import(/* webpackChunkName: "not-found-page" */ '@/pages/NotFound')
+);
 
 // Protected route component that also checks for terms acceptance
 export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
