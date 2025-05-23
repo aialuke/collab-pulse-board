@@ -2,7 +2,7 @@
 import { defineConfig, ConfigEnv, PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { federation } from '@originjs/vite-plugin-federation';
+import federation from "@originjs/vite-plugin-federation";
 import { configurePWA } from "./src/config/vite/pwa";
 import { configureCompression } from "./src/config/vite/compression";
 import { configureBuild } from "./src/config/vite/build";

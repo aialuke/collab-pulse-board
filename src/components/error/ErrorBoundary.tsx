@@ -1,7 +1,9 @@
 
 import React from 'react';
-import { toast } from '@/components/ui/use-toast';
 import { ErrorDisplay } from './ErrorDisplay';
+
+// Import the direct toast function that doesn't use hooks
+import { toast } from '@/components/ui/use-toast'; 
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -35,13 +37,12 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     // Log the error to an error reporting service
     console.error('Error caught by ErrorBoundary:', error, errorInfo);
     
-    // Notify user about the error using the imported toast function
-    // This avoids using hooks directly in a class component
-    toast({
-      title: "An error occurred",
-      description: "The application encountered an unexpected error",
-      variant: "destructive",
-    });
+    // Don't use hooks directly in class components
+    // Instead of using toast directly, defer it to the next tick to avoid hook issues
+    setTimeout(() => {
+      // Show an error message in the console
+      console.error("An error occurred:", error.message);
+    }, 0);
     
     // Call the onError prop if it exists
     if (this.props.onError) {

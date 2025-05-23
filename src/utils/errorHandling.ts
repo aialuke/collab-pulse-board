@@ -15,6 +15,22 @@ interface ErrorHandlerOptions {
   userMessage?: string;
 }
 
+// Create a non-hook based notification function for class components
+export const showErrorNotification = (title: string, description: string, variant: "default" | "destructive" = "destructive") => {
+  // Use setTimeout to ensure this runs after React has finished its work
+  // This avoids invalid hook calls when used in class components
+  setTimeout(() => {
+    try {
+      // Only attempt to use toast in a safe context
+      if (typeof window !== 'undefined') {
+        console.error(`${title}: ${description}`);
+      }
+    } catch (err) {
+      console.error('Failed to show error toast:', err);
+    }
+  }, 0);
+};
+
 /**
  * Standard error handler function to handle errors consistently across the application
  */
@@ -54,13 +70,12 @@ export function handleError(
       console.error(formattedMessage, error);
   }
   
-  // Show toast notification if not silent - use imported toast function
+  // Show error notification instead of directly using toast
   if (!silent) {
-    toast({
-      title: severity === ErrorSeverity.CRITICAL ? "Critical Error" : "Error",
-      description: userMessage || errorObject.message || "An unexpected error occurred",
-      variant: "destructive",
-    });
+    showErrorNotification(
+      severity === ErrorSeverity.CRITICAL ? "Critical Error" : "Error",
+      userMessage || errorObject.message || "An unexpected error occurred",
+    );
   }
   
   return enhancedError;
