@@ -6,11 +6,13 @@ import { toast } from '@/hooks/use-toast';
  * Provides consistent error logging and user feedback
  */
 export async function handleApiError<T>(
-  promise: Promise<T>, 
+  promise: Promise<T> | (() => Promise<T>), 
   errorMessage: string = "An error occurred. Please try again."
 ): Promise<T> {
   try {
-    return await promise;
+    // If promise is a function, call it to get the actual Promise
+    const actualPromise = typeof promise === 'function' ? promise() : promise;
+    return await actualPromise;
   } catch (error) {
     console.error(`API Error: ${errorMessage}`, error);
     
@@ -28,12 +30,14 @@ export async function handleApiError<T>(
  * Wrapper for API calls that need toast notifications on success
  */
 export async function withSuccessToast<T>(
-  promise: Promise<T>,
+  promise: Promise<T> | (() => Promise<T>),
   successMessage: string,
   errorMessage: string = "An error occurred. Please try again."
 ): Promise<T> {
   try {
-    const result = await promise;
+    // If promise is a function, call it to get the actual Promise
+    const actualPromise = typeof promise === 'function' ? promise() : promise;
+    const result = await actualPromise;
     
     toast({
       title: "Success",

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { CreateFeedbackForm } from '@/components/feedback/form/CreateFeedbackForm';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { CreateFeedbackInput } from '@/types/feedback';
 import { createFeedback, uploadFeedbackImage } from '@/services/feedbackService';
@@ -35,8 +35,8 @@ export default function CreateFeedbackPage() {
         const formatInfo = feedback.imageUrl.split(';')[0].split(':')[1];
         const outputFormat = formatInfo === 'image/webp' ? 'webp' : 'jpeg';
         
-        // Upload the image using our new service
-        imageUrl = await uploadFeedbackImage(user.id, feedback.imageUrl, outputFormat);
+        // Upload the image using our service - fixed argument count
+        imageUrl = await uploadFeedbackImage(feedback.imageUrl, outputFormat);
       } else if (feedback.imageUrl) {
         // If it's already a URL (not base64), use it directly
         imageUrl = feedback.imageUrl;

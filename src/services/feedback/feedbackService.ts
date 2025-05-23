@@ -193,7 +193,7 @@ export async function fetchFeedbackById(id: string): Promise<FeedbackType> {
  */
 export async function createFeedback(input: CreateFeedbackInput): Promise<FeedbackType> {
   return withSuccessToast(
-    handleApiError(async () => {
+    async () => {
       const userId = (await supabase.auth.getUser()).data.user?.id;
       if (!userId) {
         throw new Error("You must be logged in to create feedback");
@@ -263,8 +263,9 @@ export async function createFeedback(input: CreateFeedbackInput): Promise<Feedba
         isUpvoted: false,
         image: data.image_url || undefined, // For backward compatibility
       };
-    }, "Failed to create feedback"),
-    "Feedback created successfully"
+    }, 
+    "Feedback created successfully",
+    "Failed to create feedback"
   );
 }
 
@@ -273,9 +274,9 @@ export async function createFeedback(input: CreateFeedbackInput): Promise<Feedba
  */
 export async function deleteFeedback(id: string): Promise<void> {
   return withSuccessToast(
-    handleApiError(async () => {
+    async () => {
       // Check if the feedback exists before attempting to delete
-      const { data: feedbackExists, error: checkError } = await supabaseDb
+      const { data: feedbackExists, error: checkError } = await supabase
         .from('feedback')
         .select('id')
         .eq('id', id)
@@ -286,7 +287,7 @@ export async function deleteFeedback(id: string): Promise<void> {
       }
       
       // Delete related upvotes first to maintain data integrity
-      const { error: upvotesError } = await supabaseDb
+      const { error: upvotesError } = await supabase
         .from('upvotes')
         .delete()
         .eq('feedback_id', id);
@@ -296,7 +297,7 @@ export async function deleteFeedback(id: string): Promise<void> {
       }
       
       // Now delete the actual feedback item
-      const { error } = await supabaseDb
+      const { error } = await supabase
         .from('feedback')
         .delete()
         .eq('id', id);
@@ -304,8 +305,9 @@ export async function deleteFeedback(id: string): Promise<void> {
       if (error) {
         throw error;
       }
-    }, "Failed to delete feedback"),
-    "Feedback deleted successfully"
+    }, 
+    "Feedback deleted successfully",
+    "Failed to delete feedback"
   );
 }
 
@@ -370,13 +372,14 @@ export async function toggleFeedbackUpvote(feedbackId: string): Promise<boolean>
  */
 export async function reportFeedback(feedbackId: string): Promise<void> {
   return withSuccessToast(
-    handleApiError(async () => {
+    async () => {
       // For now, just log the report. In a real app, this would store the report in a database
       console.log(`Feedback ${feedbackId} reported`);
       // Could be implemented as a table in the future
       return Promise.resolve();
-    }, "Failed to submit report"),
-    "Report submitted. Our team will review it."
+    },
+    "Report submitted. Our team will review it.",
+    "Failed to submit report"
   );
 }
 
@@ -385,7 +388,7 @@ export async function reportFeedback(feedbackId: string): Promise<void> {
  */
 export async function createRepost(originalPostId: string, comment: string): Promise<FeedbackType> {
   return withSuccessToast(
-    handleApiError(async () => {
+    async () => {
       // First, get the original post to copy its category
       const { data: originalPost, error: originalPostError } = await supabase
         .from('feedback')
@@ -458,8 +461,9 @@ export async function createRepost(originalPostId: string, comment: string): Pro
       } as FeedbackResponse;
 
       return mapFeedbackItem(feedbackWithData);
-    }, "Failed to create repost"),
-    "Repost created successfully"
+    },
+    "Repost created successfully",
+    "Failed to create repost"
   );
 }
 
