@@ -1,4 +1,3 @@
-
 import { defineConfig, ConfigEnv, PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -44,32 +43,20 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         shared: {
           react: {
             requiredVersion: '^18.0.0',
-            import: false,
-            shareScope: 'default',
-            shareKey: 'react',
             singleton: true,
             eager: true
           },
           'react-dom': {
             requiredVersion: '^18.0.0',
-            import: false,
-            shareScope: 'default',
-            shareKey: 'react-dom',
             singleton: true,
             eager: true
           },
           '@tanstack/react-query': {
             requiredVersion: '^5.0.0',
-            import: false,
-            shareScope: 'default',
-            shareKey: '@tanstack/react-query',
             singleton: true
           },
           'react-router-dom': {
             requiredVersion: '^6.0.0',
-            import: false,
-            shareScope: 'default',
-            shareKey: 'react-router-dom',
             singleton: true
           }
         },
