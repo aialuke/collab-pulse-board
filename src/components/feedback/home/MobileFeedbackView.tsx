@@ -20,7 +20,7 @@ interface MobileFeedbackViewProps {
   openRepostDialog: (feedback: FeedbackType) => void;
   closeRepostDialog: () => void;
   handleRepost: (id: string, comment: string) => Promise<any>;
-  handleRetry: () => Promise<void>;
+  handleRetry: () => Promise<void>; // Updated to match expected return type
   hasMore: boolean;
   sentinelRef?: React.RefCallback<HTMLDivElement>;
 }
@@ -53,14 +53,6 @@ export function MobileFeedbackView({
     setRefreshFunction(wrappedHandleRetry);
   }, [handleRetry, setRefreshFunction]);
 
-  // Create a callback to handle repost dialog opening
-  const handleOpenRepostDialog = React.useCallback((id: string) => {
-    const feedbackItem = feedback.find(item => item.id === id);
-    if (feedbackItem) {
-      openRepostDialog(feedbackItem);
-    }
-  }, [feedback, openRepostDialog]);
-
   // Function to render the appropriate content based on loading/error state
   const renderContent = () => {
     if (isLoading && feedback.length === 0) {
@@ -78,10 +70,20 @@ export function MobileFeedbackView({
           onUpvote={handleUpvote}
           onReport={handleReport}
           onDelete={handleDelete}
-          onRepost={handleOpenRepostDialog}
-          hasMore={hasMore}
-          sentinelRef={sentinelRef}
+          onRepost={(id) => {
+            const feedbackItem = feedback.find(item => item.id === id);
+            if (feedbackItem) {
+              openRepostDialog(feedbackItem);
+            }
+          }}
         />
+        
+        {/* Render sentinel for infinite scroll if needed */}
+        {hasMore && sentinelRef && (
+          <div ref={sentinelRef} className="py-4 flex justify-center">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500"></div>
+          </div>
+        )}
       </>
     ) : (
       <FeedbackEmptyState />

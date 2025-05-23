@@ -75,6 +75,13 @@ export const DesktopFeedbackView = memo(function DesktopFeedbackView({
         ) : (
           <FeedbackEmptyState />
         )}
+        
+        {/* Render sentinel for infinite scroll if needed */}
+        {hasMore && sentinelRef && (
+          <div ref={sentinelRef} className="py-4 flex justify-center">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500"></div>
+          </div>
+        )}
       </>
     );
   };

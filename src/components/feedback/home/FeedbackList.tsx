@@ -12,10 +12,11 @@ interface FeedbackListProps {
   onDelete?: (id: string) => void;
   onRepost?: (id: string) => void;
   hasMore?: boolean;
+  // Update the type to accept either a RefCallback or a RefObject
   sentinelRef?: React.RefCallback<HTMLDivElement> | React.RefObject<HTMLDivElement>;
 }
 
-// Fixed Row component that properly handles refs
+// Memoized row component for virtualized list
 const Row = memo(function Row({ 
   index, 
   style, 
@@ -37,23 +38,7 @@ const Row = memo(function Row({
   
   // Special case for the last item which contains the sentinel for infinite loading
   if (hasMore && index === feedback.length) {
-    // Create a div element that properly handles different ref types
-    return (
-      <div 
-        style={style} 
-        className="h-16 flex items-center justify-center"
-        ref={ref => {
-          // Handle both callback refs and RefObject refs
-          if (typeof sentinelRef === 'function') {
-            sentinelRef(ref);
-          } else if (sentinelRef && 'current' in sentinelRef) {
-            // RefObject case - manually set current property
-            // @ts-ignore - we know this is safe
-            sentinelRef.current = ref;
-          }
-        }}
-      />
-    );
+    return <div ref={sentinelRef} style={style} className="h-16 flex items-center justify-center" />;
   }
   
   const item = feedback[index];
@@ -93,7 +78,18 @@ export const FeedbackList = memo(function FeedbackList({
     if (listRef.current && feedback.length === 0) {
       listRef.current.scrollToItem(0);
     }
-  }, [feedback.length]);
+  }, [feedback.length === 0]);
+  
+  // Memoize props passed to Row component
+  const itemData = React.useMemo(() => ({
+    feedback,
+    onUpvote,
+    onReport,
+    onDelete,
+    onRepost,
+    hasMore,
+    sentinelRef
+  }), [feedback, onUpvote, onReport, onDelete, onRepost, hasMore, sentinelRef]);
   
   // Don't use virtualization for small lists (improves SEO and initial render)
   if (feedback.length <= 10) {
@@ -110,20 +106,7 @@ export const FeedbackList = memo(function FeedbackList({
           />
         ))}
         {hasMore && (
-          <div 
-            className="h-4" 
-            aria-hidden="true"
-            ref={ref => {
-              // Handle both callback refs and RefObject refs
-              if (typeof sentinelRef === 'function') {
-                sentinelRef(ref);
-              } else if (sentinelRef && 'current' in sentinelRef) {
-                // RefObject case - manually set current property
-                // @ts-ignore - we know this is safe
-                sentinelRef.current = ref;
-              }
-            }}
-          />
+          <div ref={sentinelRef} className="h-4" aria-hidden="true" />
         )}
       </div>
     );
@@ -160,17 +143,6 @@ export const FeedbackList = memo(function FeedbackList({
   
   // Determine list height based on viewport
   const listHeight = isMobile ? 500 : 600;
-  
-  // Memoize props passed to Row component
-  const itemData = React.useMemo(() => ({
-    feedback,
-    onUpvote,
-    onReport,
-    onDelete,
-    onRepost,
-    hasMore,
-    sentinelRef
-  }), [feedback, onUpvote, onReport, onDelete, onRepost, hasMore, sentinelRef]);
   
   return (
     <div ref={parentRef} className="w-full" style={{ height: `${listHeight}px` }}>

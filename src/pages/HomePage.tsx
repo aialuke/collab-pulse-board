@@ -1,14 +1,12 @@
 
 import React from 'react';
-import { FeedbackContainer } from '@/modules/feedback';
+import { FeedbackContainer } from '@/features/feedback/components/home/FeedbackContainer';
 import { FloatingFeedbackButton } from '@/components/feedback/FloatingFeedbackButton';
 import { RepostProvider } from '@/contexts/RepostContext';
-import { useToast } from '@/modules/ui';
+import { toast } from '@/hooks/use-toast';
 
 // Main page component with enhanced state management
 export default function HomePage() {
-  const { toast } = useToast();
-  
   return (
     <div className="w-full flex-1 flex flex-col">
       <RepostProvider onRepostSuccess={() => {

@@ -1,7 +1,7 @@
+
 import { defineConfig, ConfigEnv, PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import federation from "@originjs/vite-plugin-federation";
 import { configurePWA } from "./src/config/vite/pwa";
 import { configureCompression } from "./src/config/vite/compression";
 import { configureBuild } from "./src/config/vite/build";
@@ -9,7 +9,6 @@ import { configureDevelopment } from "./src/config/vite/development";
 import { configureServer } from "./src/config/vite/server";
 import { splitVendorChunkPlugin } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => {
@@ -17,7 +16,6 @@ export default defineConfig(({ mode }: ConfigEnv) => {
   
   return {
     server: {
-      host: "::",
       port: 8080,
       ...serverConfig
     },
@@ -30,24 +28,6 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         // This is the correct way to specify development mode
         plugins: mode !== 'production' ? [] : undefined,
       }),
-      federation({
-        name: 'host-app',
-        filename: 'remoteEntry.js',
-        // Expose modules that can be consumed by other applications
-        exposes: {
-          './AuthModule': './src/modules/auth/index.ts',
-          './FeedbackModule': './src/modules/feedback/index.ts',
-          './UIModule': './src/modules/ui/index.ts',
-        },
-        // Update shared configuration to match the expected type structure
-        shared: {
-          react: { requiredVersion: '^18.0.0' },
-          'react-dom': { requiredVersion: '^18.0.0' },
-          '@tanstack/react-query': { requiredVersion: '^5.0.0' },
-          'react-router-dom': { requiredVersion: '^6.0.0' }
-        },
-      }),
-      mode === 'development' && componentTagger(),
       mode === 'development' && configureDevelopment(),
       configurePWA(),
       ...(mode === 'production' ? configureCompression() : []),
@@ -129,14 +109,17 @@ export default defineConfig(({ mode }: ConfigEnv) => {
             }
             
             // Feature-based chunks for our own code
-            if (id.includes('/src/modules/auth/')) {
-              return 'feature-auth';
-            }
-            if (id.includes('/src/modules/feedback/')) {
+            if (id.includes('/src/components/feedback/')) {
               return 'feature-feedback';
             }
-            if (id.includes('/src/modules/ui/')) {
-              return 'feature-ui';
+            if (id.includes('/src/components/auth/')) {
+              return 'feature-auth';
+            }
+            if (id.includes('/src/components/common/')) {
+              return 'feature-common';
+            }
+            if (id.includes('/src/components/ui/')) {
+              return 'ui-shadcn';
             }
             
             // Core app files
