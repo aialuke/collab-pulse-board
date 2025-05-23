@@ -1,4 +1,3 @@
-
 import { defineConfig, ConfigEnv, PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -40,33 +39,25 @@ export default defineConfig(({ mode }: ConfigEnv) => {
           './FeedbackModule': './src/modules/feedback/index.ts',
           './UIModule': './src/modules/ui/index.ts',
         },
-        // Fix shared configuration to match the expected type format
+        // Fix shared configuration with correct property names
         shared: {
           react: { 
             requiredVersion: '^18.0.0',
-            shareConfig: { 
-              singleton: true,
-              eager: true
-            }
+            singleton: true,
+            eager: true
           },
           'react-dom': { 
-            requiredVersion: '^18.0.0', 
-            shareConfig: { 
-              singleton: true,
-              eager: true
-            }
+            requiredVersion: '^18.0.0',
+            singleton: true,
+            eager: true
           },
           '@tanstack/react-query': { 
             requiredVersion: '^5.0.0',
-            shareConfig: { 
-              singleton: true 
-            }
+            singleton: true
           },
           'react-router-dom': { 
             requiredVersion: '^6.0.0',
-            shareConfig: { 
-              singleton: true 
-            }
+            singleton: true
           }
         },
       }),
