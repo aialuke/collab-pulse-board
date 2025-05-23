@@ -1,5 +1,5 @@
 
-import { toast } from '@/components/ui/use-toast';
+import { queueErrorToast } from '@/components/error/ToastErrorHandler';
 
 export enum ErrorSeverity {
   INFO = 'info',
@@ -58,13 +58,9 @@ export function handleError(
       console.error(formattedMessage, error);
   }
   
-  // Show toast notification if not silent - use imported toast function
+  // Queue toast notification if not silent
   if (!silent) {
-    toast({
-      title: severity === ErrorSeverity.CRITICAL ? "Critical Error" : "Error",
-      description: userMessage || errorObject.message || "An unexpected error occurred",
-      variant: "destructive",
-    });
+    queueErrorToast(userMessage || errorObject.message);
   }
   
   return enhancedError;
