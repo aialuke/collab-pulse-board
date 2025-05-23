@@ -3,6 +3,7 @@ import { FeedbackType } from '@/types/feedback';
 import { toggleUpvote, reportFeedback, deleteFeedback } from '@/services/feedbackService';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCallback } from 'react';
 
 interface FeedbackActions {
   handleUpvote: (id: string) => Promise<void>;
@@ -16,7 +17,7 @@ export function useFeedbackActions(
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
 
-  const handleUpvote = async (id: string): Promise<void> => {
+  const handleUpvote = useCallback(async (id: string): Promise<void> => {
     if (!isAuthenticated) {
       toast({
         title: "Authentication required",
@@ -50,9 +51,9 @@ export function useFeedbackActions(
         variant: "destructive",
       });
     }
-  };
+  }, [isAuthenticated, toast, setFeedback]);
 
-  const handleReport = async (id: string): Promise<void> => {
+  const handleReport = useCallback(async (id: string): Promise<void> => {
     try {
       await reportFeedback(id);
       toast({
@@ -67,9 +68,9 @@ export function useFeedbackActions(
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
 
-  const handleDelete = async (id: string): Promise<void> => {
+  const handleDelete = useCallback(async (id: string): Promise<void> => {
     try {
       await deleteFeedback(id);
       
@@ -88,7 +89,7 @@ export function useFeedbackActions(
         variant: "destructive",
       });
     }
-  };
+  }, [toast, setFeedback]);
 
   return {
     handleUpvote,

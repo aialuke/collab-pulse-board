@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect, memo } from 'react';
+import React, { useRef, useEffect, memo, useMemo, useCallback } from 'react';
 import { FeedbackCardContainer } from '@/components/feedback/card/FeedbackCardContainer';
 import { FeedbackType } from '@/types/feedback';
 import { FixedSizeList as List } from 'react-window';
@@ -38,7 +38,7 @@ const Row = memo(function Row({
   
   // Special case for the last item which contains the sentinel for infinite loading
   if (hasMore && index === feedback.length) {
-    return <div ref={sentinelRef} style={style} className="h-16 flex items-center justify-center" />;
+    return <div ref={sentinelRef as React.RefCallback<HTMLDivElement>} style={style} className="h-16 flex items-center justify-center" />;
   }
   
   const item = feedback[index];
@@ -81,7 +81,7 @@ export const FeedbackList = memo(function FeedbackList({
   }, [feedback.length === 0]);
   
   // Memoize props passed to Row component
-  const itemData = React.useMemo(() => ({
+  const itemData = useMemo(() => ({
     feedback,
     onUpvote,
     onReport,
@@ -91,29 +91,12 @@ export const FeedbackList = memo(function FeedbackList({
     sentinelRef
   }), [feedback, onUpvote, onReport, onDelete, onRepost, hasMore, sentinelRef]);
   
-  // Don't use virtualization for small lists (improves SEO and initial render)
-  if (feedback.length <= 10) {
-    return (
-      <div className="space-y-4">
-        {feedback.map((item) => (
-          <FeedbackCardContainer
-            key={item.id}
-            feedback={item}
-            onUpvote={onUpvote}
-            onReport={onReport}
-            onDelete={onDelete}
-            onRepost={onRepost}
-          />
-        ))}
-        {hasMore && (
-          <div ref={sentinelRef} className="h-4" aria-hidden="true" />
-        )}
-      </div>
-    );
-  }
-  
   // Calculate item sizes based on content 
-  const getItemHeight = React.useCallback((index: number) => {
+  const getItemHeight = useCallback((index: number) => {
+    if (index >= feedback.length) {
+      return 80; // Height for sentinel element
+    }
+
     const item = feedback[index];
     // Base height for a card
     let height = 180; 
@@ -141,8 +124,30 @@ export const FeedbackList = memo(function FeedbackList({
     return height;
   }, [feedback]);
   
+  // Don't use virtualization for small lists (improves SEO and initial render)
+  if (feedback.length <= 10) {
+    return (
+      <div className="space-y-4">
+        {feedback.map((item) => (
+          <FeedbackCardContainer
+            key={item.id}
+            feedback={item}
+            onUpvote={onUpvote}
+            onReport={onReport}
+            onDelete={onDelete}
+            onRepost={onRepost}
+          />
+        ))}
+        {hasMore && sentinelRef && (
+          <div ref={sentinelRef as React.RefCallback<HTMLDivElement>} className="h-4" aria-hidden="true" />
+        )}
+      </div>
+    );
+  }
+  
   // Determine list height based on viewport
-  const listHeight = isMobile ? 500 : 600;
+  const listHeight = useMemo(() => isMobile ? 500 : 600, [isMobile]);
+  const itemCount = useMemo(() => hasMore ? feedback.length + 1 : feedback.length, [hasMore, feedback.length]);
   
   return (
     <div ref={parentRef} className="w-full" style={{ height: `${listHeight}px` }}>
@@ -150,7 +155,7 @@ export const FeedbackList = memo(function FeedbackList({
         ref={listRef}
         height={listHeight}
         width="100%"
-        itemCount={hasMore ? feedback.length + 1 : feedback.length}
+        itemCount={itemCount}
         itemSize={getItemHeight}
         overscanCount={2} // Number of items to render above/below visible area
         itemData={itemData}

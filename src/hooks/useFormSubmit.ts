@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 export interface FormSubmitOptions<TData, TResponse> {
@@ -30,7 +30,7 @@ export function useFormSubmit<TData, TResponse = unknown>({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = async (data: TData): Promise<TResponse> => {
+  const handleSubmit = useCallback(async (data: TData): Promise<TResponse> => {
     setIsSubmitting(true);
     
     try {
@@ -59,10 +59,10 @@ export function useFormSubmit<TData, TResponse = unknown>({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [onSubmit, onSuccess, onError, successMessage, errorMessage, toast]);
 
-  return {
+  return useMemo(() => ({
     isSubmitting,
     handleSubmit,
-  };
+  }), [isSubmitting, handleSubmit]);
 }

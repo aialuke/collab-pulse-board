@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 
 interface UsePaginationOptions<T = unknown> {
   pageSize?: number;
@@ -68,7 +68,8 @@ export function usePagination<T>({
     };
   }, []);
 
-  return {
+  // Memoize the return value to prevent unnecessary re-renders
+  const result = useMemo(() => ({
     page,
     items,
     setItems,
@@ -82,5 +83,16 @@ export function usePagination<T>({
     reset,
     total,
     setTotal
-  };
+  }), [
+    page,
+    items,
+    isLoading,
+    hasMore,
+    error,
+    sentinelRef,
+    reset,
+    total
+  ]);
+
+  return result;
 }

@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { FeedbackType } from '@/types/feedback';
 import { fetchFeedback } from '@/services/feedbackService';
@@ -23,13 +23,16 @@ export function useFeedbackData(): UseFeedbackDataResult {
   const [retryCount, setRetryCount] = useState(0);
   const { toast } = useToast();
 
+  // Memoize query key to prevent unnecessary refetches
+  const queryKey = useMemo(() => ['feedback', retryCount], [retryCount]);
+
   const { 
     data, 
     isLoading, 
     error,
     refetch 
   } = useQuery({
-    queryKey: ['feedback', retryCount],
+    queryKey,
     queryFn: async () => {
       try {
         return await fetchFeedback();
@@ -73,7 +76,8 @@ export function useFeedbackData(): UseFeedbackDataResult {
     setRetryCount(prev => prev + 1);
   }, []);
 
-  return {
+  // Memoize the return value
+  const result = useMemo(() => ({
     feedback,
     setFeedback,
     filteredFeedback,
@@ -82,5 +86,14 @@ export function useFeedbackData(): UseFeedbackDataResult {
     loadError,
     handleRetry,
     loadFeedback
-  };
+  }), [
+    feedback,
+    filteredFeedback,
+    isLoading,
+    loadError,
+    handleRetry,
+    loadFeedback
+  ]);
+
+  return result;
 }

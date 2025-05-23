@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { FeedbackCard } from './FeedbackCard';
 import { FeedbackType } from '@/types/feedback';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,7 +12,8 @@ interface FeedbackCardContainerProps {
   onRepost?: (id: string) => void;
 }
 
-export function FeedbackCardContainer({
+// Memoize the component to prevent unnecessary re-renders
+export const FeedbackCardContainer = memo(function FeedbackCardContainer({
   feedback,
   onUpvote,
   onReport,
@@ -27,7 +28,7 @@ export function FeedbackCardContainer({
   const isAuthor = user?.id === feedback.author.id;
   const isOwnFeedback = isAuthor;
 
-  const handleUpvote = () => {
+  const handleUpvote = useCallback(() => {
     // Don't process upvotes for reposts
     if (feedback.isRepost) return;
     
@@ -37,12 +38,12 @@ export function FeedbackCardContainer({
     setIsUpvoted(true);
     setUpvotes(prev => prev + 1);
     onUpvote(feedback.id);
-  };
+  }, [feedback.id, feedback.isRepost, isOwnFeedback, isUpvoted, onUpvote]);
 
-  const handleRepostClick = () => {
+  const handleRepostClick = useCallback(() => {
     if (!onRepost) return;
     onRepost(feedback.id);
-  };
+  }, [feedback.id, onRepost]);
 
   // Determine if this post has an image to adjust min-height accordingly
   const hasImage = !!feedback.imageUrl || !!feedback.image;
@@ -68,4 +69,4 @@ export function FeedbackCardContainer({
       />
     </div>
   );
-}
+});

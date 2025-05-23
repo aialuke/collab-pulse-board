@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useMemo } from 'react';
 import { usePagination } from './usePagination';
 import { FeedbackType } from '@/types/feedback';
 import { useToast } from './use-toast';
@@ -12,6 +12,16 @@ interface UsePaginatedFeedbackOptions {
   staleTime?: number;
 }
 
+interface UsePaginatedFeedbackResult {
+  feedback: FeedbackType[];
+  isLoading: boolean;
+  error: string | null;
+  hasMore: boolean;
+  sentinelRef: (node: HTMLElement | null) => void;
+  refresh: () => Promise<void>;
+  total: number;
+}
+
 /**
  * Enhanced hook for paginated feedback with performance optimizations
  */
@@ -19,7 +29,7 @@ export function usePaginatedFeedback({
   pageSize = 10,
   initialData,
   staleTime = 60 * 1000 // 1 minute default stale time
-}: UsePaginatedFeedbackOptions = {}) {
+}: UsePaginatedFeedbackOptions = {}): UsePaginatedFeedbackResult {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const loadingRef = useRef<boolean>(false);
@@ -39,8 +49,8 @@ export function usePaginatedFeedback({
     setTotal
   } = usePagination<FeedbackType>({ pageSize, initialData });
 
-  // Create a query key that includes all dependencies for proper cache management
-  const queryKey = ['feedback', page, pageSize];
+  // Create a memoized query key that includes all dependencies for proper cache management
+  const queryKey = useMemo(() => ['feedback', page, pageSize], [page, pageSize]);
 
   // Use React Query for efficient data fetching and caching
   const { 
@@ -80,11 +90,16 @@ export function usePaginatedFeedback({
     // Only fetch if we have a valid page
     enabled: page > 0,
     // Initialize with previous data if available
-    initialData: page === 1 && initialData ? {
-      items: initialData,
-      hasMore: true,
-      total: initialData.length
-    } : undefined,
+    initialData: useMemo(() => {
+      if (page === 1 && initialData) {
+        return {
+          items: initialData,
+          hasMore: true,
+          total: initialData.length
+        };
+      }
+      return undefined;
+    }, [page, initialData]),
     meta: {
       onError: (error: Error) => {
         setError('Failed to load feedback. Please try again.');
@@ -151,14 +166,22 @@ export function usePaginatedFeedback({
     return queryClient.invalidateQueries({ queryKey: ['feedback'] });
   }, [reset, queryClient]);
   
-  return {
+  // Memoize the return value
+  return useMemo(() => ({
     feedback,
     isLoading,
     error,
     hasMore,
     sentinelRef,
     refresh,
-    // Add total for displaying counts
     total: data?.total || 0
-  };
+  }), [
+    feedback, 
+    isLoading, 
+    error, 
+    hasMore, 
+    sentinelRef, 
+    refresh, 
+    data?.total
+  ]);
 }

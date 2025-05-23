@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { FeedbackType } from '@/types/feedback';
 
 export function useFilteredFeedback(
@@ -12,13 +12,19 @@ export function useFilteredFeedback(
   },
   setFilteredFeedback: React.Dispatch<React.SetStateAction<FeedbackType[]>>
 ) {
-  useEffect(() => {
+  // Memoize the filtered and sorted result
+  const sortedFeedback = useMemo(() => {
     // Apply sorting only, without filtering
     let result = [...feedback];
     
     // Sort by date (newest first)
     result.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     
-    setFilteredFeedback(result);
-  }, [feedback, setFilteredFeedback]);
+    return result;
+  }, [feedback]);
+
+  // Update filtered feedback when the sorted result changes
+  useEffect(() => {
+    setFilteredFeedback(sortedFeedback);
+  }, [sortedFeedback, setFilteredFeedback]);
 }
